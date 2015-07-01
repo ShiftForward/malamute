@@ -9,7 +9,7 @@ scalacOptions := Seq("-unchecked", "-encoding", "utf8")
 libraryDependencies ++= {
   val akkaV = "2.3.11"
   val sprayV = "1.3.3"
-  val specsV = "2.3.11"
+  val specsV = "2.4.17"
   Seq(
     "io.spray"            %%  "spray-can"      % sprayV,
     "io.spray"            %%  "spray-routing"  % sprayV,

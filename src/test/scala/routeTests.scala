@@ -12,16 +12,9 @@ import StatusCodes._
 class routeTests extends Specification with Specs2RouteTest with SpraySampleService {
   def actorRefFactory = system
 
-  val smallRoute =
-    get {
-        path("ping") {
-          complete("pong")
-        }
-    }
-
   "The service" should {
     "return a 'pong' response for GET requests to /ping" in {
-      Get("/ping") ~> smallRoute ~> check {
+      Get("/ping") ~> spraysampleRoute ~> check {
         status === OK
         responseAs[String] === "pong"
       }

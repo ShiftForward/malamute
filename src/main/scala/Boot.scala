@@ -20,7 +20,7 @@ object Boot extends App {
   implicit val dispatcher = system.dispatcher
 
   // create and start our service actor
-  val service = system.actorOf(Props[MalamuteBaseActor], "base-service")
+  val service = system.actorOf(Props[DeployLoggerActor], "base-service")
 
   implicit val timeout = Timeout(5.seconds)
   // start a new HTTP server on port 8000 with our service actor as the handler

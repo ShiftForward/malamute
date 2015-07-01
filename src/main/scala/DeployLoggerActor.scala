@@ -5,7 +5,7 @@ package org.shiftforward
 
 import akka.actor.{ActorLogging, Actor}
 
-class MalamuteBaseActor extends Actor with MalamuteBaseService with ActorLogging {
+class DeployLoggerActor extends Actor with DeployLoggerService with ActorLogging {
   def actorRefFactory = context
-  def receive = runRoute(malamuteBaseRoute)
+  def receive = runRoute(deployLoggerRoute)
 }

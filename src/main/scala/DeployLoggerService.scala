@@ -6,8 +6,8 @@ package org.shiftforward
 import spray.routing._
 
 
-trait MalamuteBaseService extends HttpService {
-  val malamuteBaseRoute = {
+trait DeployLoggerService extends HttpService {
+  val deployLoggerRoute = {
       path ("ping") {
         get {
           complete("pong")

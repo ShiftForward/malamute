@@ -9,12 +9,12 @@ import spray.testkit.Specs2RouteTest
 import spray.http._
 import StatusCodes._
 
-class RouteTests extends Specification with Specs2RouteTest with MalamuteBaseService {
+class DeployLoggerRouteSpec extends Specification with Specs2RouteTest with DeployLoggerService {
   def actorRefFactory = system
 
-  "The service" should {
+  "The deployLoggerService" should {
     "return a 'pong' response for GET requests to /ping" in {
-      Get("/ping") ~> malamuteBaseRoute ~> check {
+      Get("/ping") ~> deployLoggerRoute ~> check {
         status === OK
         responseAs[String] === "pong"
       }

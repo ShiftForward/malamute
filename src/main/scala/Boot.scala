@@ -14,11 +14,14 @@ import scala.io.StdIn
 
 object Boot extends App {
 
-  // create our actor system with the name smartjava
+  // we need an ActorSystem to host our application in
   implicit val system = ActorSystem("shiftforward")
 
-  val service= system.actorOf(Props[SpraySampleActor], "spray-sample-service")
-  IO(Http) ! Http.Bind(service, interface = "localhost", port = 8080)
+  // create and start our service actor
+  val service = system.actorOf(Props[SpraySampleActor], "demo-service")
 
-  println("Running on localhost:8080")
+  implicit val timeout = Timeout(5.seconds)
+  // start a new HTTP server on port 8080 with our service actor as the handler
+  IO(Http) ? Http.Bind(service, interface = "localhost", port = 8000)
+  println("Running on localhost - port 8000")
 }

@@ -2,14 +2,13 @@
  * Created by JP on 30/06/2015.
  */
 
-package org.shiftforward
+package eu.shiftforward
 
 import akka.actor.Props
 import org.specs2.mutable.Specification
-import spray.testkit.Specs2RouteTest
-import spray.http._
-import StatusCodes._
+import spray.http.StatusCodes._
 import spray.httpx.SprayJsonSupport._
+import spray.testkit.Specs2RouteTest
 
 class DeployLoggerRouteSpec extends Specification with Specs2RouteTest with DeployLoggerService {
 

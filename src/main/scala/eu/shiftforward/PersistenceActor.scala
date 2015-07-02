@@ -1,9 +1,10 @@
 /**
  * Created by JP on 02/07/2015.
  */
-package org.shiftforward
+package eu.shiftforward
 
 import akka.actor.Actor
+
 import scala.collection.mutable
 import scala.compat.Platform._
 
@@ -49,6 +50,10 @@ class MemoryPersistenceActor extends PersistenceActor {
   }
 
   override def addDeploy(name: String, deploy: Deploy): Deploy = {
+    val proj: Project = (MemoryPersistenceActor.allProjects find (_.name == name)).get
+    val newproj = proj.copy(deploys = Some(proj.deploys.getOrElse(List()) :+ deploy))
+    MemoryPersistenceActor.allProjects -= proj
+    MemoryPersistenceActor.allProjects += newproj
     deploy
   }
 }

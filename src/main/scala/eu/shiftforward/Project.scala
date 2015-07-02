@@ -1,9 +1,10 @@
 /**
  * Created by JP on 01/07/2015.
  */
-package org.shiftforward
+package eu.shiftforward
 
-import spray.json.{ RootJsonFormat, DefaultJsonProtocol }
+import spray.json.{DefaultJsonProtocol, RootJsonFormat}
+
 import scala.compat.Platform.currentTime
 
 case class Project(name: String, description: String, timestamp: Option[Long] = Some(currentTime), deploys: Option[List[Deploy]] = Some(List()))

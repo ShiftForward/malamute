@@ -2,16 +2,16 @@
  * Created by JP on 30/06/2015.
  */
 
-package org.shiftforward
+package eu.shiftforward
 
-import akka.actor.{ ActorSystem, Props }
+import akka.actor.{ActorSystem, Props}
 import akka.io.IO
 import akka.pattern.ask
 import akka.util.Timeout
 import spray.can.Http
 
 import scala.concurrent.duration._
-import scala.util.{ Failure, Success }
+import scala.util.{Failure, Success}
 
 object Boot extends App {
 

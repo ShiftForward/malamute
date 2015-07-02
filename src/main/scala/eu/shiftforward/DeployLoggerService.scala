@@ -1,16 +1,16 @@
 /**
  * Created by JP on 30/06/2015.
  */
-package org.shiftforward
+package eu.shiftforward
 
 import akka.actor.ActorRef
+import akka.pattern.ask
 import akka.util.Timeout
 import spray.httpx.SprayJsonSupport._
 import spray.routing.HttpService
+
 import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.util.{ Failure, Success }
-import akka.pattern.ask
 import scala.concurrent.duration._
 
 trait DeployLoggerService extends HttpService {

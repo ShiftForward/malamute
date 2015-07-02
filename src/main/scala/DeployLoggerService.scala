@@ -3,6 +3,7 @@
  */
 package org.shiftforward
 
+
 import spray.json.JsonParser
 import spray.routing.HttpService
 import spray.httpx.SprayJsonSupport._
@@ -11,7 +12,10 @@ import scala.compat.Platform.currentTime
 import org.json4s._
 import org.json4s.native.Serialization
 import org.json4s.native.Serialization.{ read, write, writePretty }
-
+import scala.concurrent.Future
+import scala.concurrent.duration._
+import scala.util.{Failure, Success}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 trait DeployLoggerService extends HttpService {
 
@@ -26,10 +30,15 @@ trait DeployLoggerService extends HttpService {
       path("project") {
         post {
           entity(as[Project]) { proj =>
-            allProjects += proj
             val projFinal = proj.copy(timestamp = Some(currentTime))
-            println("New project: " + projFinal.name)
-            complete(projFinal)
+            val res: Future[Project] = Future {
+              allProjects += projFinal
+              projFinal
+            }
+            onComplete(res) {
+              case Success(proj) => complete(proj)
+              case Failure(ex)   => complete(ex.getMessage)
+            }
           }
         } ~
           get {
@@ -39,8 +48,15 @@ trait DeployLoggerService extends HttpService {
       } ~
       path("project" / Rest) { name =>
           delete {
-              println(s"Deleting customer with id $name")
-              complete("done")
+            val res: Future[Project] = Future {
+               val elem: Project = (allProjects find (_.name == name)).get
+               allProjects -= elem
+               elem
+            }
+            onComplete(res) {
+              case Success(proj) => complete(proj)
+              case Failure(ex)    => complete(ex.getMessage)
+            }
           }
       }
   }

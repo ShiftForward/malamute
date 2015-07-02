@@ -3,7 +3,7 @@
  */
 package org.shiftforward
 
-import akka.actor.{ActorLogging, Actor}
+import akka.actor.{ ActorLogging, Actor }
 
 class DeployLoggerActor extends Actor with DeployLoggerService with ActorLogging {
   def actorRefFactory = context

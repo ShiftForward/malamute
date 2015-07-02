@@ -3,19 +3,16 @@
  */
 package org.shiftforward
 
-
-import spray.json.JsonParser
-import spray.routing.HttpService
+import org.json4s._
+import org.json4s.native.Serialization.write
+import spray.http.MediaTypes._
 import spray.httpx.SprayJsonSupport._
+import spray.routing.HttpService
 import scala.collection.mutable
 import scala.compat.Platform.currentTime
-import org.json4s._
-import org.json4s.native.Serialization
-import org.json4s.native.Serialization.{ read, write, writePretty }
-import scala.concurrent.Future
-import scala.concurrent.duration._
-import scala.util.{Failure, Success}
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+import scala.util.{ Failure, Success }
 
 trait DeployLoggerService extends HttpService {
 
@@ -37,27 +34,29 @@ trait DeployLoggerService extends HttpService {
             }
             onComplete(res) {
               case Success(proj) => complete(proj)
-              case Failure(ex)   => complete(ex.getMessage)
+              case Failure(ex) => complete(ex.getMessage)
             }
           }
         } ~
           get {
-            implicit val formats = DefaultFormats + FieldSerializer[Project]()
-            complete(write(allProjects))
+            respondWithMediaType(`application/json`) {
+              implicit val formats = DefaultFormats + FieldSerializer[Project]()
+              complete(write(allProjects))
+            }
           }
       } ~
       path("project" / Rest) { name =>
-          delete {
-            val res: Future[Project] = Future {
-               val elem: Project = (allProjects find (_.name == name)).get
-               allProjects -= elem
-               elem
-            }
-            onComplete(res) {
-              case Success(proj) => complete(proj)
-              case Failure(ex)    => complete(ex.getMessage)
-            }
+        delete {
+          val res: Future[Project] = Future {
+            val elem: Project = (allProjects find (_.name == name)).get
+            allProjects -= elem
+            elem
           }
+          onComplete(res) {
+            case Success(proj) => complete(proj)
+            case Failure(ex) => complete(ex.getMessage)
+          }
+        }
       }
   }
 }

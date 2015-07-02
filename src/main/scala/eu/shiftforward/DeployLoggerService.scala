@@ -28,7 +28,7 @@ trait DeployLoggerService extends HttpService {
       }
     } ~ path("project") {
         post {
-          entity(as[Project]) { proj =>
+          entity(as[SimpleProject]) { proj =>
             complete((actorPersistence ? SaveProject(proj)).mapTo[Project])
           }
         } ~
@@ -36,16 +36,16 @@ trait DeployLoggerService extends HttpService {
             complete((actorPersistence ? GetProject).mapTo[List[Project]])
           }
       } ~
-      path("project" / Rest ) { name =>
-        delete {
-          complete((actorPersistence ? DeleteProject(name)).mapTo[Project])
+      path("project" / Segment / "deploy") { name =>
+        post {
+          entity(as[SimpleDeploy]) { deploy =>
+            complete((actorPersistence ? AddDeploy(name, deploy)).mapTo[Deploy])
+         }
         }
       } ~
-      path("project" / Rest / "deploy") { name =>
-        post {
-          entity(as[Deploy]) { deploy =>
-            complete((actorPersistence ? AddDeploy(name,deploy)).mapTo[Project])
-          }
+      delete{
+        path ("project" / Rest ) { name =>
+          complete((actorPersistence ? DeleteProject(name)).mapTo[Project])
         }
       }
   }

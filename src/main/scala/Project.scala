@@ -6,8 +6,14 @@ package org.shiftforward
 import spray.json.{ RootJsonFormat, DefaultJsonProtocol }
 import scala.compat.Platform.currentTime
 
-case class Project(name: String, description: String, timestamp: Option[Long] = Some(currentTime))
+case class Project(name: String, description: String, timestamp: Option[Long] = Some(currentTime), deploys: Option[List[Deploy]] = Some(List()))
+
+case class Deploy(user: String,  timestamp: Option[Long] = Some(currentTime), commit: String)
 
 object Project extends DefaultJsonProtocol {
-  implicit val projFormat: RootJsonFormat[Project] = jsonFormat3(Project.apply)
+  implicit val projFormat: RootJsonFormat[Project] = jsonFormat4(Project.apply)
+}
+
+object Deploy extends DefaultJsonProtocol {
+  implicit val deployFormat: RootJsonFormat[Deploy] = jsonFormat3(Deploy.apply)
 }

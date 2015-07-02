@@ -4,17 +4,19 @@
 
 package org.shiftforward
 
-import org.json4s.{ FieldSerializer, DefaultFormats }
-import org.json4s.JsonAST.JArray
+import akka.actor.Props
 import org.specs2.mutable.Specification
 import spray.testkit.Specs2RouteTest
 import spray.http._
 import StatusCodes._
 import spray.httpx.SprayJsonSupport._
-import org.json4s.native.Serialization.{ read, write, writePretty }
 
 class DeployLoggerRouteSpec extends Specification with Specs2RouteTest with DeployLoggerService {
+
   def actorRefFactory = system
+
+  def actorPersistence = system.actorOf(Props[TestPersistenceActor])
+
 
   "The deployLoggerService" should {
     "return a 'pong' response for GET requests to /ping" in {
@@ -23,8 +25,7 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest with Depl
         responseAs[String] === "pong"
       }
     }
-  }
-  "The deployLoggerService" should {
+
     "return a 'JSON obj Project' response for POST requests to /project" in {
       Post("/project", Project("TestProj", "Proj Description Test")) ~> deployLoggerRoute ~> check {
         status === OK
@@ -33,8 +34,7 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest with Depl
         responseAs[Project].timestamp must beSome
       }
     }
-  }
-  "The deployLoggerService" should {
+
     "return a 'JSON Array of Project' response for GET requests to /project" in {
       Post("/project", Project("TestProj", "Proj Description Test")) ~> deployLoggerRoute ~> check {
         status === OK
@@ -50,12 +50,10 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest with Depl
       }
       Get("/project") ~> deployLoggerRoute ~> check {
         status === OK
-        implicit val formats = DefaultFormats + FieldSerializer[Project]()
-        responseAs[Array[Project]].size must beEqualTo(2)
+        responseAs[List[Project]].length must beEqualTo(2)
       }
     }
-  }
-  "The deployLoggerService" should {
+
     "return a 'JSON Obj of Project' response for DELETE requests to /project/projname" in {
       Post("/project", Project("TestProj", "Proj Description Test")) ~> deployLoggerRoute ~> check {
         status === OK
@@ -71,8 +69,7 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest with Depl
       }
       Get("/project") ~> deployLoggerRoute ~> check {
         status === OK
-        implicit val formats = DefaultFormats + FieldSerializer[Project]()
-        responseAs[Array[Project]].size must beEqualTo(2)
+        responseAs[List[Project]].length must beEqualTo(2)
       }
       Delete("/project/TestProj1") ~> deployLoggerRoute ~> check {
         status === OK
@@ -82,8 +79,7 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest with Depl
       }
       Get("/project") ~> deployLoggerRoute ~> check {
         status === OK
-        implicit val formats = DefaultFormats + FieldSerializer[Project]()
-        responseAs[Array[Project]].size must beEqualTo(1)
+        responseAs[List[Project]].length must beEqualTo(1)
       }
     }
   }

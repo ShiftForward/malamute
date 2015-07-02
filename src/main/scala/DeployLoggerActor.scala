@@ -3,9 +3,10 @@
  */
 package org.shiftforward
 
-import akka.actor.{ ActorLogging, Actor }
+import akka.actor.{Props, ActorLogging, Actor}
 
 class DeployLoggerActor extends Actor with DeployLoggerService with ActorLogging {
   def actorRefFactory = context
+  def actorPersistence = context.actorOf(Props[MemoryPersistenceActor])
   def receive = runRoute(deployLoggerRoute)
 }

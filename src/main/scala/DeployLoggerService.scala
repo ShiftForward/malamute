@@ -3,58 +3,48 @@
  */
 package org.shiftforward
 
-import org.json4s._
-import org.json4s.native.Serialization.write
-import spray.http.MediaTypes._
+import akka.actor.ActorRef
+import akka.util.Timeout
 import spray.httpx.SprayJsonSupport._
 import spray.routing.HttpService
 import scala.collection.mutable
-import scala.compat.Platform.currentTime
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 import scala.util.{ Failure, Success }
+import akka.pattern.ask
+import scala.concurrent.duration._
 
 trait DeployLoggerService extends HttpService {
 
   val allProjects = mutable.Set[Project]()
+
+  def actorPersistence: ActorRef
+
+  implicit val timeout = Timeout(5.seconds)
 
   val deployLoggerRoute = {
     path("ping") {
       get {
         complete("pong")
       }
-    } ~
-      path("project") {
+    } ~ path("project") {
         post {
           entity(as[Project]) { proj =>
-            val projFinal = proj.copy(timestamp = Some(currentTime))
-            val res: Future[Project] = Future {
-              allProjects += projFinal
-              projFinal
-            }
-            onComplete(res) {
-              case Success(proj) => complete(proj)
-              case Failure(ex) => complete(ex.getMessage)
-            }
+            complete((actorPersistence ? SaveProject(proj)).mapTo[Project])
           }
         } ~
           get {
-            respondWithMediaType(`application/json`) {
-              implicit val formats = DefaultFormats + FieldSerializer[Project]()
-              complete(write(allProjects))
-            }
+            complete((actorPersistence ? GetProject).mapTo[List[Project]])
           }
       } ~
-      path("project" / Rest) { name =>
+      path("project" / Rest ) { name =>
         delete {
-          val res: Future[Project] = Future {
-            val elem: Project = (allProjects find (_.name == name)).get
-            allProjects -= elem
-            elem
-          }
-          onComplete(res) {
-            case Success(proj) => complete(proj)
-            case Failure(ex) => complete(ex.getMessage)
+          complete((actorPersistence ? DeleteProject(name)).mapTo[Project])
+        }
+      } ~
+      path("project" / Rest / "deploy") { name =>
+        post {
+          entity(as[Deploy]) { deploy =>
+            complete((actorPersistence ? AddDeploy(name,deploy)).mapTo[Project])
           }
         }
       }

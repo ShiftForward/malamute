@@ -19,6 +19,7 @@ trait DeployLoggerService extends HttpService {
 
   implicit val timeout = Timeout(5.seconds)
 
+
   val deployLoggerRoute = {
     path("ping") {
       get {
@@ -31,19 +32,22 @@ trait DeployLoggerService extends HttpService {
         }
       } ~
         get {
-          complete((actorPersistence ? GetProject).mapTo[List[Project]])
+          complete((actorPersistence ? GetProjects).mapTo[List[Project]])
         }
     } ~
       path("project" / Segment / "deploy") { name =>
         post {
           entity(as[SimpleDeploy]) { deploy =>
-            complete((actorPersistence ? AddDeploy(name, deploy)).mapTo[Deploy])
+            complete((actorPersistence ? AddDeploy(name, deploy)).mapTo[Option[Deploy]])
           }
         }
       } ~
-      delete {
-        path("project" / Rest) { name =>
+      path("project" / Rest) { name =>
+        delete {
           complete((actorPersistence ? DeleteProject(name)).mapTo[Option[Project]])
+        } ~
+        get {
+          complete((actorPersistence ? GetProject(name)).mapTo[Option[Project]])
         }
       }
   }

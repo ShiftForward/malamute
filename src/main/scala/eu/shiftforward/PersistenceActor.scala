@@ -15,53 +15,64 @@ trait PersistenceActor extends Actor {
 
   def deleteProject(name: String): Option[Project]
 
-  def addDeploy(name: String, deploy: SimpleDeploy): Deploy
+  def addDeploy(name: String, deploy: SimpleDeploy): Option[Deploy]
+
+  def getDeploy(name: String): Option[Project]
 
   override def receive: Receive = {
     case SaveProject(project) =>
       sender() ! saveProject(project)
-    case GetProject =>
+    case GetProjects =>
       sender() ! getProjects
     case DeleteProject(name) =>
       sender() ! deleteProject(name)
     case AddDeploy(name, deploy) =>
       sender() ! addDeploy(name, deploy)
+    case GetProject(name) =>
+      sender() ! getDeploy(name)
   }
-}
-
-object MemoryPersistenceActor {
-  val allProjects = mutable.Set[Project]()
 }
 
 class MemoryPersistenceActor extends PersistenceActor {
 
+  val allProjects = mutable.Set[Project]()
+
   override def saveProject(project: SimpleProject): Project = {
     val proj = Project(project.name, project.description, currentTime, List())
-    MemoryPersistenceActor.allProjects += proj
+    allProjects += proj
     proj
   }
 
-  override def getProjects: List[Project] = MemoryPersistenceActor.allProjects.toList
+  override def getProjects: List[Project] = allProjects.toList
 
   override def deleteProject(name: String): Option[Project] = {
-    val proj: Option[Project] = (MemoryPersistenceActor.allProjects find (_.name == name))
-    proj.foreach(MemoryPersistenceActor.allProjects -= _)
+    val proj = (allProjects find (_.name == name))
+    proj.foreach(allProjects -= _)
     proj
   }
 
-  override def addDeploy(name: String, deploy: SimpleDeploy): Deploy = {
-    val proj: Project = (MemoryPersistenceActor.allProjects find (_.name == name)).get
-    val newDeploy = Deploy(deploy.user, currentTime, deploy.commit, deploy.observations)
-    val newproj = proj.copy(deploys = proj.deploys :+ newDeploy)
-    MemoryPersistenceActor.allProjects -= proj
-    MemoryPersistenceActor.allProjects += newproj
-    newDeploy
+  override def addDeploy(name: String, deploy: SimpleDeploy): Option[Deploy] = {
+    val proj: Option[Project] = (allProjects find (_.name == name))
+    proj.map { p: Project =>
+      val newDeploy = Deploy(deploy.user, currentTime, deploy.commit, deploy.observations)
+      val newproj = p.copy(deploys = p.deploys :+ newDeploy)
+      allProjects -= p
+      allProjects += newproj
+      newDeploy
+    }
+  }
+
+  override def getDeploy(name: String): Option[Project] = {
+    val proj: Option[Project] = (allProjects find (_.name == name))
+    proj.map { p: Project => p }
   }
 }
 
 case class SaveProject(project: SimpleProject)
 
-case class GetProject()
+case class GetProjects()
+
+case class GetProject(name: String)
 
 case class DeleteProject(name: String)
 

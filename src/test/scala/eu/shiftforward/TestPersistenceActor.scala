@@ -1,8 +1,8 @@
-/**
- * Created by JP on 02/07/2015.
- */
 package eu.shiftforward
 
-class TestPersistenceActor extends MemoryPersistenceActor {
+/**
+ * Created by JP on 03/07/2015.
+ */
+class TestPersistenceActor extends MemoryPersistenceActor{
 
 }

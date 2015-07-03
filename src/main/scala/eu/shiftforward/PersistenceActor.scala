@@ -7,13 +7,13 @@ import akka.actor.Actor
 import scala.collection.mutable
 import scala.compat.Platform._
 
-trait PersistenceActor extends Actor{
+trait PersistenceActor extends Actor {
 
   def saveProject(project: SimpleProject): Project
 
-  def getProject: List[Project]
+  def getProjects: List[Project]
 
-  def deleteProject(name: String): Project
+  def deleteProject(name: String): Option[Project]
 
   def addDeploy(name: String, deploy: SimpleDeploy): Deploy
 
@@ -21,38 +21,38 @@ trait PersistenceActor extends Actor{
     case SaveProject(project) =>
       sender() ! saveProject(project)
     case GetProject =>
-      sender() ! getProject
+      sender() ! getProjects
     case DeleteProject(name) =>
       sender() ! deleteProject(name)
-    case AddDeploy(name,deploy) =>
-      sender() ! addDeploy(name,deploy)
+    case AddDeploy(name, deploy) =>
+      sender() ! addDeploy(name, deploy)
   }
 }
 
-object MemoryPersistenceActor{
+object MemoryPersistenceActor {
   val allProjects = mutable.Set[Project]()
 }
 
 class MemoryPersistenceActor extends PersistenceActor {
 
   override def saveProject(project: SimpleProject): Project = {
-    val proj = Project(project.name,project.description,currentTime,List())
-    MemoryPersistenceActor.allProjects+=proj
+    val proj = Project(project.name, project.description, currentTime, List())
+    MemoryPersistenceActor.allProjects += proj
     proj
   }
 
-  override def getProject: List[Project] = MemoryPersistenceActor.allProjects.toList
+  override def getProjects: List[Project] = MemoryPersistenceActor.allProjects.toList
 
-  override def deleteProject(name: String): Project = {
-    val proj: Project = (MemoryPersistenceActor.allProjects find (_.name == name)).get
-    MemoryPersistenceActor.allProjects -= proj
+  override def deleteProject(name: String): Option[Project] = {
+    val proj: Option[Project] = (MemoryPersistenceActor.allProjects find (_.name == name))
+    proj.foreach(MemoryPersistenceActor.allProjects -= _)
     proj
   }
 
   override def addDeploy(name: String, deploy: SimpleDeploy): Deploy = {
     val proj: Project = (MemoryPersistenceActor.allProjects find (_.name == name)).get
-    val newDeploy = Deploy(deploy.user,currentTime,deploy.commit,deploy.observations)
-    val newproj = proj.copy(deploys =  proj.deploys :+ newDeploy)
+    val newDeploy = Deploy(deploy.user, currentTime, deploy.commit, deploy.observations)
+    val newproj = proj.copy(deploys = proj.deploys :+ newDeploy)
     MemoryPersistenceActor.allProjects -= proj
     MemoryPersistenceActor.allProjects += newproj
     newDeploy

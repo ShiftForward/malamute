@@ -9,8 +9,7 @@ import org.specs2.mutable.Specification
 import spray.http.StatusCodes._
 import spray.httpx.SprayJsonSupport._
 import spray.testkit.Specs2RouteTest
-
-import scala.Long
+import scala.concurrent.ExecutionContext
 
 class DeployLoggerRouteSpec extends Specification with Specs2RouteTest with DeployLoggerService {
 
@@ -18,6 +17,7 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest with Depl
 
   def actorPersistence = system.actorOf(Props[TestPersistenceActor])
 
+  override def ec: ExecutionContext = system.dispatcher
 
   "The deployLoggerService" should {
     "return a 'pong' response for GET requests to /ping" in {

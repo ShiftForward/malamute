@@ -11,14 +11,16 @@ libraryDependencies ++= {
   val sprayV = "1.3.3"
   val specsV = "2.4.17"
   Seq(
-    "io.spray"            %%  "spray-can"      % sprayV,
-    "io.spray"            %%  "spray-routing"  % sprayV,
-    "io.spray"            %%  "spray-testkit"  % sprayV   % "test",
-    "org.specs2"          %%  "specs2-core"    % specsV   % "test",
-    "org.specs2"          %%  "specs2-junit"   % specsV   % "test",
-    "org.specs2"          %%  "specs2-scalacheck" % specsV% "test",
-    "com.typesafe.akka"   %%  "akka-actor"     % akkaV,
-    "org.json4s"          %%  "json4s-native"  % "3.2.11"
+    "io.spray"            %%  "spray-can"         % sprayV,
+    "io.spray"            %%  "spray-routing"     % sprayV,
+    "io.spray"            %%  "spray-json"        % "1.3.2",
+    "io.spray"            %%  "spray-testkit"     % sprayV   % "test",
+    "org.specs2"          %%  "specs2-core"       % specsV   % "test",
+    "org.specs2"          %%  "specs2-junit"      % specsV   % "test",
+    "org.specs2"          %%  "specs2-scalacheck" % specsV   % "test",
+    "com.typesafe.akka"   %%  "akka-actor"        % akkaV,
+    "com.typesafe.akka"   %%  "akka-testkit"      % akkaV    % "test",
+    "org.json4s"          %%  "json4s-native"     % "3.2.11"
   )
 }
 

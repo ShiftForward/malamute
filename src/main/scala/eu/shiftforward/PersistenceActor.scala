@@ -6,30 +6,34 @@ package eu.shiftforward
 import akka.actor.Actor
 import scala.collection.mutable
 import scala.compat.Platform._
+import scala.concurrent.{ExecutionContext, Future}
+import akka.pattern.{ after, ask, pipe }
 
 trait PersistenceActor extends Actor {
 
-  def saveProject(project: SimpleProject): Project
+  implicit def ec: ExecutionContext
 
-  def getProjects: List[Project]
+  def saveProject(project: SimpleProject): Future[Project]
 
-  def deleteProject(name: String): Option[Project]
+  def getProjects:  Future[List[Project]]
 
-  def addDeploy(name: String, deploy: SimpleDeploy): Option[Deploy]
+  def deleteProject(name: String):  Future[Option[Project]]
 
-  def getDeploy(name: String): Option[Project]
+  def addDeploy(name: String, deploy: SimpleDeploy):  Future[Option[Deploy]]
+
+  def getDeploy(name: String):  Future[Option[Project]]
 
   override def receive: Receive = {
     case SaveProject(project) =>
-      sender() ! saveProject(project)
+      saveProject(project).pipeTo(sender())
     case GetProjects =>
-      sender() ! getProjects
+      getProjects.pipeTo(sender())
     case DeleteProject(name) =>
-      sender() ! deleteProject(name)
+      deleteProject(name).pipeTo(sender())
     case AddDeploy(name, deploy) =>
-      sender() ! addDeploy(name, deploy)
+      addDeploy(name, deploy).pipeTo(sender())
     case GetProject(name) =>
-      sender() ! getDeploy(name)
+      getDeploy(name).pipeTo(sender())
   }
 }
 
@@ -37,21 +41,23 @@ class MemoryPersistenceActor extends PersistenceActor {
 
   val allProjects = mutable.Set[Project]()
 
-  override def saveProject(project: SimpleProject): Project = {
+  override implicit def ec: ExecutionContext = context.dispatcher
+
+  override def saveProject(project: SimpleProject): Future[Project] = Future{
     val proj = Project(project.name, project.description, currentTime, List())
     allProjects += proj
     proj
   }
 
-  override def getProjects: List[Project] = allProjects.toList
+  override def getProjects: Future[List[Project]] = Future{allProjects.toList}
 
-  override def deleteProject(name: String): Option[Project] = {
+  override def deleteProject(name: String): Future[Option[Project]] = Future{
     val proj = (allProjects find (_.name == name))
     proj.foreach(allProjects -= _)
     proj
   }
 
-  override def addDeploy(name: String, deploy: SimpleDeploy): Option[Deploy] = {
+  override def addDeploy(name: String, deploy: SimpleDeploy): Future[Option[Deploy]] = Future{
     val proj: Option[Project] = (allProjects find (_.name == name))
     proj.map { p: Project =>
       val newDeploy = Deploy(deploy.user, currentTime, deploy.commit, deploy.observations)
@@ -62,10 +68,11 @@ class MemoryPersistenceActor extends PersistenceActor {
     }
   }
 
-  override def getDeploy(name: String): Option[Project] = {
+  override def getDeploy(name: String): Future[Option[Project]] = Future {
     val proj: Option[Project] = (allProjects find (_.name == name))
     proj.map { p: Project => p }
   }
+
 }
 
 case class SaveProject(project: SimpleProject)

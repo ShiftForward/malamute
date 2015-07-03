@@ -1,6 +1,3 @@
-/**
- * Created by JP on 30/06/2015.
- */
 package eu.shiftforward
 
 import akka.actor.{ Actor, ActorLogging, Props }

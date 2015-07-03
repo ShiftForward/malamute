@@ -1,6 +1,3 @@
-/**
- * Created by JP on 01/07/2015.
- */
 package eu.shiftforward
 
 import spray.json.{ DefaultJsonProtocol, RootJsonFormat }

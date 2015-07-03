@@ -16,7 +16,7 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
 
   class MockDeployLoggerService extends DeployLoggerService with Scope {
     def actorRefFactory = system
-    val actorPersistence = system.actorOf(Props[MockPersistenceActor])
+    val actorPersistence = system.actorOf(Props[MemoryPersistenceActor])
     override def ec: ExecutionContext = system.dispatcher
   }
 
@@ -36,7 +36,7 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
       }
     }
 
-    "return a 'JSON Array of Project' response for GET requests to /project"  in new MockDeployLoggerService {
+    "return a 'JSON Array of Project' response for GET requests to /project" in new MockDeployLoggerService {
       Post("/project", SimpleProject("TestProj", "Proj Description Test")) ~> deployLoggerRoute ~> check {
         status === OK
         responseAs[Project].name must beEqualTo("TestProj")
@@ -52,7 +52,7 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
         responseAs[List[Project]].length must beEqualTo(2)
       }
     }
-    "return a 'JSON of Project' response for GET requests to /project/:name"  in new MockDeployLoggerService {
+    "return a 'JSON of Project' response for GET requests to /project/:name" in new MockDeployLoggerService {
       Post("/project", SimpleProject("TestProj", "Proj Description Test")) ~> deployLoggerRoute ~> check {
         status === OK
         responseAs[Project].name must beEqualTo("TestProj")
@@ -64,7 +64,7 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
         responseAs[Project].description must beEqualTo("Proj Description Test")
       }
     }
-    "return a 404 response for GET requests to /project/:name not exists"  in new MockDeployLoggerService {
+    "return a 404 response for GET requests to /project/:name not exists" in new MockDeployLoggerService {
       Post("/project", SimpleProject("TestProj", "Proj Description Test")) ~> deployLoggerRoute ~> check {
         status === OK
         responseAs[Project].name must beEqualTo("TestProj")
@@ -74,7 +74,7 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
         status === NotFound
       }
     }
-    "return a 'JSON Obj of Project' response for DELETE requests to /project/projname"  in new MockDeployLoggerService {
+    "return a 'JSON Obj of Project' response for DELETE requests to /project/projname" in new MockDeployLoggerService {
       Post("/project", SimpleProject("TestProj", "Proj Description Test")) ~> deployLoggerRoute ~> check {
         status === OK
         responseAs[Project].name must beEqualTo("TestProj")
@@ -99,7 +99,7 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
         responseAs[List[Project]].length must beEqualTo(1)
       }
     }
-    "return a 404 response for DELETE requests to /project/projname not exists"  in new MockDeployLoggerService {
+    "return a 404 response for DELETE requests to /project/projname not exists" in new MockDeployLoggerService {
       Post("/project", SimpleProject("TestProj", "Proj Description Test")) ~> deployLoggerRoute ~> check {
         status === OK
         responseAs[Project].name must beEqualTo("TestProj")
@@ -116,7 +116,7 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
         responseAs[Project].name must beEqualTo("TestProj")
         responseAs[Project].description must beEqualTo("Proj Description Test")
       }
-      Post("/project/TestProj/deploy", SimpleDeploy("testUser","21312ui32ig4iu24","testestess")) ~> deployLoggerRoute ~> check {
+      Post("/project/TestProj/deploy", SimpleDeploy("testUser", "21312ui32ig4iu24", "testestess")) ~> deployLoggerRoute ~> check {
         status === OK
         responseAs[Deploy].user must beEqualTo("testUser")
       }
@@ -127,7 +127,7 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
         responseAs[Project].name must beEqualTo("TestProj")
         responseAs[Project].description must beEqualTo("Proj Description Test")
       }
-      Post("/project/abc/deploy", SimpleDeploy("testUser","21312ui32ig4iu24","testestess")) ~> deployLoggerRoute ~> check {
+      Post("/project/abc/deploy", SimpleDeploy("testUser", "21312ui32ig4iu24", "testestess")) ~> deployLoggerRoute ~> check {
         status === NotFound
       }
     }

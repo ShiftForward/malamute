@@ -4,7 +4,6 @@
 package eu.shiftforward
 
 import akka.actor.Actor
-
 import scala.collection.mutable
 import scala.compat.Platform._
 

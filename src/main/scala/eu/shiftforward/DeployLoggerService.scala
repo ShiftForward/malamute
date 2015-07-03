@@ -14,9 +14,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 
 trait DeployLoggerService extends HttpService {
-
-  val allProjects = mutable.Set[Project]()
-
+  
   def actorPersistence: ActorRef
 
   implicit val timeout = Timeout(5.seconds)

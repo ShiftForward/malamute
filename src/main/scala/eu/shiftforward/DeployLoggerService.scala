@@ -40,7 +40,7 @@ trait DeployLoggerService extends HttpService {
         entity(as[SimpleProject]) { proj =>
           onComplete((actorPersistence ? SaveProject(proj)).mapTo[Project]){
             case Success(project) => complete(project)
-            case Failure(ex : DuplicatedEntry) => complete(Found, s"An error occurred: ${ex.error}")
+            case Failure(ex : DuplicatedEntry) => complete(UnprocessableEntity, s"An error occurred: ${ex.error}")
           }
         }
       }

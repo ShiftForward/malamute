@@ -36,6 +36,17 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
       }
     }
 
+    "return a 422 - UnprocessableEntity response for POST requests to /project with a duplicated name" in new MockDeployLoggerService {
+      Post("/project", SimpleProject("TestProj1", "Proj Description Test")) ~> deployLoggerRoute ~> check {
+        status === OK
+        responseAs[Project].name must beEqualTo("TestProj1")
+        responseAs[Project].description must beEqualTo("Proj Description Test")
+      }
+      Post("/project", SimpleProject("TestProj1", "Proj Description Test")) ~> deployLoggerRoute ~> check {
+        status === UnprocessableEntity
+      }
+    }
+
     "return a 'JSON Array of Project' response for GET requests to /project" in new MockDeployLoggerService {
       Post("/project", SimpleProject("TestProj", "Proj Description Test")) ~> deployLoggerRoute ~> check {
         status === OK
@@ -47,7 +58,7 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
         responseAs[Project].name must beEqualTo("TestProj1")
         responseAs[Project].description must beEqualTo("Proj Description Test 1")
       }
-      Get("/project") ~> deployLoggerRoute ~> check {
+      Get("/projects") ~> deployLoggerRoute ~> check {
         status === OK
         responseAs[List[Project]].length must beEqualTo(2)
       }
@@ -64,7 +75,7 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
         responseAs[Project].description must beEqualTo("Proj Description Test")
       }
     }
-    "return a 404 response for GET requests to /project/:name not exists" in new MockDeployLoggerService {
+    "return a 404 response for GET requests to /project/:name that doesn't exists" in new MockDeployLoggerService {
       Post("/project", SimpleProject("TestProj", "Proj Description Test")) ~> deployLoggerRoute ~> check {
         status === OK
         responseAs[Project].name must beEqualTo("TestProj")
@@ -85,7 +96,7 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
         responseAs[Project].name must beEqualTo("TestProj1")
         responseAs[Project].description must beEqualTo("Proj Description Test 1")
       }
-      Get("/project") ~> deployLoggerRoute ~> check {
+      Get("/projects") ~> deployLoggerRoute ~> check {
         status === OK
         responseAs[List[Project]].length must beEqualTo(2)
       }
@@ -94,12 +105,12 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
         responseAs[Project].name must beEqualTo("TestProj1")
         responseAs[Project].description must beEqualTo("Proj Description Test 1")
       }
-      Get("/project") ~> deployLoggerRoute ~> check {
+      Get("/projects") ~> deployLoggerRoute ~> check {
         status === OK
         responseAs[List[Project]].length must beEqualTo(1)
       }
     }
-    "return a 404 response for DELETE requests to /project/projname not exists" in new MockDeployLoggerService {
+    "return a 404 response for DELETE requests to /project/projname that doesn't exists" in new MockDeployLoggerService {
       Post("/project", SimpleProject("TestProj", "Proj Description Test")) ~> deployLoggerRoute ~> check {
         status === OK
         responseAs[Project].name must beEqualTo("TestProj")
@@ -121,7 +132,7 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
         responseAs[Deploy].user must beEqualTo("testUser")
       }
     }
-    "return a 404 response for POST requests to /project/:name/deploy not exists" in new MockDeployLoggerService {
+    "return a 404 response for POST requests to /project/:name/deploy that doesn't exists" in new MockDeployLoggerService {
       Post("/project", SimpleProject("TestProj", "Proj Description Test")) ~> deployLoggerRoute ~> check {
         status === OK
         responseAs[Project].name must beEqualTo("TestProj")

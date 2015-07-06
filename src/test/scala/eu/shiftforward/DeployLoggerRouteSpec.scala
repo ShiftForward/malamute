@@ -116,7 +116,7 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
         responseAs[Project].name must beEqualTo("TestProj")
         responseAs[Project].description must beEqualTo("Proj Description Test")
       }
-      Post("/project/TestProj/deploy", SimpleDeploy("testUser", "21312ui32ig4iu24", "testestess")) ~> deployLoggerRoute ~> check {
+      Post("/project/TestProj/deploy", SimpleDeploy("testUser", "21312ui32ig4iu24", "testestess","up","http://google.com/")) ~> deployLoggerRoute ~> check {
         status === OK
         responseAs[Deploy].user must beEqualTo("testUser")
       }
@@ -127,7 +127,7 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
         responseAs[Project].name must beEqualTo("TestProj")
         responseAs[Project].description must beEqualTo("Proj Description Test")
       }
-      Post("/project/abc/deploy", SimpleDeploy("testUser", "21312ui32ig4iu24", "testestess")) ~> deployLoggerRoute ~> check {
+      Post("/project/abc/deploy", SimpleDeploy("testUser", "21312ui32ig4iu24", "testestess","up","http://google.com/")) ~> deployLoggerRoute ~> check {
         status === NotFound
       }
     }

@@ -1,5 +1,8 @@
 package eu.shiftforward
 
+import java.net.MalformedURLException
+import javax.management.openmbean.KeyAlreadyExistsException
+
 import akka.actor.ActorRef
 import akka.pattern.ask
 import akka.util.Timeout
@@ -7,6 +10,10 @@ import spray.httpx.SprayJsonSupport._
 import spray.routing.HttpService
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
+import scala.util.{Failure,Success}
+import spray.http.MediaTypes._
+import spray.http.StatusCodes._
+import spray.http._
 
 trait DeployLoggerService extends HttpService {
 
@@ -23,20 +30,28 @@ trait DeployLoggerService extends HttpService {
         complete("pong")
       }
     } ~
+    path("projects") {
+      get {
+        complete((actorPersistence ? GetProjects).mapTo[List[Project]])
+      }
+    } ~
     path("project") {
       post {
         entity(as[SimpleProject]) { proj =>
-          complete((actorPersistence ? SaveProject(proj)).mapTo[Project])
+          onComplete((actorPersistence ? SaveProject(proj)).mapTo[Project]){
+            case Success(project) => complete(project)
+            case Failure(ex : DuplicatedEntry) => complete(Found, s"An error occurred: ${ex.error}")
+          }
         }
-      } ~
-      get {
-        complete((actorPersistence ? GetProjects).mapTo[List[Project]])
       }
     } ~
     path("project" / Segment / "deploy") { name =>
       post {
         entity(as[SimpleDeploy]) { deploy =>
-          complete((actorPersistence ? AddDeploy(name, deploy)).mapTo[Option[Deploy]])
+          onComplete((actorPersistence ? AddDeploy(name, deploy)).mapTo[Option[Deploy]]){
+            case Success(deploy) => complete(deploy)
+            case Failure(ex : MalformedURLException) => complete(BadRequest, s"An error occurred: ${ex.getMessage}")
+          }
         }
       }
     } ~

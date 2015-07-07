@@ -25,6 +25,8 @@ trait PersistenceActor extends Actor {
 
   def getDeploy(name: String): Future[Option[Project]]
 
+  def addEvent(projName: String,deployId: String, event: Event): Future[Option[Event]]
+
   override def receive: Receive = {
     case SaveProject(project) =>
       saveProject(project).pipeTo(sender())
@@ -36,6 +38,8 @@ trait PersistenceActor extends Actor {
       addDeploy(name, deploy).pipeTo(sender())
     case GetProject(name) =>
       getDeploy(name).pipeTo(sender())
+    case AddEvent(projName,deployId,event) =>
+      addEvent(projName,deployId,event).pipeTo(sender())
   }
 }
 
@@ -46,7 +50,8 @@ class MemoryPersistenceActor extends PersistenceActor {
   override implicit def ec: ExecutionContext = context.dispatcher
 
   override def saveProject(project: SimpleProject): Future[Project] = Future {
-    val proj = Project(project.name, project.description, currentTime, List())
+    val git = new URL( project.git )
+    val proj = Project(project.name, project.description, currentTime, git.toString(), List())
     allProjects.exists(_.name == proj.name) match {
       case true => throw new DuplicatedEntry(proj.name+" already exists.")
       case false => {
@@ -68,7 +73,8 @@ class MemoryPersistenceActor extends PersistenceActor {
     val proj: Option[Project] = allProjects find (_.name == name)
     proj.map { p: Project =>
       val url = new URL( deploy.changelog )
-      val newDeploy = Deploy(deploy.user, currentTime, deploy.commit, deploy.observations, deploy.status, url.toString(), Random.alphanumeric.take(10).mkString)
+      val events:  List[Event] =  List(Event(currentTime,"STARTED","new"))
+      val newDeploy = Deploy(deploy.user, currentTime, deploy.commit, deploy.observations, events , url.toString(), Random.alphanumeric.take(10).mkString)
       val newproj = p.copy(deploys = p.deploys :+ newDeploy)
       allProjects -= p
       allProjects += newproj
@@ -81,6 +87,16 @@ class MemoryPersistenceActor extends PersistenceActor {
     proj.map { p: Project => p }
   }
 
+  override def addEvent(projName: String, deployId: String, event: Event): Future[Option[Event]] = Future{
+    val proj: Option[Project] = allProjects find (_.name == projName)
+    proj.map { p: Project =>
+      val deploy: Option[Deploy] = p.deploys find (_.id == deployId)
+      deploy.map { d: Deploy =>
+        d.events:+event
+      }
+      event
+    }
+  }
 }
 
 case class SaveProject(project: SimpleProject)
@@ -92,3 +108,5 @@ case class GetProject(name: String)
 case class DeleteProject(name: String)
 
 case class AddDeploy(name: String, deploy: SimpleDeploy)
+
+case class AddEvent(projName: String, deployId: String, event: Event)

@@ -55,6 +55,16 @@ trait DeployLoggerService extends HttpService {
         }
       }
     } ~
+    path("project" / Segment / "deploy" / Segment / "event") { projName, deployId  =>
+      post {
+        entity(as[SimpleEvent]) { ev =>
+          onComplete((actorPersistence ? AddDeploy(name, deploy)).mapTo[Option[Deploy]]){
+            case Success(deploy) => complete(deploy)
+            case Failure(ex : MalformedURLException) => complete(BadRequest, s"An error occurred: ${ex.getMessage}")
+          }
+        }
+      }
+    } ~
     path("project" / Rest) { name =>
       delete {
         complete((actorPersistence ? DeleteProject(name)).mapTo[Option[Project]])

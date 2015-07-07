@@ -32,7 +32,7 @@ trait DeployLoggerService extends HttpService {
     } ~
     path("projects") {
       get {
-        complete((actorPersistence ? GetProjects).mapTo[List[Project]])
+        complete((actorPersistence ? GetProjects).mapTo[List[ResponseProject]])
       }
     } ~
     path("project") {
@@ -80,7 +80,7 @@ trait DeployLoggerService extends HttpService {
         complete((actorPersistence ? DeleteProject(name)).mapTo[Option[Project]])
       } ~
       get {
-        complete((actorPersistence ? GetProject(name)).mapTo[Option[Project]])
+        complete((actorPersistence ? GetProject(name)).mapTo[Option[ResponseProject]])
       }
     }
   }

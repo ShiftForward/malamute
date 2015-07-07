@@ -9,6 +9,8 @@ case class SimpleDeploy(user: String, commit: Commit, description: String, statu
 
 case class Project(name: String, description: String, timestamp: Long, git: String, deploys: List[Deploy])
 
+case class ResponseProject(name: String, description: String, timestamp: Long, git: String)
+
 case class Commit(hash: String, branch: String)
 
 case class SimpleEvent(status: String, description: String)
@@ -20,6 +22,11 @@ case class Deploy(user: String, timestamp: Long, commit: Commit, description: St
 object Project extends DefaultJsonProtocol {
   implicit val projFormat: RootJsonFormat[Project] = jsonFormat5(Project.apply)
 }
+
+object ResponseProject extends DefaultJsonProtocol {
+  implicit val projFormat: RootJsonFormat[ResponseProject] = jsonFormat4(ResponseProject.apply)
+}
+
 
 object Deploy extends DefaultJsonProtocol {
   implicit val deployFormat: RootJsonFormat[Deploy] = jsonFormat7(Deploy.apply)

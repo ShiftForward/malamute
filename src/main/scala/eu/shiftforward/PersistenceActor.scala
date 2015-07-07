@@ -17,13 +17,13 @@ trait PersistenceActor extends Actor {
 
   def saveProject(project: SimpleProject): Future[Project]
 
-  def getProjects: Future[List[Project]]
+  def getProjects: Future[List[ResponseProject]]
 
   def deleteProject(name: String): Future[Option[Project]]
 
   def addDeploy(name: String, deploy: SimpleDeploy): Future[Option[Deploy]]
 
-  def getProject(name: String): Future[Option[Project]]
+  def getProject(name: String): Future[Option[ResponseProject]]
 
   def getDeploys(name: String, max: Int): Future[Option[List[Deploy]]]
 
@@ -69,7 +69,13 @@ class MemoryPersistenceActor extends PersistenceActor {
     }
   }
 
-  override def getProjects: Future[List[Project]] = Future { allProjects.toList }
+  override def getProjects: Future[List[ResponseProject]] = Future {
+    val projs: mutable.MutableList[ResponseProject] = mutable.MutableList()
+    allProjects.foreach(p =>
+     projs+=ResponseProject(p.name,p.description,p.timestamp,p.git)
+    )
+    projs.toList
+  }
 
   override def deleteProject(name: String): Future[Option[Project]] = Future {
     val proj = allProjects find (_.name == name)
@@ -90,8 +96,11 @@ class MemoryPersistenceActor extends PersistenceActor {
     }
   }
 
-  override def getProject(name: String): Future[Option[Project]] = Future {
-    allProjects find (_.name == name)
+  override def getProject(name: String): Future[Option[ResponseProject]] = Future {
+    val proje = allProjects find (_.name == name)
+    proje.map{proj =>
+      ResponseProject(proj.name,proj.description,proj.timestamp,proj.git)
+    }
   }
 
   override def addEvent(projName: String, deployId: String, event: SimpleEvent): Future[Option[Event]] = Future{

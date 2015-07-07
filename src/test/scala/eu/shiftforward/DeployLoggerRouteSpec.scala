@@ -142,5 +142,70 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
         status === NotFound
       }
     }
+    "return a 'JSON obj Event' response for POST requests to /project/:name/deploy/:id/event" in new MockDeployLoggerService {
+      Post("/project", SimpleProject("TestProj", "Proj Description Test", "http://bitbucket.com/abc")) ~> deployLoggerRoute ~> check {
+        status === OK
+        responseAs[Project].name must beEqualTo("TestProj")
+        responseAs[Project].description must beEqualTo("Proj Description Test")
+      }
+      Post("/project/TestProj/deploy", SimpleDeploy("testUser", Commit("abc124ada", "master"), "testestess", "up", "http://google.com/")) ~> deployLoggerRoute ~> check {
+          status === OK
+          responseAs[Deploy].user must beEqualTo("testUser")
+          val deployId = responseAs[Deploy].id
+
+        Post("/project/TestProj/deploy/" + deployId + "/event", SimpleEvent("SUCCESS", "done")) ~> deployLoggerRoute ~> check {
+          status === OK
+          responseAs[Event].status === "SUCCESS"
+        }
+        //tests if the first and only deploy have two events (inital + success)
+        Get("/project/TestProj") ~> deployLoggerRoute ~> check {
+          responseAs[Project].deploys(0).events.size === 2
+        }
+      }
+    }
+    "return a 'JSON obj Deploy' response for GET requests to /project/:name/deploy/:id" in new MockDeployLoggerService {
+      Post("/project", SimpleProject("TestProj", "Proj Description Test", "http://bitbucket.com/abc")) ~> deployLoggerRoute ~> check {
+        status === OK
+        responseAs[Project].name must beEqualTo("TestProj")
+        responseAs[Project].description must beEqualTo("Proj Description Test")
+      }
+      Post("/project/TestProj/deploy", SimpleDeploy("testUser", Commit("abc124ada", "master"), "testestess", "up", "http://google.com/")) ~> deployLoggerRoute ~> check {
+        status === OK
+        responseAs[Deploy].user must beEqualTo("testUser")
+        val deployId = responseAs[Deploy].id
+
+        Post("/project/TestProj/deploy/" + deployId + "/event", SimpleEvent("SUCCESS", "done")) ~> deployLoggerRoute ~> check {
+          status === OK
+          responseAs[Event].status === "SUCCESS"
+        }
+        Get("/project/TestProj/deploy/" + deployId) ~> deployLoggerRoute ~> check {
+          status === OK
+          responseAs[Deploy].id === deployId
+        }
+      }
+    }
+    "return a 'JSON Array obj Deploy' response for GET requests to /project/:name/deploy" in new MockDeployLoggerService {
+      Post("/project", SimpleProject("TestProj", "Proj Description Test", "http://bitbucket.com/abc")) ~> deployLoggerRoute ~> check {
+        status === OK
+        responseAs[Project].name must beEqualTo("TestProj")
+        responseAs[Project].description must beEqualTo("Proj Description Test")
+      }
+      Post("/project/TestProj/deploy", SimpleDeploy("testUser", Commit("abc124ada", "master"), "testestess", "up", "http://google.com/")) ~> deployLoggerRoute ~> check {
+        status === OK
+        responseAs[Deploy].user must beEqualTo("testUser")
+      }
+      Post("/project/TestProj/deploy", SimpleDeploy("testUser", Commit("abc124ada", "master"), "testestess", "up", "http://google.com/")) ~> deployLoggerRoute ~> check {
+        status === OK
+        responseAs[Deploy].user must beEqualTo("testUser")
+      }
+      Get("/project/TestProj/deploys?max=2") ~> deployLoggerRoute ~> check {
+        status === OK
+        responseAs[List[Deploy]].size === 2
+      }
+      Get("/project/TestProj/deploys") ~> deployLoggerRoute ~> check {
+        status === OK
+        responseAs[List[Deploy]].size === 1
+      }
+    }
   }
 }

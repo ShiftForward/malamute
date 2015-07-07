@@ -1,20 +1,21 @@
 package eu.shiftforward
 
-import spray.json.{ DefaultJsonProtocol, RootJsonFormat }
+import spray.json.DefaultJsonProtocol
+import spray.json.RootJsonFormat
 
 case class SimpleProject(name: String, description: String, git: String)
 
-case class SimpleDeploy(user: String, commit: Commit, observations: String, status: String, changelog: String)
+case class SimpleDeploy(user: String, commit: Commit, description: String, status: String, changelog: String)
 
 case class Project(name: String, description: String, timestamp: Long, git: String, deploys: List[Deploy])
 
 case class Commit(hash: String, branch: String)
 
-case class SimpleEvent(status: String, observation: String)
+case class SimpleEvent(status: String, description: String)
 
-case class Event(timestamp: Long, status: String, observation: String)
+case class Event(timestamp: Long, status: String, description: String)
 
-case class Deploy(user: String, timestamp: Long, commit: Commit, observations: String, events: List[Event], changelog: String, id: String)
+case class Deploy(user: String, timestamp: Long, commit: Commit, description: String, events: List[Event], changelog: String, id: String)
 
 object Project extends DefaultJsonProtocol {
   implicit val projFormat: RootJsonFormat[Project] = jsonFormat5(Project.apply)
@@ -29,7 +30,7 @@ object Event extends DefaultJsonProtocol {
 }
 
 object SimpleEvent extends DefaultJsonProtocol {
-  implicit val simpleEventFormat: RootJsonFormat[Event] = jsonFormat3(Event.apply)
+  implicit val simpleEventFormat: RootJsonFormat[SimpleEvent] = jsonFormat2(SimpleEvent.apply)
 }
 
 object Commit extends DefaultJsonProtocol {
@@ -43,3 +44,4 @@ object SimpleProject extends DefaultJsonProtocol {
 object SimpleDeploy extends DefaultJsonProtocol {
   implicit val simpleDeployFormat: RootJsonFormat[SimpleDeploy] = jsonFormat5(SimpleDeploy.apply)
 }
+

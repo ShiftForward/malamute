@@ -55,14 +55,24 @@ trait DeployLoggerService extends HttpService {
         }
       }
     } ~
-    path("project" / Segment / "deploy" / Segment / "event") { projName, deployId  =>
+    path("project" / Segment / "deploys") { projName =>
+      parameters('max.?) { (max: Option[String]) =>
+        get {
+          val maxParam = (max getOrElse "1").toInt
+          complete((actorPersistence ? GetDeploys(projName, maxParam)).mapTo[Option[List[Deploy]]])
+        }
+      }
+    } ~
+    path("project" / Segment / "deploy" / Segment / "event") { (projName, deployId)  =>
       post {
         entity(as[SimpleEvent]) { ev =>
-          onComplete((actorPersistence ? AddDeploy(name, deploy)).mapTo[Option[Deploy]]){
-            case Success(deploy) => complete(deploy)
-            case Failure(ex : MalformedURLException) => complete(BadRequest, s"An error occurred: ${ex.getMessage}")
-          }
+          complete((actorPersistence ? AddEvent(projName, deployId, ev)).mapTo[Option[Event]])
         }
+      }
+    } ~
+    path("project" / Segment / "deploy" / Rest ) { (projName, deployId)  =>
+      get {
+        complete((actorPersistence ? GetDeploy(projName, deployId)).mapTo[Option[Deploy]])
       }
     } ~
     path("project" / Rest) { name =>

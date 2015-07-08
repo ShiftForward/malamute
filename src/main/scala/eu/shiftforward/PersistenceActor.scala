@@ -1,13 +1,12 @@
 package eu.shiftforward
 
 
+import java.util.UUID
 import akka.actor.Actor
 import scala.collection.mutable
 import scala.compat.Platform._
 import scala.concurrent.{ ExecutionContext, Future }
-import spray.http._
 import akka.pattern.pipe
-import scala.util.Random
 
 case class DuplicatedEntry(error: String) extends Exception
 
@@ -84,7 +83,7 @@ class MemoryPersistenceActor extends PersistenceActor {
     val proj: Option[Project] = allProjects find (_.name == name)
     proj.map { p: Project =>
       val events: List[Event] = List(Event(currentTime, "STARTED", ""))
-      val newDeploy = Deploy(deploy.user, currentTime, deploy.commit, deploy.description, events, deploy.changelog, Random.alphanumeric.take(10).mkString)
+      val newDeploy = Deploy(deploy.user, currentTime, deploy.commit, deploy.description, events, deploy.changelog, UUID.randomUUID().toString)
       val newproj = p.copy(deploys = p.deploys :+ newDeploy)
       allProjects -= p
       allProjects += newproj

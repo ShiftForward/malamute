@@ -1,9 +1,9 @@
 package eu.shiftforward
 
 import eu.shiftforward.DeployStatus.DeployStatus
-import spray.json.{DefaultJsonProtocol, JsString, JsValue, RootJsonFormat}
+import spray.json.{ DefaultJsonProtocol, JsString, JsValue, RootJsonFormat }
 
-object DeployStatus extends Enumeration{
+object DeployStatus extends Enumeration {
 
   type DeployStatus = Value
   val Started = Value("STARTED")

@@ -1,6 +1,5 @@
 package eu.shiftforward
 
-
 import java.util.UUID
 import akka.actor.Actor
 import scala.collection.mutable

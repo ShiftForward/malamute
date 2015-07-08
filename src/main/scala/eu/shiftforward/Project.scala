@@ -9,7 +9,7 @@ sealed trait Response
 
 case class RequestProject(name: String, description: String, git: String) extends Request
 
-case class RequestDeploy(user: String, commit: Commit, description: String, status: String, changelog: String)  extends Request
+case class RequestDeploy(user: String, commit: Commit, description: String, status: String, changelog: String, version: String, isAutomatic: Boolean)  extends Request
 
 case class RequestEvent(status: String, description: String) extends Request
 
@@ -21,7 +21,7 @@ case class Commit(hash: String, branch: String)
 
 case class Event(timestamp: Long, status: String, description: String)
 
-case class Deploy(user: String, timestamp: Long, commit: Commit, description: String, events: List[Event], changelog: String, id: String)
+case class Deploy(user: String, timestamp: Long, commit: Commit, description: String, events: List[Event], changelog: String, id: String, version: String, isAutomatic: Boolean)
 
 object Project extends DefaultJsonProtocol {
   implicit val projFormat: RootJsonFormat[Project] = jsonFormat5(Project.apply)
@@ -32,7 +32,7 @@ object ResponseProject extends DefaultJsonProtocol {
 }
 
 object Deploy extends DefaultJsonProtocol {
-  implicit val deployFormat: RootJsonFormat[Deploy] = jsonFormat7(Deploy.apply)
+  implicit val deployFormat: RootJsonFormat[Deploy] = jsonFormat9(Deploy.apply)
 }
 
 object Event extends DefaultJsonProtocol {
@@ -52,6 +52,6 @@ object RequestProject extends DefaultJsonProtocol {
 }
 
 object RequestDeploy extends DefaultJsonProtocol {
-  implicit val simpleDeployFormat: RootJsonFormat[RequestDeploy] = jsonFormat5(RequestDeploy.apply)
+  implicit val simpleDeployFormat: RootJsonFormat[RequestDeploy] = jsonFormat7(RequestDeploy.apply)
 }
 

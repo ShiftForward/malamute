@@ -83,7 +83,7 @@ class MemoryPersistenceActor extends PersistenceActor {
     val proj: Option[Project] = allProjects find (_.name == name)
     proj.map { p: Project =>
       val events: List[Event] = List(Event(currentTime, "STARTED", ""))
-      val newDeploy = Deploy(deploy.user, currentTime, deploy.commit, deploy.description, events, deploy.changelog, UUID.randomUUID().toString)
+      val newDeploy = Deploy(deploy.user, currentTime, deploy.commit, deploy.description, events, deploy.changelog, UUID.randomUUID().toString, deploy.version, deploy.isAutomatic)
       val newproj = p.copy(deploys = p.deploys :+ newDeploy)
       allProjects -= p
       allProjects += newproj

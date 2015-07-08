@@ -27,7 +27,7 @@ trait PersistenceActor extends Actor {
 
   def getDeploys(name: String, max: Int): Future[Option[List[Deploy]]]
 
-  def addEvent(projName: String,deployId: String, event: SimpleEvent): Future[Option[Event]]
+  def addEvent(projName: String, deployId: String, event: SimpleEvent): Future[Option[Event]]
 
   def getDeploy(projName: String, deployId: String): Future[Option[Deploy]]
 
@@ -58,10 +58,10 @@ class MemoryPersistenceActor extends PersistenceActor {
   override implicit def ec: ExecutionContext = context.dispatcher
 
   override def saveProject(project: SimpleProject): Future[Project] = Future {
-    val git = new URL( project.git )
+    val git = new URL(project.git)
     val proj = Project(project.name, project.description, currentTime, git.toString(), List())
     allProjects.exists(_.name == proj.name) match {
-      case true => throw new DuplicatedEntry(proj.name+" already exists.")
+      case true => throw new DuplicatedEntry(proj.name + " already exists.")
       case false => {
         allProjects += proj
         proj
@@ -72,8 +72,7 @@ class MemoryPersistenceActor extends PersistenceActor {
   override def getProjects: Future[List[ResponseProject]] = Future {
     val projs: mutable.MutableList[ResponseProject] = mutable.MutableList()
     allProjects.foreach(p =>
-     projs+=ResponseProject(p.name,p.description,p.timestamp,p.git)
-    )
+      projs += ResponseProject(p.name, p.description, p.timestamp, p.git))
     projs.toList
   }
 
@@ -86,8 +85,8 @@ class MemoryPersistenceActor extends PersistenceActor {
   override def addDeploy(name: String, deploy: SimpleDeploy): Future[Option[Deploy]] = Future {
     val proj: Option[Project] = allProjects find (_.name == name)
     proj.map { p: Project =>
-      val url = new URL( deploy.changelog )
-      val events: List[Event] =  List(Event(currentTime,"STARTED",""))
+      val url = new URL(deploy.changelog)
+      val events: List[Event] = List(Event(currentTime, "STARTED", ""))
       val newDeploy = Deploy(deploy.user, currentTime, deploy.commit, deploy.description, events, url.toString(), Random.alphanumeric.take(10).mkString)
       val newproj = p.copy(deploys = p.deploys :+ newDeploy)
       allProjects -= p
@@ -98,23 +97,23 @@ class MemoryPersistenceActor extends PersistenceActor {
 
   override def getProject(name: String): Future[Option[ResponseProject]] = Future {
     val proje = allProjects find (_.name == name)
-    proje.map{proj =>
-      ResponseProject(proj.name,proj.description,proj.timestamp,proj.git)
+    proje.map { proj =>
+      ResponseProject(proj.name, proj.description, proj.timestamp, proj.git)
     }
   }
 
-  override def addEvent(projName: String, deployId: String, event: SimpleEvent): Future[Option[Event]] = Future{
+  override def addEvent(projName: String, deployId: String, event: SimpleEvent): Future[Option[Event]] = Future {
     val proj: Option[Project] = allProjects find (_.name == projName)
     proj.flatMap { p: Project =>
       val deploy: Option[Deploy] = p.deploys find (_.id == deployId)
       deploy.map { d: Deploy =>
-         val ev = Event(currentTime,event.status,event.description)
-         val newDeploy = d.copy(events = ev :: d.events)
-         val newDeploys = p.deploys.filterNot(_ == d) :+ newDeploy
-         val newProj = p.copy(deploys = newDeploys)
-         allProjects -= p
-         allProjects += newProj
-         ev
+        val ev = Event(currentTime, event.status, event.description)
+        val newDeploy = d.copy(events = ev :: d.events)
+        val newDeploys = p.deploys.filterNot(_ == d) :+ newDeploy
+        val newProj = p.copy(deploys = newDeploys)
+        allProjects -= p
+        allProjects += newProj
+        ev
       }
 
     }
@@ -129,8 +128,8 @@ class MemoryPersistenceActor extends PersistenceActor {
 
   override def getDeploy(projName: String, deployId: String): Future[Option[Deploy]] = Future {
     val proj: Option[Project] = allProjects find (_.name == projName)
-    proj.flatMap {p : Project =>
-      p.deploys find(_.id == deployId)
+    proj.flatMap { p: Project =>
+      p.deploys find (_.id == deployId)
     }
   }
 }

@@ -27,7 +27,6 @@ object ResponseProject extends DefaultJsonProtocol {
   implicit val projFormat: RootJsonFormat[ResponseProject] = jsonFormat4(ResponseProject.apply)
 }
 
-
 object Deploy extends DefaultJsonProtocol {
   implicit val deployFormat: RootJsonFormat[Deploy] = jsonFormat7(Deploy.apply)
 }

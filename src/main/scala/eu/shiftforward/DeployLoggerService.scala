@@ -37,7 +37,7 @@ trait DeployLoggerService extends HttpService {
     } ~
     path("project") {
       post {
-        entity(as[SimpleProject]) { proj =>
+        entity(as[RequestProject]) { proj =>
           onComplete((actorPersistence ? SaveProject(proj)).mapTo[Project]){
             case Success(project) => complete(project)
             case Failure(ex : DuplicatedEntry) => complete(UnprocessableEntity, s"An error occurred: ${ex.error}")
@@ -47,7 +47,7 @@ trait DeployLoggerService extends HttpService {
     } ~
     path("project" / Segment / "deploy") { name =>
       post {
-        entity(as[SimpleDeploy]) { deploy =>
+        entity(as[RequestDeploy]) { deploy =>
           onComplete((actorPersistence ? AddDeploy(name, deploy)).mapTo[Option[Deploy]]){
             case Success(deploy) => complete(deploy)
             case Failure(ex : MalformedURLException) => complete(BadRequest, s"An error occurred: ${ex.getMessage}")
@@ -56,16 +56,16 @@ trait DeployLoggerService extends HttpService {
       }
     } ~
     path("project" / Segment / "deploys") { projName =>
-      parameters('max.?) { (max: Option[String]) =>
+      parameters('max.as[Int].?) { (max: Option[Int]) =>
         get {
-          val maxParam = (max getOrElse "1").toInt
+          val maxParam = max getOrElse 10
           complete((actorPersistence ? GetDeploys(projName, maxParam)).mapTo[Option[List[Deploy]]])
         }
       }
     } ~
     path("project" / Segment / "deploy" / Segment / "event") { (projName, deployId)  =>
       post {
-        entity(as[SimpleEvent]) { ev =>
+        entity(as[RequestEvent]) { ev =>
           complete((actorPersistence ? AddEvent(projName, deployId, ev)).mapTo[Option[Event]])
         }
       }

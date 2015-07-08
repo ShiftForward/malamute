@@ -3,17 +3,21 @@ package eu.shiftforward
 import spray.json.DefaultJsonProtocol
 import spray.json.RootJsonFormat
 
-case class SimpleProject(name: String, description: String, git: String)
+sealed trait Request
 
-case class SimpleDeploy(user: String, commit: Commit, description: String, status: String, changelog: String)
+sealed trait Response
+
+case class RequestProject(name: String, description: String, git: String) extends Request
+
+case class RequestDeploy(user: String, commit: Commit, description: String, status: String, changelog: String)  extends Request
+
+case class RequestEvent(status: String, description: String) extends Request
 
 case class Project(name: String, description: String, timestamp: Long, git: String, deploys: List[Deploy])
 
-case class ResponseProject(name: String, description: String, timestamp: Long, git: String)
+case class ResponseProject(name: String, description: String, timestamp: Long, git: String) extends Response
 
 case class Commit(hash: String, branch: String)
-
-case class SimpleEvent(status: String, description: String)
 
 case class Event(timestamp: Long, status: String, description: String)
 
@@ -35,19 +39,19 @@ object Event extends DefaultJsonProtocol {
   implicit val eventFormat: RootJsonFormat[Event] = jsonFormat3(Event.apply)
 }
 
-object SimpleEvent extends DefaultJsonProtocol {
-  implicit val simpleEventFormat: RootJsonFormat[SimpleEvent] = jsonFormat2(SimpleEvent.apply)
+object RequestEvent extends DefaultJsonProtocol {
+  implicit val simpleEventFormat: RootJsonFormat[RequestEvent] = jsonFormat2(RequestEvent.apply)
 }
 
 object Commit extends DefaultJsonProtocol {
   implicit val commitFormat: RootJsonFormat[Commit] = jsonFormat2(Commit.apply)
 }
 
-object SimpleProject extends DefaultJsonProtocol {
-  implicit val simpleProjFormat: RootJsonFormat[SimpleProject] = jsonFormat3(SimpleProject.apply)
+object RequestProject extends DefaultJsonProtocol {
+  implicit val simpleProjFormat: RootJsonFormat[RequestProject] = jsonFormat3(RequestProject.apply)
 }
 
-object SimpleDeploy extends DefaultJsonProtocol {
-  implicit val simpleDeployFormat: RootJsonFormat[SimpleDeploy] = jsonFormat5(SimpleDeploy.apply)
+object RequestDeploy extends DefaultJsonProtocol {
+  implicit val simpleDeployFormat: RootJsonFormat[RequestDeploy] = jsonFormat5(RequestDeploy.apply)
 }
 

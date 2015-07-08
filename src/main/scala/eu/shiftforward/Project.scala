@@ -15,6 +15,7 @@ object DeployStatus extends Enumeration{
 
     def read(json: JsValue): DeployStatus.Value = json match {
       case JsString(str) => DeployStatus.withName(str)
+      case _ => throw new Exception("Enum string expected")
     }
   }
 }

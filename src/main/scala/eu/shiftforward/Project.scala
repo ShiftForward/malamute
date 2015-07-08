@@ -4,7 +4,6 @@ import eu.shiftforward.DeployStatus.DeployStatus
 import spray.json.{ DefaultJsonProtocol, JsString, JsValue, RootJsonFormat }
 
 object DeployStatus extends Enumeration {
-
   type DeployStatus = Value
   val Started = Value("STARTED")
   val Skipped = Value("SKIPPED")

@@ -51,54 +51,54 @@ trait PersistenceActor extends Actor {
 
 class MemoryPersistenceActor extends PersistenceActor {
 
-  val allProjects = mutable.Set[Project]()
+  val allProjects = mutable.Map[String,Project]()
 
   override implicit def ec: ExecutionContext = context.dispatcher
 
   override def saveProject(project: RequestProject): Future[Project] = Future {
     val proj = Project(project.name, project.description, currentTime, project.git, List())
-    allProjects.exists(_.name == proj.name) match {
-      case true => throw new DuplicatedEntry(proj.name + " already exists.")
-      case false =>
-        allProjects += proj
+    allProjects.get(proj.name) match {
+      case Some(_) => throw new DuplicatedEntry(proj.name + " already exists.")
+      case None => {
+        allProjects += proj.name -> proj
         proj
+      }
     }
   }
 
   override def getProjects: Future[List[ResponseProject]] = Future {
-    val projs = mutable.MutableList[ResponseProject]()
-    allProjects.foreach(p =>
-      projs += ResponseProject(p.name, p.description, p.createdAt, p.git))
-    projs.toList
+    allProjects.values.map{ p =>
+      ResponseProject(p.name, p.description, p.createdAt, p.git)
+    }.toList
   }
 
   override def deleteProject(name: String): Future[Option[Project]] = Future {
-    val proj = allProjects find (_.name == name)
-    proj.foreach(allProjects -= _)
-    proj
+    val p = allProjects.get(name)
+    allProjects -= name
+    p
   }
 
   override def addDeploy(name: String, deploy: RequestDeploy): Future[Option[Deploy]] = Future {
-    val proj: Option[Project] = allProjects find (_.name == name)
+
+    val proj: Option[Project] = allProjects.get(name)
     proj.map { p: Project =>
       val events: List[Event] = List(Event(currentTime, DeployStatus.Started, ""))
       val newDeploy = Deploy(deploy.user, currentTime, deploy.commit, deploy.description, events, deploy.changelog, UUID.randomUUID().toString, deploy.version, deploy.isAutomatic)
-      val newproj = p.copy(deploys = p.deploys :+ newDeploy)
-      allProjects -= p
-      allProjects += newproj
+      val newProj = p.copy(deploys = p.deploys :+ newDeploy)
+      allProjects += (name -> newProj)
       newDeploy
     }
   }
 
   override def getProject(name: String): Future[Option[ResponseProject]] = Future {
-    val proj = allProjects find (_.name == name)
+    val proj = allProjects.get(name)
     proj.map { p =>
       ResponseProject(p.name, p.description, p.createdAt, p.git)
     }
   }
 
   override def addEvent(projName: String, deployId: String, event: RequestEvent): Future[Option[Event]] = Future {
-    val proj: Option[Project] = allProjects find (_.name == projName)
+    val proj: Option[Project] = allProjects.get(projName)
     proj.flatMap { p: Project =>
       val deploy: Option[Deploy] = p.deploys find (_.id == deployId)
       deploy.map { d: Deploy =>
@@ -106,8 +106,7 @@ class MemoryPersistenceActor extends PersistenceActor {
         val newDeploy = d.copy(events = ev :: d.events)
         val newDeploys = p.deploys.filterNot(_ == d) :+ newDeploy
         val newProj = p.copy(deploys = newDeploys)
-        allProjects -= p
-        allProjects += newProj
+        allProjects += (projName -> newProj)
         ev
       }
 
@@ -115,14 +114,14 @@ class MemoryPersistenceActor extends PersistenceActor {
   }
 
   override def getDeploys(name: String, max: Int): Future[Option[List[Deploy]]] = Future {
-    val proj: Option[Project] = allProjects find (_.name == name)
+    val proj: Option[Project] = allProjects.get(name)
     proj.map { p: Project =>
       p.deploys.take(max)
     }
   }
 
   override def getDeploy(projName: String, deployId: String): Future[Option[Deploy]] = Future {
-    val proj: Option[Project] = allProjects find (_.name == projName)
+    val proj: Option[Project] = allProjects.get(projName)
     proj.flatMap { p: Project =>
       p.deploys find (_.id == deployId)
     }

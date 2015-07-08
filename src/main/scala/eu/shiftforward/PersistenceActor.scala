@@ -51,7 +51,7 @@ trait PersistenceActor extends Actor {
 
 class MemoryPersistenceActor extends PersistenceActor {
 
-  val allProjects = mutable.Map[String,Project]()
+  val allProjects = mutable.Map[String, Project]()
 
   override implicit def ec: ExecutionContext = context.dispatcher
 
@@ -67,7 +67,7 @@ class MemoryPersistenceActor extends PersistenceActor {
   }
 
   override def getProjects: Future[List[ResponseProject]] = Future {
-    allProjects.values.map{ p =>
+    allProjects.values.map { p =>
       ResponseProject(p.name, p.description, p.createdAt, p.git)
     }.toList
   }

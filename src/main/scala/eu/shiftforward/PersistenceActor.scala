@@ -69,7 +69,7 @@ class MemoryPersistenceActor extends PersistenceActor {
   override def getProjects: Future[List[ResponseProject]] = Future {
     val projs = mutable.MutableList[ResponseProject]()
     allProjects.foreach(p =>
-      projs += ResponseProject(p.name, p.description, p.timestamp, p.git))
+      projs += ResponseProject(p.name, p.description, p.createdAt, p.git))
     projs.toList
   }
 
@@ -94,7 +94,7 @@ class MemoryPersistenceActor extends PersistenceActor {
   override def getProject(name: String): Future[Option[ResponseProject]] = Future {
     val proj = allProjects find (_.name == name)
     proj.map { p =>
-      ResponseProject(p.name, p.description, p.timestamp, p.git)
+      ResponseProject(p.name, p.description, p.createdAt, p.git)
     }
   }
 

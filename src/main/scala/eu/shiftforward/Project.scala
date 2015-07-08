@@ -13,9 +13,9 @@ case class RequestDeploy(user: String, commit: Commit, description: String, stat
 
 case class RequestEvent(status: String, description: String) extends Request
 
-case class Project(name: String, description: String, timestamp: Long, git: String, deploys: List[Deploy])
+case class Project(name: String, description: String, createdAt: Long, git: String, deploys: List[Deploy])
 
-case class ResponseProject(name: String, description: String, timestamp: Long, git: String) extends Response
+case class ResponseProject(name: String, description: String, createdAt: Long, git: String) extends Response
 
 case class Commit(hash: String, branch: String)
 

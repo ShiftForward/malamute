@@ -133,7 +133,7 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
           responseAs[ResponseProject].name must beEqualTo("TestProj")
           responseAs[ResponseProject].description must beEqualTo("Proj Description Test")
         }
-        Post("/project/TestProj/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "up", "http://google.com/","1.1.1",false)) ~> deployLoggerRoute ~> check {
+        Post("/project/TestProj/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/","1.1.1",false)) ~> deployLoggerRoute ~> check {
           status === OK
           responseAs[Deploy].user must beEqualTo("testUser")
         }
@@ -144,7 +144,7 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
           responseAs[ResponseProject].name must beEqualTo("TestProj")
           responseAs[ResponseProject].description must beEqualTo("Proj Description Test")
         }
-        Post("/project/abc/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "up", "http://google.com/", "1.1.1",false)) ~> deployLoggerRoute ~> check {
+        Post("/project/abc/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1",false)) ~> deployLoggerRoute ~> check {
           status === NotFound
         }
       }
@@ -156,14 +156,14 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
           responseAs[ResponseProject].name must beEqualTo("TestProj")
           responseAs[ResponseProject].description must beEqualTo("Proj Description Test")
         }
-        Post("/project/TestProj/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "up", "http://google.com/", "1.1.1",false)) ~> deployLoggerRoute ~> check {
+        Post("/project/TestProj/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1",false)) ~> deployLoggerRoute ~> check {
           status === OK
           responseAs[Deploy].user must beEqualTo("testUser")
           val deployId = responseAs[Deploy].id
 
-          Post("/project/TestProj/deploy/" + deployId + "/event", RequestEvent("SUCCESS", "done")) ~> deployLoggerRoute ~> check {
+          Post("/project/TestProj/deploy/" + deployId + "/event", RequestEvent(DeployStatus.Success, "done")) ~> deployLoggerRoute ~> check {
             status === OK
-            responseAs[Event].status === "SUCCESS"
+            responseAs[Event].status === DeployStatus.Success
           }
           //tests if the first and only deploy have two events (inital + success)
           Get("/project/TestProj/deploys") ~> deployLoggerRoute ~> check {
@@ -179,14 +179,14 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
           responseAs[ResponseProject].name must beEqualTo("TestProj")
           responseAs[ResponseProject].description must beEqualTo("Proj Description Test")
         }
-        Post("/project/TestProj/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "up", "http://google.com/","1.1.1",false)) ~> deployLoggerRoute ~> check {
+        Post("/project/TestProj/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/","1.1.1",false)) ~> deployLoggerRoute ~> check {
           status === OK
           responseAs[Deploy].user must beEqualTo("testUser")
           val deployId = responseAs[Deploy].id
 
-          Post("/project/TestProj/deploy/" + deployId + "/event", RequestEvent("SUCCESS", "done")) ~> deployLoggerRoute ~> check {
+          Post("/project/TestProj/deploy/" + deployId + "/event", RequestEvent(DeployStatus.Success, "done")) ~> deployLoggerRoute ~> check {
             status === OK
-            responseAs[Event].status === "SUCCESS"
+            responseAs[Event].status === DeployStatus.Success
           }
           Get("/project/TestProj/deploy/" + deployId) ~> deployLoggerRoute ~> check {
             status === OK
@@ -202,11 +202,11 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
           responseAs[ResponseProject].name must beEqualTo("TestProj")
           responseAs[ResponseProject].description must beEqualTo("Proj Description Test")
         }
-        Post("/project/TestProj/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "up", "http://google.com/","1.1.1",false)) ~> deployLoggerRoute ~> check {
+        Post("/project/TestProj/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/","1.1.1",false)) ~> deployLoggerRoute ~> check {
           status === OK
           responseAs[Deploy].user must beEqualTo("testUser")
         }
-        Post("/project/TestProj/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "up", "http://google.com/","1.1.1",false)) ~> deployLoggerRoute ~> check {
+        Post("/project/TestProj/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/","1.1.1",false)) ~> deployLoggerRoute ~> check {
           status === OK
           responseAs[Deploy].user must beEqualTo("testUser")
         }

@@ -82,7 +82,7 @@ class MemoryPersistenceActor extends PersistenceActor {
   override def addDeploy(name: String, deploy: RequestDeploy): Future[Option[Deploy]] = Future {
     val proj: Option[Project] = allProjects find (_.name == name)
     proj.map { p: Project =>
-      val events: List[Event] = List(Event(currentTime, "STARTED", ""))
+      val events: List[Event] = List(Event(currentTime, DeployStatus.Started, ""))
       val newDeploy = Deploy(deploy.user, currentTime, deploy.commit, deploy.description, events, deploy.changelog, UUID.randomUUID().toString, deploy.version, deploy.isAutomatic)
       val newproj = p.copy(deploys = p.deploys :+ newDeploy)
       allProjects -= p

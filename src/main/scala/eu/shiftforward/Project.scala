@@ -1,7 +1,23 @@
 package eu.shiftforward
 
-import spray.json.DefaultJsonProtocol
-import spray.json.RootJsonFormat
+import eu.shiftforward.DeployStatus.DeployStatus
+import spray.json.{DefaultJsonProtocol, JsString, JsValue, RootJsonFormat}
+
+object DeployStatus extends Enumeration{
+
+  type DeployStatus = Value
+  val Started = Value("STARTED")
+  val Skipped = Value("SKIPPED")
+  val Failed = Value("FAILED")
+  val Success = Value("SUCCESS")
+  implicit object DeployStatusJsonFormat extends RootJsonFormat[DeployStatus.DeployStatus] {
+    def write(obj: DeployStatus.DeployStatus): JsValue = JsString(obj.toString)
+
+    def read(json: JsValue): DeployStatus.Value = json match {
+      case JsString(str) => DeployStatus.withName(str)
+    }
+  }
+}
 
 sealed trait Request
 
@@ -9,9 +25,9 @@ sealed trait Response
 
 case class RequestProject(name: String, description: String, git: String) extends Request
 
-case class RequestDeploy(user: String, commit: Commit, description: String, status: String, changelog: String, version: String, isAutomatic: Boolean)  extends Request
+case class RequestDeploy(user: String, commit: Commit, description: String, changelog: String, version: String, isAutomatic: Boolean) extends Request
 
-case class RequestEvent(status: String, description: String) extends Request
+case class RequestEvent(status: DeployStatus, description: String) extends Request
 
 case class Project(name: String, description: String, createdAt: Long, git: String, deploys: List[Deploy])
 
@@ -19,7 +35,7 @@ case class ResponseProject(name: String, description: String, createdAt: Long, g
 
 case class Commit(hash: String, branch: String)
 
-case class Event(timestamp: Long, status: String, description: String)
+case class Event(timestamp: Long, status: DeployStatus, description: String)
 
 case class Deploy(user: String, timestamp: Long, commit: Commit, description: String, events: List[Event], changelog: String, id: String, version: String, isAutomatic: Boolean)
 
@@ -52,6 +68,6 @@ object RequestProject extends DefaultJsonProtocol {
 }
 
 object RequestDeploy extends DefaultJsonProtocol {
-  implicit val simpleDeployFormat: RootJsonFormat[RequestDeploy] = jsonFormat7(RequestDeploy.apply)
+  implicit val simpleDeployFormat: RootJsonFormat[RequestDeploy] = jsonFormat6(RequestDeploy.apply)
 }
 

@@ -7,6 +7,7 @@ import akka.actor.ActorRef
 import akka.pattern.ask
 import akka.util.Timeout
 import com.wordnik.swagger.annotations._
+import eu.shiftforward.entities._
 import spray.http.MediaTypes._
 import spray.http.StatusCodes._
 import spray.httpx.SprayJsonSupport._
@@ -51,7 +52,7 @@ abstract class DeployLoggerService extends HttpService {
   @Path("project")
   @ApiOperation(httpMethod = "POST", response = classOf[Project], value = "Returns a Project", consumes = "application/json; charset=UTF-8", produces = "{'application/json','text/plain'}")
   @ApiImplicitParams(Array(
-    new ApiImplicitParam(name = "body", value = "Deploy Object", dataType = "eu.shiftforward.RequestProject", required = true, paramType = "body")
+    new ApiImplicitParam(name = "body", value = "Deploy Object", dataType = "eu.shiftforward.entities.RequestProject", required = true, paramType = "body")
   ))
   @ApiResponses(Array(
     new ApiResponse(code = 200, message = "OK"),
@@ -73,7 +74,7 @@ abstract class DeployLoggerService extends HttpService {
   @ApiOperation(httpMethod = "POST", response = classOf[Deploy], value = "Returns a Deploy", consumes = "application/json; charset=UTF-8", produces = "application/json; charset=UTF-8")
   @ApiImplicitParams(Array(
     new ApiImplicitParam(name = "projName", required = true, dataType = "string", paramType = "path", value = "Name of project that needs to be fetched"),
-    new ApiImplicitParam(name = "body", value = "Deploy Object", dataType = "eu.shiftforward.RequestDeploy", required = true, paramType = "body")
+    new ApiImplicitParam(name = "body", value = "Deploy Object", dataType = "eu.shiftforward.entities.RequestDeploy", required = true, paramType = "body")
   ))
   @ApiResponses(Array(
     new ApiResponse(code = 200, message = "OK"),
@@ -115,7 +116,7 @@ abstract class DeployLoggerService extends HttpService {
   @ApiImplicitParams(Array(
     new ApiImplicitParam(name = "projName", required = true, dataType = "string", paramType = "path", value = "Name of project that needs to be fetched"),
     new ApiImplicitParam(name = "deployId", required = true, dataType = "string", paramType = "path", value = "Id of deploy that needs to be fetched"),
-    new ApiImplicitParam(name = "body", value = "Event Object", dataType = "eu.shiftforward.RequestEvent", required = true, paramType = "body")
+    new ApiImplicitParam(name = "body", value = "Event Object", dataType = "eu.shiftforward.entities.RequestEvent", required = true, paramType = "body")
   ))
   @ApiResponses(Array(
     new ApiResponse(code = 200, message = "OK"),

@@ -2,6 +2,7 @@ package eu.shiftforward
 
 import java.util.UUID
 import akka.actor.Actor
+import eu.shiftforward.entities._
 import scala.collection.mutable
 import scala.compat.Platform._
 import scala.concurrent.{ ExecutionContext, Future }

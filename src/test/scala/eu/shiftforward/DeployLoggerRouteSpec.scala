@@ -5,6 +5,7 @@
 package eu.shiftforward
 
 import akka.actor.{ActorRef, Props}
+import eu.shiftforward.entities._
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
 import spray.http.StatusCodes._

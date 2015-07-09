@@ -17,7 +17,7 @@ trait PersistenceActor extends Actor {
 
   def getProjects: Future[List[ResponseProject]]
 
-  def deleteProject(name: String): Future[Option[Project]]
+  def deleteProject(name: String): Future[Option[ResponseProject]]
 
   def addDeploy(name: String, deploy: RequestDeploy): Future[Option[Deploy]]
 
@@ -72,10 +72,12 @@ class MemoryPersistenceActor extends PersistenceActor {
     }.toList
   }
 
-  override def deleteProject(name: String): Future[Option[Project]] = Future {
-    val p = allProjects.get(name)
+  override def deleteProject(name: String): Future[Option[ResponseProject]] = Future {
+    val proj = allProjects.get(name)
     allProjects -= name
-    p
+    proj.map { p =>
+      ResponseProject(p.name, p.description, p.createdAt, p.git)
+    }
   }
 
   override def addDeploy(name: String, deploy: RequestDeploy): Future[Option[Deploy]] = Future {

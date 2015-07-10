@@ -9,14 +9,14 @@ case class Commit(hash: String, branch: String)
 
 case class Event(timestamp: Long, status: DeployStatus, description: String)
 
-case class Deploy(user: String, timestamp: Long, commit: Commit, description: String, events: List[Event], changelog: String, id: String, version: String, isAutomatic: Boolean)
+case class Deploy(user: String, timestamp: Long, commit: Commit, description: String, events: List[Event], changelog: String, id: String, version: String, isAutomatic: Boolean, client: String)
 
 object Project extends DefaultJsonProtocol {
   implicit val projFormat: RootJsonFormat[Project] = jsonFormat5(Project.apply)
 }
 
 object Deploy extends DefaultJsonProtocol {
-  implicit val deployFormat: RootJsonFormat[Deploy] = jsonFormat9(Deploy.apply)
+  implicit val deployFormat: RootJsonFormat[Deploy] = jsonFormat10(Deploy.apply)
 }
 
 object Event extends DefaultJsonProtocol {

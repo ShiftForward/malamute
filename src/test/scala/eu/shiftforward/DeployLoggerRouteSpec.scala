@@ -134,7 +134,7 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
           responseAs[ResponseProject].name must beEqualTo("TestProj")
           responseAs[ResponseProject].description must beEqualTo("Proj Description Test")
         }
-        Post("/project/TestProj/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/","1.1.1",false)) ~> projectDeployPostRoute ~> check {
+        Post("/project/TestProj/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/","1.1.1",false,"Cliente")) ~> projectDeployPostRoute ~> check {
           status === OK
           responseAs[Deploy].user must beEqualTo("testUser")
         }
@@ -145,7 +145,7 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
           responseAs[ResponseProject].name must beEqualTo("TestProj")
           responseAs[ResponseProject].description must beEqualTo("Proj Description Test")
         }
-        Post("/project/abc/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1",false)) ~> projectDeployPostRoute ~> check {
+        Post("/project/abc/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1",false,"Cliente")) ~> projectDeployPostRoute ~> check {
           status === NotFound
         }
       }
@@ -157,7 +157,7 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
           responseAs[ResponseProject].name must beEqualTo("TestProj")
           responseAs[ResponseProject].description must beEqualTo("Proj Description Test")
         }
-        Post("/project/TestProj/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1",false)) ~> projectDeployPostRoute ~> check {
+        Post("/project/TestProj/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1",false,"Cliente")) ~> projectDeployPostRoute ~> check {
           status === OK
           responseAs[Deploy].user must beEqualTo("testUser")
           val deployId = responseAs[Deploy].id
@@ -180,7 +180,7 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
           responseAs[ResponseProject].name must beEqualTo("TestProj")
           responseAs[ResponseProject].description must beEqualTo("Proj Description Test")
         }
-        Post("/project/TestProj/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/","1.1.1",false)) ~> projectDeployPostRoute ~> check {
+        Post("/project/TestProj/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/","1.1.1",false,"Cliente")) ~> projectDeployPostRoute ~> check {
           status === OK
           responseAs[Deploy].user must beEqualTo("testUser")
           val deployId = responseAs[Deploy].id
@@ -203,11 +203,11 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
           responseAs[ResponseProject].name must beEqualTo("TestProj")
           responseAs[ResponseProject].description must beEqualTo("Proj Description Test")
         }
-        Post("/project/TestProj/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/","1.1.1",false)) ~> projectDeployPostRoute ~> check {
+        Post("/project/TestProj/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/","1.1.1",false,"Cliente")) ~> projectDeployPostRoute ~> check {
           status === OK
           responseAs[Deploy].user must beEqualTo("testUser")
         }
-        Post("/project/TestProj/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/","1.1.1",false)) ~> projectDeployPostRoute ~> check {
+        Post("/project/TestProj/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/","1.1.1",false,"Cliente")) ~> projectDeployPostRoute ~> check {
           status === OK
           responseAs[Deploy].user must beEqualTo("testUser")
         }

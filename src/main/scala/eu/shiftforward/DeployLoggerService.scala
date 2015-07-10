@@ -7,13 +7,9 @@ import akka.pattern.ask
 import akka.util.Timeout
 import com.wordnik.swagger.annotations._
 import eu.shiftforward.entities._
-import spray.http.StatusCode
-import spray.httpx.UnsuccessfulResponseException
-import spray.json._
-import spray.json.DefaultJsonProtocol._
 import spray.http.StatusCodes._
 import spray.httpx.SprayJsonSupport._
-import spray.routing.{ ExceptionHandler, HttpService }
+import spray.routing.{HttpService }
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 import scala.util.{ Failure, Success }

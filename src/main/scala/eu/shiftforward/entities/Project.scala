@@ -27,5 +27,3 @@ object Commit extends DefaultJsonProtocol {
   implicit val commitFormat: RootJsonFormat[Commit] = jsonFormat2(Commit.apply)
 }
 
-
-

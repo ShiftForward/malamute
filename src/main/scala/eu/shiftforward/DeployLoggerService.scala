@@ -2,16 +2,18 @@ package eu.shiftforward
 
 import java.net.MalformedURLException
 import javax.ws.rs.Path
-
 import akka.actor.ActorRef
 import akka.pattern.ask
 import akka.util.Timeout
 import com.wordnik.swagger.annotations._
 import eu.shiftforward.entities._
-import spray.http.MediaTypes._
+import spray.http.StatusCode
+import spray.httpx.UnsuccessfulResponseException
+import spray.json._
+import spray.json.DefaultJsonProtocol._
 import spray.http.StatusCodes._
 import spray.httpx.SprayJsonSupport._
-import spray.routing.HttpService
+import spray.routing.{ ExceptionHandler, HttpService }
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 import scala.util.{ Failure, Success }
@@ -32,9 +34,7 @@ abstract class DeployLoggerService extends HttpService {
   ))
   def pingRoute = path("ping") {
     get {
-      respondWithMediaType(`text/plain`) {
-        complete("pong")
-      }
+      complete(Map("teste" -> "pong"))
     }
   }
 
@@ -103,10 +103,9 @@ abstract class DeployLoggerService extends HttpService {
     new ApiResponse(code = 404, message = "NotFound")
   ))
   def projectDeploysGetRoute = path("project" / Segment / "deploys") { projName =>
-    parameters('max.as[Int].?) { (max: Option[Int]) =>
+    parameters("max".?[Int](10)) { max: Int =>
       get {
-        val maxParam = max getOrElse 10
-        complete((actorPersistence ? GetDeploys(projName, maxParam)).mapTo[Option[List[Deploy]]])
+        complete((actorPersistence ? GetDeploys(projName, max)).mapTo[Option[List[Deploy]]])
       }
     }
   }

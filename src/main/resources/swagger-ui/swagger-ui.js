@@ -3723,7 +3723,7 @@ Operation.prototype.setContentTypes = function (args, opts) {
   if (opts.responseContentType) {
     accepts = opts.responseContentType;
   } else {
-    accepts = 'application/json';
+    accepts = '';
   }
 
   if (accepts && this.produces) {

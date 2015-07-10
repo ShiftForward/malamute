@@ -8,7 +8,7 @@ import scala.compat.Platform._
 import scala.concurrent.{ ExecutionContext, Future }
 import akka.pattern.pipe
 
-case class DuplicatedEntry(error: String) extends Exception
+case class DuplicatedEntry(error: String) extends RuntimeException
 
 trait PersistenceActor extends Actor {
 

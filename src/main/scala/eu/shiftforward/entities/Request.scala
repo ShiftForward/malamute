@@ -1,7 +1,7 @@
 package eu.shiftforward.entities
 
 import DeployStatus._
-import spray.json.{RootJsonFormat, DefaultJsonProtocol}
+import spray.json.{ RootJsonFormat, DefaultJsonProtocol }
 
 sealed trait Request
 

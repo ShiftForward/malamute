@@ -1,6 +1,6 @@
 package eu.shiftforward.entities
 
-import spray.json.{JsString, JsValue, RootJsonFormat}
+import spray.json.{ JsString, JsValue, RootJsonFormat }
 
 object DeployStatus extends Enumeration {
   type DeployStatus = Value

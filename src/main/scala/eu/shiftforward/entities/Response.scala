@@ -1,5 +1,5 @@
 package eu.shiftforward.entities
-import spray.json.{RootJsonFormat, DefaultJsonProtocol}
+import spray.json.{ RootJsonFormat, DefaultJsonProtocol }
 
 sealed trait Response
 

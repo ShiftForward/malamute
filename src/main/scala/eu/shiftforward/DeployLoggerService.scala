@@ -34,7 +34,7 @@ abstract class DeployLoggerService extends HttpService {
   ))
   def pingRoute = path("ping") {
     get {
-      complete(Map("teste" -> "pong"))
+      complete("pong")
     }
   }
 
@@ -50,7 +50,7 @@ abstract class DeployLoggerService extends HttpService {
   }
 
   @Path("project")
-  @ApiOperation(httpMethod = "POST", response = classOf[Project], value = "Returns a Project", consumes = "application/json; charset=UTF-8", produces = "{'application/json','text/plain'}")
+  @ApiOperation(httpMethod = "POST", response = classOf[Project], value = "Returns a Project", consumes = "application/json; charset=UTF-8", produces = "application/json; charset=UTF-8")
   @ApiImplicitParams(Array(
     new ApiImplicitParam(name = "body", value = "Deploy Object", dataType = "eu.shiftforward.entities.RequestProject", required = true, paramType = "body")
   ))

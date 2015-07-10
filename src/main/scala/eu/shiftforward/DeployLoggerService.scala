@@ -14,8 +14,15 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 import scala.util.{ Failure, Success }
 
+
+object DeployLoggerService {
+  final val json = "application/json; charset=UTF-8"
+}
+
 @Api(value = "/", description = "Deploy Logger Service")
 abstract class DeployLoggerService extends HttpService {
+
+  import DeployLoggerService._
 
   def actorPersistence: ActorRef
 
@@ -23,7 +30,6 @@ abstract class DeployLoggerService extends HttpService {
 
   implicit val timeout = Timeout(5.seconds)
 
-  final val json = "application/json; charset=UTF-8"
 
   @Path("ping")
   @ApiOperation(httpMethod = "GET", response = classOf[String], value = "Returns a pong", produces = "text/plain")

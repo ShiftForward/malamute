@@ -9,11 +9,10 @@ import com.wordnik.swagger.annotations._
 import eu.shiftforward.entities._
 import spray.http.StatusCodes._
 import spray.httpx.SprayJsonSupport._
-import spray.routing.{HttpService }
+import spray.routing.{ HttpService }
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 import scala.util.{ Failure, Success }
-
 
 object DeployLoggerService {
   final val json = "application/json; charset=UTF-8"
@@ -29,7 +28,6 @@ abstract class DeployLoggerService extends HttpService {
   implicit def ec: ExecutionContext
 
   implicit val timeout = Timeout(5.seconds)
-
 
   @Path("ping")
   @ApiOperation(httpMethod = "GET", response = classOf[String], value = "Returns a pong", produces = "text/plain")

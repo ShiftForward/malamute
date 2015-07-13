@@ -3,13 +3,37 @@ package eu.shiftforward.entities
 import DeployStatus.DeployStatus
 import spray.json.{ DefaultJsonProtocol, RootJsonFormat }
 
-case class Project(name: String, description: String, createdAt: Long, git: String, deploys: List[Deploy])
+case class Project(
+  name: String,
+  description: String,
+  createdAt: Long,
+  git: String,
+  deploys: List[Deploy]
+)
 
-case class Commit(hash: String, branch: String)
+case class Commit(
+  hash: String,
+  branch: String
+)
 
-case class Event(timestamp: Long, status: DeployStatus, description: String)
+case class Event(
+  timestamp: Long,
+  status: DeployStatus,
+  description: String
+)
 
-case class Deploy(user: String, timestamp: Long, commit: Commit, description: String, events: List[Event], changelog: String, id: String, version: String, isAutomatic: Boolean, client: String)
+case class Deploy(
+  user: String,
+  timestamp: Long,
+  commit: Commit,
+  description: String,
+  events: List[Event],
+  changelog: String,
+  id: String,
+  version: String,
+  isAutomatic: Boolean,
+  client: String
+)
 
 object Project extends DefaultJsonProtocol {
   implicit val projFormat: RootJsonFormat[Project] = jsonFormat5(Project.apply)

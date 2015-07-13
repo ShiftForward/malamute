@@ -1,12 +1,10 @@
-package eu.shiftforward
+package eu.shiftforward.persistence
 
-import java.util.UUID
 import akka.actor.Actor
-import eu.shiftforward.entities._
-import scala.collection.mutable
-import scala.compat.Platform._
-import scala.concurrent.{ ExecutionContext, Future }
 import akka.pattern.pipe
+import eu.shiftforward.entities._
+
+import scala.concurrent.{ExecutionContext, Future}
 
 case class DuplicatedEntry(error: String) extends RuntimeException
 

@@ -4,6 +4,7 @@ import akka.actor.{ ActorSystem, Props }
 import akka.io.IO
 import akka.pattern.ask
 import akka.util.Timeout
+import eu.shiftforward.api.DeployLoggerActor
 import spray.can.Http
 
 import scala.concurrent.duration._

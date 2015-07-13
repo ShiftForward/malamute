@@ -1,11 +1,13 @@
-package eu.shiftforward
+package eu.shiftforward.api
 
 import akka.actor._
 import akka.util.Timeout
 import com.gettyimages.spray.swagger._
 import com.typesafe.scalalogging.LazyLogging
 import com.wordnik.swagger.model.ApiInfo
+import eu.shiftforward.persistence.MemoryPersistenceActor
 import spray.routing.HttpService
+
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 import scala.reflect.runtime.universe._

@@ -5,7 +5,7 @@ import akka.util.Timeout
 import com.gettyimages.spray.swagger._
 import com.typesafe.scalalogging.LazyLogging
 import com.wordnik.swagger.model.ApiInfo
-import eu.shiftforward.persistence.{SlickPersistenceActor, MemoryPersistenceActor}
+import eu.shiftforward.persistence.{ SlickPersistenceActor, MemoryPersistenceActor }
 import spray.routing.HttpService
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
@@ -18,7 +18,7 @@ class DeployLoggerActor extends Actor with HttpService with LazyLogging {
   def actorRefFactory: ActorRefFactory = context
 
   val swaggerService = new SwaggerHttpService {
-    override def apiTypes = Seq(typeOf[SlickPersistenceActor])
+    override def apiTypes = Seq(typeOf[DeployLoggerService])
     override def apiVersion = "0.1"
     override def baseUrl = "/"
     override def docsPath = "api-docs"
@@ -33,8 +33,7 @@ class DeployLoggerActor extends Actor with HttpService with LazyLogging {
   }
 
   def receive = runRoute(
-    projects.projectPostRoute ~  projects.projectGetRoute ~ projects.projectsGetRoute
-   /* projects.pingRoute ~
+    projects.pingRoute ~
       projects.projectPostRoute ~
       projects.projectsGetRoute ~
       projects.projectDeployPostRoute ~
@@ -51,7 +50,7 @@ class DeployLoggerActor extends Actor with HttpService with LazyLogging {
           }
         } ~
           getFromResourceDirectory("swagger-ui")
-      }*/
+      }
   )
 
 }

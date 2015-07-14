@@ -121,8 +121,8 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
       "return a 404 response for DELETE requests to a name that doesn't exists" in new MockDeployLoggerService {
         Post("/project", RequestProject("TestProj", "Proj Description Test", "http://bitbucket.com/abc")) ~> projectPostRoute ~> check {
           status === OK
-          responseAs[Project].name must beEqualTo("TestProj")
-          responseAs[Project].description must beEqualTo("Proj Description Test")
+          responseAs[ResponseProject].name must beEqualTo("TestProj")
+          responseAs[ResponseProject].description must beEqualTo("Proj Description Test")
         }
         Delete("/project/babla") ~> projectDeleteRoute ~> check {
           status === NotFound

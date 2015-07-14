@@ -2,11 +2,11 @@ package eu.shiftforward.persistence
 
 import java.util.UUID
 
-import eu.shiftforward.entities.{Deploy, Event, Project, RequestProject, ResponseProject, _}
+import eu.shiftforward.entities.{ Deploy, Event, Project, RequestProject, ResponseProject, _ }
 
 import scala.collection.mutable
 import scala.compat.Platform._
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 class MemoryPersistenceActor extends PersistenceActor {
 
@@ -14,13 +14,13 @@ class MemoryPersistenceActor extends PersistenceActor {
 
   override implicit def ec: ExecutionContext = context.dispatcher
 
-  override def saveProject(project: RequestProject): Future[Project] = Future {
+  override def saveProject(project: RequestProject): Future[ResponseProject] = Future {
     val proj = Project(project.name, project.description, currentTime, project.git, List())
     allProjects.get(proj.name) match {
       case Some(_) => throw new DuplicatedEntry(proj.name + " already exists.")
       case None => {
         allProjects += proj.name -> proj
-        proj
+        ResponseProject(proj.name, proj.description, proj.createdAt, proj.git)
       }
     }
   }

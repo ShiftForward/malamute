@@ -15,7 +15,7 @@ import spray.routing.HttpService
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
-import scala.util.{Failure, Success}
+import scala.util.{ Failure, Success }
 
 object DeployLoggerService {
   final val json = "application/json; charset=UTF-8"
@@ -67,7 +67,7 @@ abstract class DeployLoggerService extends HttpService {
   def projectPostRoute = path("project") {
     post {
       entity(as[RequestProject]) { proj =>
-        onComplete((actorPersistence ? SaveProject(proj)).mapTo[Project]) {
+        onComplete((actorPersistence ? SaveProject(proj)).mapTo[ResponseProject]) {
           case Success(project) => complete(project)
           case Failure(ex: DuplicatedEntry) => complete(UnprocessableEntity, s"An error occurred: ${ex.error}")
           case Failure(ex) => complete(BadRequest, s"An error occurred: ${ex.getMessage}")

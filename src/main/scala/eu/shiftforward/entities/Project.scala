@@ -3,6 +3,7 @@ package eu.shiftforward.entities
 import DeployStatus.DeployStatus
 import spray.json.{ DefaultJsonProtocol, RootJsonFormat }
 
+
 case class Project(
   name: String,
   description: String,
@@ -50,4 +51,6 @@ object Event extends DefaultJsonProtocol {
 object Commit extends DefaultJsonProtocol {
   implicit val commitFormat: RootJsonFormat[Commit] = jsonFormat2(Commit.apply)
 }
+
+
 

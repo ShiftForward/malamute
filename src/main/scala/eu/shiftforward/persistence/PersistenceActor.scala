@@ -4,7 +4,7 @@ import akka.actor.Actor
 import akka.pattern.pipe
 import eu.shiftforward.entities._
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 case class DuplicatedEntry(error: String) extends RuntimeException
 
@@ -12,7 +12,7 @@ trait PersistenceActor extends Actor {
 
   implicit def ec: ExecutionContext
 
-  def saveProject(project: RequestProject): Future[Project]
+  def saveProject(project: RequestProject): Future[ResponseProject]
 
   def getProjects: Future[List[ResponseProject]]
 

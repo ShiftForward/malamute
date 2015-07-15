@@ -18,15 +18,12 @@ object SlickPersistenceActor extends LazyLogging {
   val deploys = TableQuery[Deploys]
   val events = TableQuery[Events]
 
-  logger.info("Updating db.")
+  logger.info("Updating db. Drop and create.")
   val ddl = projects.schema ++ deploys.schema ++ events.schema
   db.run(DBIO.seq(
     ddl.drop,
     ddl.create
   ))
-  //Await.result(db.run(ddl.drop), 5.seconds)
-  // Await.result(db.run(ddl.create), 5.seconds)
-  //}
 }
 
 class SlickPersistenceActor extends PersistenceActor {
@@ -113,41 +110,37 @@ class SlickPersistenceActor extends PersistenceActor {
     }
   }
 
-  def getEvents(id: String): Future[List[Event]] ={
-    db.run(events.filter(_.deployID === id).result).map { _.map { e =>
+  def getEvents(id: String): Future[List[Event]] = {
+    db.run(events.filter(_.deployID === id).result).map {
+      _.map { e =>
         Event(e.timestamp, e.status, e.description)
       }.toList
     }
   }
 
   def projExists(name: String): Future[Boolean] = {
-    db.run(projects.filter(_.name === name).result).map{ f => f.nonEmpty }
+    db.run(projects.filter(_.name === name).result).map { f => f.nonEmpty }
   }
 
-  /*
-  *   Deploy(
-              d.user,
-              d.timestamp,
-              Commit(d.commit_hash, d.commit_branch),
-              d.description,
-              f,
-              d.changelog,
-              d.id,
-              d.version,
-              d.isAutomatic,
-              d.client
-            )
-            : Future[Option[List[Deploy]]]
-  * */
-  override def getDeploys(name: String, max: Int): Future[Option[List[Deploy]]] = ??? /* {
-  db.run(deploys.filter(_.projName === name).result).map(f =>
-      Future.sequence(
-        f.map { d =>
-          getEvents(d.id).map(f => Deploy(d.user, d.timestamp, Commit(d.commit_hash, d.commit_branch), d.description, f, d.changelog, d.id, d.version, d.isAutomatic, d.client))
-        }.toList.take(max)
-      )
-    )
-  }*/
+  override def getDeploys(name: String, max: Int): Future[List[Deploy]] = {
+    db.run(deploys.filter(_.projName === name).result).flatMap(f =>
+      Future.sequence(f.map { d =>
+        getEvents(d.id).map { listEvents =>
+          Deploy(
+            d.user,
+            d.timestamp,
+            Commit(d.commit_hash, d.commit_branch),
+            d.description,
+            listEvents,
+            d.changelog,
+            d.id,
+            d.version,
+            d.isAutomatic,
+            d.client
+          )
+        }
+      }.toList.take(max)))
+  }
 
   override def getProjects: Future[List[ResponseProject]] = {
     db.run(projects.result).map { list =>
@@ -158,24 +151,23 @@ class SlickPersistenceActor extends PersistenceActor {
   }
 
   override def getDeploy(projName: String, deployId: String): Future[Option[Deploy]] = {
-    db.run(deploys.filter(_.projName === projName).filter(_.id === deployId).result.headOption).map { list =>
-      list.map { d =>
-        val deployEvents = Await.result(db.run(events.filter(_.deployID === d.id).result), 5.seconds).map { e =>
-          Event(e.timestamp, e.status, e.description)
-        }.toList
-        Deploy(
-          d.user,
-          d.timestamp,
-          Commit(d.commit_hash, d.commit_branch),
-          d.description,
-          deployEvents,
-          d.changelog,
-          d.id,
-          d.version,
-          d.isAutomatic,
-          d.client
-        )
-      }
-    }
+    db.run(deploys.filter(_.projName === projName).filter(_.id === deployId).result.headOption).flatMap { f =>
+      Future.sequence(f.map { d =>
+        getEvents(d.id).map { listEvents =>
+          Deploy(
+            d.user,
+            d.timestamp,
+            Commit(d.commit_hash, d.commit_branch),
+            d.description,
+            listEvents,
+            d.changelog,
+            d.id,
+            d.version,
+            d.isAutomatic,
+            d.client
+          )
+        }
+      }.toList)
+    }.map(_.headOption)
   }
 }

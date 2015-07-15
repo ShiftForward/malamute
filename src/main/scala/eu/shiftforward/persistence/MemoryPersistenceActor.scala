@@ -73,11 +73,11 @@ class MemoryPersistenceActor extends PersistenceActor {
     }
   }
 
-  override def getDeploys(name: String, max: Int): Future[Option[List[Deploy]]] = Future {
+  override def getDeploys(name: String, max: Int): Future[List[Deploy]] = Future {
     val proj: Option[Project] = allProjects.get(name)
     proj.map { p: Project =>
       p.deploys.take(max)
-    }
+    }.getOrElse(List())
   }
 
   override def getDeploy(projName: String, deployId: String): Future[Option[Deploy]] = Future {

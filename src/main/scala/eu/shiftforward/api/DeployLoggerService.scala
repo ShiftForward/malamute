@@ -111,7 +111,7 @@ abstract class DeployLoggerService extends HttpService {
   def projectDeploysGetRoute = path("project" / Segment / "deploys") { projName =>
     parameters("max".?[Int](10)) { max: Int =>
       get {
-        complete((actorPersistence ? GetDeploys(projName, max)).mapTo[Option[List[Deploy]]])
+        complete((actorPersistence ? GetDeploys(projName, max)).mapTo[List[Deploy]])
       }
     }
   }

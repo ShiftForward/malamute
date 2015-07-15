@@ -22,7 +22,7 @@ trait PersistenceActor extends Actor {
 
   def getProject(name: String): Future[Option[ResponseProject]]
 
-  def getDeploys(name: String, max: Int): Future[Option[List[Deploy]]]
+  def getDeploys(name: String, max: Int): Future[List[Deploy]]
 
   def addEvent(projName: String, deployId: String, event: RequestEvent): Future[Option[Event]]
 

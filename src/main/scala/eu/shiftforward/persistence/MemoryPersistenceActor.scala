@@ -39,14 +39,14 @@ class MemoryPersistenceActor extends PersistenceActor {
     }
   }
 
-  override def addDeploy(name: String, deploy: RequestDeploy): Future[Option[Deploy]] = Future {
+  override def addDeploy(name: String, deploy: RequestDeploy): Future[Option[ResponseDeploy]] = Future {
     val proj: Option[Project] = allProjects.get(name)
     proj.map { p: Project =>
       val events: List[Event] = List(Event(currentTime, DeployStatus.Started, ""))
       val newDeploy = Deploy(deploy.user, currentTime, deploy.commit, deploy.description, events, deploy.changelog, UUID.randomUUID().toString, deploy.version, deploy.isAutomatic, deploy.client)
       val newProj = p.copy(deploys = p.deploys :+ newDeploy)
       allProjects += (name -> newProj)
-      newDeploy
+      ResponseDeploy(newDeploy.user,newDeploy.timestamp,newDeploy.commit.branch, newDeploy.commit.hash, newDeploy.description,newDeploy.events,newDeploy.changelog,newDeploy.id,newDeploy.version,newDeploy.isAutomatic,newDeploy.client)
     }
   }
 
@@ -57,7 +57,7 @@ class MemoryPersistenceActor extends PersistenceActor {
     }
   }
 
-  override def addEvent(projName: String, deployId: String, event: RequestEvent): Future[Option[Event]] = Future {
+  override def addEvent(projName: String, deployId: String, event: RequestEvent): Future[Option[ResponseEvent]] = Future {
     val proj: Option[Project] = allProjects.get(projName)
     proj.flatMap { p: Project =>
       val deploy: Option[Deploy] = p.deploys find (_.id == deployId)
@@ -67,23 +67,26 @@ class MemoryPersistenceActor extends PersistenceActor {
         val newDeploys = p.deploys.filterNot(_ == d) :+ newDeploy
         val newProj = p.copy(deploys = newDeploys)
         allProjects += (projName -> newProj)
-        ev
+        ResponseEvent(ev.timestamp,ev.status,ev.description)
       }
 
     }
   }
 
-  override def getDeploys(name: String, max: Int): Future[List[Deploy]] = Future {
+  override def getDeploys(name: String, max: Int): Future[List[ResponseDeploy]] = Future {
     val proj: Option[Project] = allProjects.get(name)
     proj.map { p: Project =>
-      p.deploys.take(max)
+      p.deploys.map{newDeploy => ResponseDeploy(newDeploy.user,newDeploy.timestamp,newDeploy.commit.branch, newDeploy.commit.hash, newDeploy.description,newDeploy.events,newDeploy.changelog,newDeploy.id,newDeploy.version,newDeploy.isAutomatic,newDeploy.client)
+      }.take(max)
     }.getOrElse(List())
   }
 
-  override def getDeploy(projName: String, deployId: String): Future[Option[Deploy]] = Future {
+  override def getDeploy(projName: String, deployId: String): Future[Option[ResponseDeploy]] = Future {
     val proj: Option[Project] = allProjects.get(projName)
     proj.flatMap { p: Project =>
-      p.deploys find (_.id == deployId)
+      p.deploys find (_.id == deployId) match {
+        case Some(newDeploy) => Some(ResponseDeploy(newDeploy.user,newDeploy.timestamp,newDeploy.commit.branch, newDeploy.commit.hash, newDeploy.description,newDeploy.events,newDeploy.changelog,newDeploy.id,newDeploy.version,newDeploy.isAutomatic,newDeploy.client))
+      }
     }
   }
 }

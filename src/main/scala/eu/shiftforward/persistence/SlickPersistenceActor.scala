@@ -1,38 +1,69 @@
 package eu.shiftforward.persistence
 
 import java.util.UUID
+import akka.actor.Actor.Receive
+import akka.actor.{Props, Actor}
 import com.typesafe.scalalogging.LazyLogging
 import eu.shiftforward.entities._
 import eu.shiftforward.models._
+import slick.driver.SQLiteDriver
 import slick.jdbc.meta.MTable
 import scala.compat.Platform._
-import scala.concurrent.{ Await, ExecutionContext, Future }
-import slick.driver.SQLiteDriver.api._
 import scala.concurrent.duration._
+import scala.concurrent.{Await, ExecutionContext, Future}
+import slick.driver.SQLiteDriver.api._
 
-object SlickPersistenceActor extends LazyLogging {
-
-  val db = Database.forURL("jdbc:sqlite:rdvs.db", driver = "org.sqlite.JDBC", keepAliveConnection = true)
+object Db {
 
   val projects = TableQuery[Projects]
   val deploys = TableQuery[Deploys]
   val events = TableQuery[Events]
 
-  logger.info("Updating db. Drop and create.")
-  val ddl = projects.schema ++ deploys.schema ++ events.schema
-  db.run(DBIO.seq(
-    ddl.drop,
-    ddl.create
-  ))
+  val ddl =  projects.schema ++ deploys.schema ++ events.schema
+
 }
+/*
+class SqlActor extends Actor with LazyLogging {
 
-class SlickPersistenceActor extends PersistenceActor {
+  val database =  Db.create()
 
-  import SlickPersistenceActor._
+  logger.info("Updating db. Drop and create.")
+
+  val actorRef = context.actorOf(Props(new SlickPersistenceActor(database)))
+
+  override def receive: Receive ={
+    case initDb => Db.setup(database)
+    //case Any(x) => actorRef ! x
+  }
+
+}
+*/
+class SlickPersistenceActor(dbUrl: String) extends PersistenceActor with LazyLogging {
+
+  import Db._
+
+  var db: Database = _
+
+  override def preStart(): Unit ={
+
+
+    db = Database.forURL(dbUrl, driver = "org.sqlite.JDBC", keepAliveConnection = true)
+    Await.result(db.run(MTable.getTables), 1.seconds).headOption match {
+      case None => {
+        logger.info("Creating DB.")
+        Await.result(db.run(DBIO.seq(
+          ddl.create
+        )), 5.seconds)
+      }
+      case Some(_) =>
+        logger.info("Using existent DB.")
+    }
+
+  }
 
   override implicit def ec: ExecutionContext = context.dispatcher
 
-  override def addDeploy(name: String, deploy: RequestDeploy): Future[Option[Deploy]] = {
+  override def addDeploy(name: String, deploy: RequestDeploy): Future[Option[ResponseDeploy]] = {
     db.run(projects.filter(_.name === name).result.headOption).flatMap { projOpt =>
       projOpt.map { p =>
         val newDeploy = DeployModel(
@@ -52,10 +83,11 @@ class SlickPersistenceActor extends PersistenceActor {
         db.run(deploys += newDeploy).zip(
           db.run(events += deployEvent)).map {
           case _ =>
-            Some(Deploy(
+            Some(ResponseDeploy(
               newDeploy.user,
               newDeploy.timestamp,
-              Commit(newDeploy.commit_hash, newDeploy.commit_branch),
+              newDeploy.commit_branch,
+              newDeploy.commit_hash,
               newDeploy.description,
               List(Event(deployEvent.timestamp, deployEvent.status, deployEvent.description)),
               newDeploy.changelog,
@@ -86,12 +118,12 @@ class SlickPersistenceActor extends PersistenceActor {
     }
   }
 
-  override def addEvent(projName: String, deployId: String, event: RequestEvent): Future[Option[Event]] = {
+  override def addEvent(projName: String, deployId: String, event: RequestEvent): Future[Option[ResponseEvent]] = {
     db.run(projects.filter(_.name === projName).result.headOption).map {
       case Some(_) => Some({
-        val newEvent = EventModel(currentTime, DeployStatus.Started, "", deployId)
+        val newEvent = EventModel(currentTime, event.status, event.description, deployId)
         db.run(events += newEvent)
-        Event(newEvent.timestamp, newEvent.status, newEvent.description)
+        ResponseEvent(newEvent.timestamp, newEvent.status, newEvent.description)
       })
     }
   }
@@ -119,14 +151,15 @@ class SlickPersistenceActor extends PersistenceActor {
     db.run(projects.filter(_.name === name).result).map { f => f.nonEmpty }
   }
 
-  override def getDeploys(name: String, max: Int): Future[List[Deploy]] = {
+  override def getDeploys(name: String, max: Int): Future[List[ResponseDeploy]] = {
     db.run(deploys.filter(_.projName === name).result).flatMap(f =>
       Future.sequence(f.map { d =>
         getEvents(d.id).map { listEvents =>
-          Deploy(
+          ResponseDeploy(
             d.user,
             d.timestamp,
-            Commit(d.commit_hash, d.commit_branch),
+            d.commit_branch,
+            d.commit_hash,
             d.description,
             listEvents,
             d.changelog,
@@ -147,14 +180,15 @@ class SlickPersistenceActor extends PersistenceActor {
     }
   }
 
-  override def getDeploy(projName: String, deployId: String): Future[Option[Deploy]] = {
+  override def getDeploy(projName: String, deployId: String): Future[Option[ResponseDeploy]] = {
     db.run(deploys.filter(_.projName === projName).filter(_.id === deployId).result.headOption).flatMap { f =>
       Future.sequence(f.map { d =>
         getEvents(d.id).map { listEvents =>
-          Deploy(
+          ResponseDeploy(
             d.user,
             d.timestamp,
-            Commit(d.commit_hash, d.commit_branch),
+            d.commit_branch,
+            d.commit_hash,
             d.description,
             listEvents,
             d.changelog,

@@ -5,7 +5,7 @@ import akka.util.Timeout
 import com.gettyimages.spray.swagger._
 import com.typesafe.scalalogging.LazyLogging
 import com.wordnik.swagger.model.ApiInfo
-import eu.shiftforward.persistence.{ SlickPersistenceActor, MemoryPersistenceActor }
+import eu.shiftforward.persistence.{ SlickPersistenceActor, MemoryPersistenceActor}
 import spray.routing.HttpService
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
@@ -28,7 +28,7 @@ class DeployLoggerActor extends Actor with HttpService with LazyLogging {
 
   val projects = new DeployLoggerService() {
     def actorRefFactory = context
-    val actorPersistence: ActorRef = context.system.actorOf(Props[SlickPersistenceActor])
+    val actorPersistence: ActorRef = context.system.actorOf(Props(new SlickPersistenceActor("jdbc:sqlite:rdvs.db")))
     override implicit def ec: ExecutionContext = context.system.dispatcher
   }
 

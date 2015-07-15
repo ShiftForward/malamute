@@ -90,7 +90,7 @@ abstract class DeployLoggerService extends HttpService {
   def projectDeployPostRoute = path("project" / Segment / "deploy") { name =>
     post {
       entity(as[RequestDeploy]) { deploy =>
-        onComplete((actorPersistence ? AddDeploy(name, deploy)).mapTo[Option[Deploy]]) {
+        onComplete((actorPersistence ? AddDeploy(name, deploy)).mapTo[Option[ResponseDeploy]]) {
           case Success(deploy) => complete(deploy)
           case Failure(ex: MalformedURLException) => complete(BadRequest, s"An error occurred: ${ex.getMessage}")
           case Failure(ex) => complete(BadRequest, s"An error occurred: ${ex.getMessage}")
@@ -100,7 +100,7 @@ abstract class DeployLoggerService extends HttpService {
   }
 
   @Path("project/{projName}/deploys")
-  @ApiOperation(httpMethod = "GET", response = classOf[List[Deploy]], value = "Returns a List of Deploy", produces = json)
+  @ApiOperation(httpMethod = "GET", response = classOf[List[ResponseDeploy]], value = "Returns a List of Deploy", produces = json)
   @ApiImplicitParams(Array(
     new ApiImplicitParam(name = "projName", required = true, dataType = "string", paramType = "path", value = "Name of project that needs to be fetched")
   ))
@@ -111,13 +111,13 @@ abstract class DeployLoggerService extends HttpService {
   def projectDeploysGetRoute = path("project" / Segment / "deploys") { projName =>
     parameters("max".?[Int](10)) { max: Int =>
       get {
-        complete((actorPersistence ? GetDeploys(projName, max)).mapTo[List[Deploy]])
+        complete((actorPersistence ? GetDeploys(projName, max)).mapTo[List[ResponseDeploy]])
       }
     }
   }
 
   @Path("project/{projName}/deploys/{deployId}/event")
-  @ApiOperation(httpMethod = "GET", response = classOf[Event], value = "Returns a List of Deploy", produces = json)
+  @ApiOperation(httpMethod = "GET", response = classOf[ResponseEvent], value = "Returns a List of Deploy", produces = json)
   @ApiImplicitParams(Array(
     new ApiImplicitParam(name = "projName", required = true, dataType = "string", paramType = "path", value = "Name of project that needs to be fetched"),
     new ApiImplicitParam(name = "deployId", required = true, dataType = "string", paramType = "path", value = "Id of deploy that needs to be fetched"),
@@ -130,13 +130,13 @@ abstract class DeployLoggerService extends HttpService {
   def projectDeployEventPostRoute = path("project" / Segment / "deploy" / Segment / "event") { (projName, deployId) =>
     post {
       entity(as[RequestEvent]) { ev =>
-        complete((actorPersistence ? AddEvent(projName, deployId, ev)).mapTo[Option[Event]])
+        complete((actorPersistence ? AddEvent(projName, deployId, ev)).mapTo[Option[ResponseEvent]])
       }
     }
   }
 
   @Path("project/{projName}/deploys/{deployId}")
-  @ApiOperation(httpMethod = "GET", response = classOf[Deploy], value = "Returns a Deploy", produces = json)
+  @ApiOperation(httpMethod = "GET", response = classOf[ResponseDeploy], value = "Returns a Deploy", produces = json)
   @ApiImplicitParams(Array(
     new ApiImplicitParam(name = "projName", required = true, dataType = "string", paramType = "path", value = "Name of project that needs to be fetched"),
     new ApiImplicitParam(name = "deployId", required = true, dataType = "string", paramType = "path", value = "Id of deploy that needs to be fetched")
@@ -147,7 +147,7 @@ abstract class DeployLoggerService extends HttpService {
   ))
   def projectDeployGetRoute = path("project" / Segment / "deploy" / Rest) { (projName, deployId) =>
     get {
-      complete((actorPersistence ? GetDeploy(projName, deployId)).mapTo[Option[Deploy]])
+      complete((actorPersistence ? GetDeploy(projName, deployId)).mapTo[Option[ResponseDeploy]])
     }
   }
 

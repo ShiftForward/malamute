@@ -18,15 +18,15 @@ trait PersistenceActor extends Actor {
 
   def deleteProject(name: String): Future[Option[ResponseProject]]
 
-  def addDeploy(name: String, deploy: RequestDeploy): Future[Option[Deploy]]
+  def addDeploy(name: String, deploy: RequestDeploy): Future[Option[ResponseDeploy]]
 
   def getProject(name: String): Future[Option[ResponseProject]]
 
-  def getDeploys(name: String, max: Int): Future[List[Deploy]]
+  def getDeploys(name: String, max: Int): Future[List[ResponseDeploy]]
 
-  def addEvent(projName: String, deployId: String, event: RequestEvent): Future[Option[Event]]
+  def addEvent(projName: String, deployId: String, event: RequestEvent): Future[Option[ResponseEvent]]
 
-  def getDeploy(projName: String, deployId: String): Future[Option[Deploy]]
+  def getDeploy(projName: String, deployId: String): Future[Option[ResponseDeploy]]
 
   override def receive: Receive = {
     case SaveProject(project) =>

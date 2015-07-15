@@ -80,3 +80,5 @@ project/plugins/project/
 .scala_dependencies
 .worksheet
 
+rdvs.db
+db-*

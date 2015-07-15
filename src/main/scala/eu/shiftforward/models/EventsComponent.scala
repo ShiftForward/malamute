@@ -2,7 +2,7 @@ package eu.shiftforward.models
 
 import eu.shiftforward.entities.DeployStatus
 import eu.shiftforward.entities.DeployStatus._
-import eu.shiftforward.persistence.SlickPersistenceActor
+import eu.shiftforward.persistence.{Db, SlickPersistenceActor}
 import slick.driver.SQLiteDriver.api._
 
 case class EventModel(
@@ -24,7 +24,7 @@ class Events(tag: Tag) extends Table[EventModel](tag, "EVENTS") {
   def description = column[String]("DESCRIPTION")
   def deployID = column[String]("DEPLOY_ID")
 
-  def project = foreignKey("DEPLOY_ID", deployID, SlickPersistenceActor.deploys)(_.id)
+  def project = foreignKey("DEPLOY_ID", deployID, Db.deploys)(_.id)
 
   def * = (timestamp, status, description, deployID) <> (EventModel.tupled, EventModel.unapply)
 }

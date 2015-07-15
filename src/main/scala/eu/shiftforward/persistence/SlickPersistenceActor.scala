@@ -34,7 +34,7 @@ class SlickPersistenceActor extends PersistenceActor {
 
   override def addDeploy(name: String, deploy: RequestDeploy): Future[Option[Deploy]] = {
     db.run(projects.filter(_.name === name).result.headOption).flatMap { projOpt =>
-      val z = projOpt.map { p =>
+      projOpt.map { p =>
         val newDeploy = DeployModel(
           UUID.randomUUID().toString,
           deploy.user,
@@ -48,10 +48,9 @@ class SlickPersistenceActor extends PersistenceActor {
           deploy.client,
           name
         )
-        val x = db.run(deploys += newDeploy)
         val deployEvent = EventModel(currentTime, DeployStatus.Started, "", newDeploy.id)
-        val y = db.run(events += deployEvent)
-        val o = x.zip(y).map {
+        db.run(deploys += newDeploy).zip(
+          db.run(events += deployEvent)).map {
           case _ =>
             Some(Deploy(
               newDeploy.user,
@@ -66,9 +65,7 @@ class SlickPersistenceActor extends PersistenceActor {
               newDeploy.client
             ))
         }
-        o
       }.getOrElse(Future.successful(None))
-      z
     }
   }
 

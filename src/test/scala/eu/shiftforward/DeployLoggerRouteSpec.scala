@@ -13,8 +13,9 @@ import spray.testkit.Specs2RouteTest
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
 
+
+
 class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
-  sequential
 
   implicit val routeTestTimeout = RouteTestTimeout(Duration(5, SECONDS))
 
@@ -23,7 +24,7 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
       |persistence {
       | connectionPool = disabled
       | driver = "org.sqlite.JDBC"
-      | url = "jdbc:sqlite:db-$i"
+      | url = "jdbc:sqlite:testdb:test$i"
       |}
     """.stripMargin
   )
@@ -76,9 +77,11 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
           responseAs[ResponseProject].name must beEqualTo("TestProj20")
           responseAs[ResponseProject].description must beEqualTo("Proj Description Test 1")
         }
-        Get("/projects") ~> projectsGetRoute ~> check {
-          status === OK
-          responseAs[List[ResponseProject]].length must beEqualTo(2)
+        eventually {
+          Get("/projects") ~> projectsGetRoute ~> check {
+            status === OK
+            responseAs[List[ResponseProject]].length must beEqualTo(2)
+          }
         }
       }
     }
@@ -89,10 +92,12 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
           responseAs[ResponseProject].name must beEqualTo("TestProj4")
           responseAs[ResponseProject].description must beEqualTo("Proj Description Test")
         }
-        Get("/project/TestProj4") ~> projectGetRoute ~> check {
-          status === OK
-          responseAs[ResponseProject].name must beEqualTo("TestProj4")
-          responseAs[ResponseProject].description must beEqualTo("Proj Description Test")
+        eventually {
+          Get("/project/TestProj4") ~> projectGetRoute ~> check {
+            status === OK
+            responseAs[ResponseProject].name must beEqualTo("TestProj4")
+            responseAs[ResponseProject].description must beEqualTo("Proj Description Test")
+          }
         }
       }
       "return a 404 response for GET requests to /project/:name that doesn't exist" in new MockDeployLoggerService(6) {
@@ -116,19 +121,23 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
           responseAs[ResponseProject].name must beEqualTo("TestProj7")
           responseAs[ResponseProject].description must beEqualTo("Proj Description Test 1")
         }
-        Get("/projects") ~> projectsGetRoute ~> check {
-          status === OK
+        eventually {
+          Get("/projects") ~> projectsGetRoute ~> check {
+            status === OK
 
-          responseAs[List[ResponseProject]].length must beEqualTo(2)
+            responseAs[List[ResponseProject]].length must beEqualTo(2)
+          }
         }
         Delete("/project/TestProj6") ~> projectDeleteRoute ~> check {
           status === OK
           responseAs[ResponseProject].name must beEqualTo("TestProj6")
           responseAs[ResponseProject].description must beEqualTo("Proj Description Test")
         }
-        Get("/projects") ~> projectsGetRoute ~> check {
-          status === OK
-          responseAs[List[ResponseProject]].length must beEqualTo(1)
+        eventually {
+          Get("/projects") ~> projectsGetRoute ~> check {
+            status === OK
+            responseAs[List[ResponseProject]].length must beEqualTo(1)
+          }
         }
       }
       "return a 404 response for DELETE requests to a name that doesn't exist" in new MockDeployLoggerService(8) {
@@ -149,9 +158,11 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
           responseAs[ResponseProject].name must beEqualTo("TestProj9")
           responseAs[ResponseProject].description must beEqualTo("Proj Description Test")
         }
-        Post("/project/TestProj9/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente")) ~> projectDeployPostRoute ~> check {
-          status === OK
-          responseAs[ResponseDeploy].user must beEqualTo("testUser")
+        eventually{
+          Post("/project/TestProj9/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente")) ~> projectDeployPostRoute ~> check {
+            status === OK
+            responseAs[ResponseDeploy].user must beEqualTo("testUser")
+          }
         }
       }
       "return a 404 response for POST requests to project that doesn't exist" in new MockDeployLoggerService(10) {
@@ -172,18 +183,20 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
           responseAs[ResponseProject].name must beEqualTo("TestProj11")
           responseAs[ResponseProject].description must beEqualTo("Proj Description Test")
         }
-        Post("/project/TestProj11/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente")) ~> projectDeployPostRoute ~> check {
-          status === OK
-          responseAs[ResponseDeploy].user must beEqualTo("testUser")
-          val deployId = responseAs[ResponseDeploy].id
-
-          Post("/project/TestProj11/deploy/" + deployId + "/event", RequestEvent(DeployStatus.Success, "done")) ~> projectDeployEventPostRoute ~> check {
+        eventually {
+          Post("/project/TestProj11/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente")) ~> projectDeployPostRoute ~> check {
             status === OK
-            responseAs[ResponseEvent].status === DeployStatus.Success
-          }
-          //tests if the first and only deploy have two events (inital + success)
-          Get("/project/TestProj11/deploys") ~> projectDeploysGetRoute ~> check {
-            responseAs[List[ResponseDeploy]].head.events.size === 2
+            responseAs[ResponseDeploy].user must beEqualTo("testUser")
+            val deployId = responseAs[ResponseDeploy].id
+
+            Post("/project/TestProj11/deploy/" + deployId + "/event", RequestEvent(DeployStatus.Success, "done")) ~> projectDeployEventPostRoute ~> check {
+              status === OK
+              responseAs[ResponseEvent].status === DeployStatus.Success
+            }
+            //tests if the first and only deploy have two events (inital + success)
+            Get("/project/TestProj11/deploys") ~> projectDeploysGetRoute ~> check {
+              responseAs[List[ResponseDeploy]].head.events.size === 2
+            }
           }
         }
       }
@@ -195,18 +208,20 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
           responseAs[ResponseProject].name must beEqualTo("TestProj")
           responseAs[ResponseProject].description must beEqualTo("Proj Description Test")
         }
-        Post("/project/TestProj/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente")) ~> projectDeployPostRoute ~> check {
-          status === OK
-          responseAs[ResponseDeploy].user must beEqualTo("testUser")
-          val deployId = responseAs[ResponseDeploy].id
+        eventually {
+          Post("/project/TestProj/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente")) ~> projectDeployPostRoute ~> check {
+            status === OK
+            responseAs[ResponseDeploy].user must beEqualTo("testUser")
+            val deployId = responseAs[ResponseDeploy].id
 
-          Post("/project/TestProj/deploy/" + deployId + "/event", RequestEvent(DeployStatus.Success, "done")) ~> projectDeployEventPostRoute ~> check {
-            status === OK
-            responseAs[ResponseEvent].status === DeployStatus.Success
-          }
-          Get("/project/TestProj/deploy/" + deployId) ~> projectDeployGetRoute ~> check {
-            status === OK
-            responseAs[ResponseDeploy].id === deployId
+            Post("/project/TestProj/deploy/" + deployId + "/event", RequestEvent(DeployStatus.Success, "done")) ~> projectDeployEventPostRoute ~> check {
+              status === OK
+              responseAs[ResponseEvent].status === DeployStatus.Success
+            }
+            Get("/project/TestProj/deploy/" + deployId) ~> projectDeployGetRoute ~> check {
+              status === OK
+              responseAs[ResponseDeploy].id === deployId
+            }
           }
         }
       }
@@ -218,23 +233,29 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
           responseAs[ResponseProject].name must beEqualTo("TestProj13")
           responseAs[ResponseProject].description must beEqualTo("Proj Description Test")
         }
-        Post("/project/TestProj13/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente")) ~> projectDeployPostRoute ~> check {
-          status === OK
-          responseAs[ResponseDeploy].user must beEqualTo("testUser")
-        }
-        Post("/project/TestProj13/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente")) ~> projectDeployPostRoute ~> check {
-          status === OK
-          responseAs[ResponseDeploy].user must beEqualTo("testUser")
-        }
-        Get("/project/TestProj13/deploys?max=1") ~> projectDeploysGetRoute ~> check {
-          status === OK
-          responseAs[List[ResponseDeploy]].size === 1
-        }
-        Get("/project/TestProj13/deploys") ~> projectDeploysGetRoute ~> check {
-          status === OK
-          responseAs[List[ResponseDeploy]].size === 2
+        eventually {
+          Post("/project/TestProj13/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente")) ~> projectDeployPostRoute ~> check {
+            status === OK
+            responseAs[ResponseDeploy].user must beEqualTo("testUser")
+          }
+          Post("/project/TestProj13/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente")) ~> projectDeployPostRoute ~> check {
+            status === OK
+            responseAs[ResponseDeploy].user must beEqualTo("testUser")
+          }
+
+          Get("/project/TestProj13/deploys?max=1") ~> projectDeploysGetRoute ~> check {
+            status === OK
+            responseAs[List[ResponseDeploy]].size === 1
+          }
+          Get("/project/TestProj13/deploys") ~> projectDeploysGetRoute ~> check {
+            status === OK
+            responseAs[List[ResponseDeploy]].size === 2
+          }
         }
       }
     }
+  }
+  step {
+    new java.io.File("testdb").delete()
   }
 }

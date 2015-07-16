@@ -20,7 +20,10 @@ libraryDependencies ++= {
     "org.specs2"          %%  "specs2-scalacheck" % specsV   % "test",
     "com.typesafe.akka"   %%  "akka-actor"        % akkaV,
     "com.typesafe.akka"   %%  "akka-testkit"      % akkaV    % "test",
-    "org.json4s"          %%  "json4s-native"     % "3.2.11"
+    "org.json4s"          %%  "json4s-native"     % "3.2.11",
+    "com.gettyimages"     %%  "spray-swagger"     % "0.5.1",
+    "ch.qos.logback"      %   "logback-classic"   % "1.1.3",
+    "com.sksamuel.elastic4s" %% "elastic4s" % "1.2.1.2"
   )
 }
 

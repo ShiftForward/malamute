@@ -25,14 +25,13 @@ class DeployLoggerActor(config: Config) extends Actor with HttpService with Lazy
     override def docsPath = "api-docs"
     override def actorRefFactory = context
     override def apiInfo = Some(new ApiInfo(
-        config.getString("apiConfig.title"),
-        config.getString("apiConfig.description"),
-        config.getString("apiConfig.termsOfServiceUrl"),
-        config.getString("apiConfig.contact"),
-        config.getString("apiConfig.license"),
-        config.getString("apiConfig.licenseUrl")
-      )
-    )
+      config.getString("apiConfig.title"),
+      config.getString("apiConfig.description"),
+      config.getString("apiConfig.termsOfServiceUrl"),
+      config.getString("apiConfig.contact"),
+      config.getString("apiConfig.license"),
+      config.getString("apiConfig.licenseUrl")
+    ))
   }
 
   val projects = new DeployLoggerService() {

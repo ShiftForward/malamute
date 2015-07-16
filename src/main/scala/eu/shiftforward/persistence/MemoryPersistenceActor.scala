@@ -92,6 +92,7 @@ class MemoryPersistenceActor extends PersistenceActor {
           newDeploy.commit.branch, newDeploy.commit.hash, newDeploy.description,
           newDeploy.events.map(ev => ResponseEvent(ev.timestamp, ev.status, ev.description)),
           newDeploy.changelog, newDeploy.id, newDeploy.version, newDeploy.isAutomatic, newDeploy.client))
+        case None => None
       }
     }
   }

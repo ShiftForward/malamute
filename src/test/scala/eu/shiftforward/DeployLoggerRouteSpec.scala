@@ -13,8 +13,6 @@ import spray.testkit.Specs2RouteTest
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
 
-
-
 class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
 
   implicit val routeTestTimeout = RouteTestTimeout(Duration(5, SECONDS))
@@ -158,7 +156,7 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
           responseAs[ResponseProject].name must beEqualTo("TestProj9")
           responseAs[ResponseProject].description must beEqualTo("Proj Description Test")
         }
-        eventually{
+        eventually {
           Post("/project/TestProj9/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente")) ~> projectDeployPostRoute ~> check {
             status === OK
             responseAs[ResponseDeploy].user must beEqualTo("testUser")

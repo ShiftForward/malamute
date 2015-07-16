@@ -1,7 +1,6 @@
 package eu.shiftforward.persistence
 
 import java.util.UUID
-
 import akka.actor.{ Actor, ActorRef, Props, Stash }
 import akka.pattern.pipe
 import com.typesafe.config.Config
@@ -84,6 +83,7 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
         db.run(events += newEvent)
         ResponseEvent(newEvent.timestamp, newEvent.status, newEvent.description)
       })
+      case None => None
     }
   }
 

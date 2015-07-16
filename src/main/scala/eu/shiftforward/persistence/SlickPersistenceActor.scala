@@ -22,22 +22,7 @@ object Db {
   val ddl =  projects.schema ++ deploys.schema ++ events.schema
 
 }
-/*
-class SqlActor extends Actor with LazyLogging {
 
-  val database =  Db.create()
-
-  logger.info("Updating db. Drop and create.")
-
-  val actorRef = context.actorOf(Props(new SlickPersistenceActor(database)))
-
-  override def receive: Receive ={
-    case initDb => Db.setup(database)
-    //case Any(x) => actorRef ! x
-  }
-
-}
-*/
 class SlickPersistenceActor(dbUrl: String) extends PersistenceActor with LazyLogging {
 
   import Db._

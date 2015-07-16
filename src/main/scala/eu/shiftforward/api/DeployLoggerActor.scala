@@ -27,28 +27,26 @@ class DeployLoggerActor extends Actor with HttpService with LazyLogging {
     override def apiInfo = Some(new ApiInfo("DeployLogger", "An API to save deploy historic", "", "jpdias@live.com.pt", "MIT", ""))
   }
 
-  val projects = new DeployLoggerService() {
+  val service = new DeployLoggerService() {
     def actorRefFactory = context
     val actorPersistence: ActorRef = context.system.actorOf(Props[MemoryPersistenceActor])
     override implicit def ec: ExecutionContext = context.system.dispatcher
   }
 
   def receive = runRoute(
-    projects.pingRoute ~
-      projects.projectPostRoute ~
-      projects.projectsGetRoute ~
-      projects.projectDeployPostRoute ~
-      projects.projectDeploysGetRoute ~
-      projects.projectDeployEventPostRoute ~
-      projects.projectDeployGetRoute ~
-      projects.projectGetRoute ~
-      projects.projectDeleteRoute ~
+    service.pingRoute ~
+      service.projectPostRoute ~
+      service.projectsGetRoute ~
+      service.projectDeployPostRoute ~
+      service.projectDeploysGetRoute ~
+      service.projectDeployEventPostRoute ~
+      service.projectDeployGetRoute ~
+      service.projectGetRoute ~
+      service.projectDeleteRoute ~
       swaggerService.routes ~
       get {
-        pathPrefix("") {
-          pathEndOrSingleSlash {
-            getFromResource("swagger-ui/index.html")
-          }
+        pathEndOrSingleSlash {
+          getFromResource("swagger-ui/index.html")
         } ~
           getFromResourceDirectory("swagger-ui")
       }

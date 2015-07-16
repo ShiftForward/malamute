@@ -1,6 +1,6 @@
 package eu.shiftforward.models
 
-import eu.shiftforward.persistence.{Db, SlickPersistenceActor}
+import eu.shiftforward.persistence.{ Db, SlickPersistenceActor }
 import slick.driver.SQLiteDriver.api._
 
 case class DeployModel(

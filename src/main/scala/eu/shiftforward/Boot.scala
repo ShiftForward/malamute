@@ -4,6 +4,7 @@ import akka.actor.{ ActorSystem, Props }
 import akka.io.IO
 import akka.pattern.ask
 import akka.util.Timeout
+import com.typesafe.config.{ ConfigFactory, Config }
 import com.typesafe.scalalogging.LazyLogging
 import eu.shiftforward.api.DeployLoggerActor
 import spray.can.Http
@@ -17,8 +18,10 @@ object Boot extends App with LazyLogging {
   implicit val system = ActorSystem("shiftforward")
   implicit val dispatcher = system.dispatcher
 
+  val config = ConfigFactory.load().getConfig("logger-service")
+
   // create and start our service actor
-  val service = system.actorOf(Props[DeployLoggerActor], "base-service")
+  val service = system.actorOf(Props(new DeployLoggerActor(config)), "base-service")
 
   implicit val timeout = Timeout(5.seconds)
 

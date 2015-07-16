@@ -1,9 +1,10 @@
 package eu.shiftforward
 
 import akka.actor.Props
+import com.typesafe.config.ConfigFactory
 import eu.shiftforward.api.DeployLoggerService
 import eu.shiftforward.entities._
-import eu.shiftforward.persistence.{MemoryPersistenceActor, SlickPersistenceActor}
+import eu.shiftforward.persistence.{ MemoryPersistenceActor, SlickPersistenceActor }
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
 import spray.http.StatusCodes._
@@ -15,11 +16,21 @@ import scala.concurrent.ExecutionContext
 class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
   sequential
 
-  implicit val routeTestTimeout = RouteTestTimeout(Duration(5,SECONDS))
+  implicit val routeTestTimeout = RouteTestTimeout(Duration(5, SECONDS))
+
+  def config(i: Int) = ConfigFactory.parseString(
+    s"""
+      |persistence {
+      | connectionPool = disabled
+      | driver = "org.sqlite.JDBC"
+      | url = "jdbc:sqlite:db-$i"
+      |}
+    """.stripMargin
+  )
 
   class MockDeployLoggerService(i: Int) extends DeployLoggerService with Scope {
     override def actorRefFactory = system
-    val actorPersistence = system.actorOf(Props(new SlickPersistenceActor(s"jdbc:sqlite:db-$i")))
+    val actorPersistence = system.actorOf(Props(new SlickPersistenceActor(config(i))))
     //val actorPersistence = system.actorOf(Props[MemoryPersistenceActor])
     def ec: ExecutionContext = system.dispatcher
   }
@@ -138,7 +149,7 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
           responseAs[ResponseProject].name must beEqualTo("TestProj9")
           responseAs[ResponseProject].description must beEqualTo("Proj Description Test")
         }
-        Post("/project/TestProj9/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/","1.1.1",false,"Cliente")) ~> projectDeployPostRoute ~> check {
+        Post("/project/TestProj9/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente")) ~> projectDeployPostRoute ~> check {
           status === OK
           responseAs[ResponseDeploy].user must beEqualTo("testUser")
         }
@@ -149,7 +160,7 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
           responseAs[ResponseProject].name must beEqualTo("TestProj10")
           responseAs[ResponseProject].description must beEqualTo("Proj Description Test")
         }
-        Post("/project/abc/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1",false,"Cliente")) ~> projectDeployPostRoute ~> check {
+        Post("/project/abc/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente")) ~> projectDeployPostRoute ~> check {
           status === NotFound
         }
       }
@@ -161,7 +172,7 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
           responseAs[ResponseProject].name must beEqualTo("TestProj11")
           responseAs[ResponseProject].description must beEqualTo("Proj Description Test")
         }
-        Post("/project/TestProj11/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1",false,"Cliente")) ~> projectDeployPostRoute ~> check {
+        Post("/project/TestProj11/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente")) ~> projectDeployPostRoute ~> check {
           status === OK
           responseAs[ResponseDeploy].user must beEqualTo("testUser")
           val deployId = responseAs[ResponseDeploy].id
@@ -184,7 +195,7 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
           responseAs[ResponseProject].name must beEqualTo("TestProj")
           responseAs[ResponseProject].description must beEqualTo("Proj Description Test")
         }
-        Post("/project/TestProj/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/","1.1.1",false,"Cliente")) ~> projectDeployPostRoute ~> check {
+        Post("/project/TestProj/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente")) ~> projectDeployPostRoute ~> check {
           status === OK
           responseAs[ResponseDeploy].user must beEqualTo("testUser")
           val deployId = responseAs[ResponseDeploy].id
@@ -207,11 +218,11 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
           responseAs[ResponseProject].name must beEqualTo("TestProj13")
           responseAs[ResponseProject].description must beEqualTo("Proj Description Test")
         }
-        Post("/project/TestProj13/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/","1.1.1",false,"Cliente")) ~> projectDeployPostRoute ~> check {
+        Post("/project/TestProj13/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente")) ~> projectDeployPostRoute ~> check {
           status === OK
           responseAs[ResponseDeploy].user must beEqualTo("testUser")
         }
-        Post("/project/TestProj13/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/","1.1.1",false,"Cliente")) ~> projectDeployPostRoute ~> check {
+        Post("/project/TestProj13/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente")) ~> projectDeployPostRoute ~> check {
           status === OK
           responseAs[ResponseDeploy].user must beEqualTo("testUser")
         }

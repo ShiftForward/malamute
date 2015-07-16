@@ -16,7 +16,7 @@ case class ResponseDeploy(
   user: String,
   timestamp: Long,
   commit_branch: String,
-  commit_hash:String,
+  commit_hash: String,
   description: String,
   events: List[Event],
   changelog: String,

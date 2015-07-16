@@ -1,17 +1,19 @@
 package eu.shiftforward.persistence
 
 import java.util.UUID
-import akka.actor.Actor.Receive
-import akka.actor.{Props, Actor}
+
+import akka.actor.{ Actor, ActorRef, Props, Stash }
+import akka.pattern.pipe
+import com.typesafe.config.Config
 import com.typesafe.scalalogging.LazyLogging
 import eu.shiftforward.entities._
 import eu.shiftforward.models._
-import slick.driver.SQLiteDriver
-import slick.jdbc.meta.MTable
-import scala.compat.Platform._
-import scala.concurrent.duration._
-import scala.concurrent.{Await, ExecutionContext, Future}
+import eu.shiftforward.persistence.SlickPersistenceActor.DBConnected
 import slick.driver.SQLiteDriver.api._
+import slick.jdbc.meta.MTable
+
+import scala.compat.Platform._
+import scala.concurrent.{ ExecutionContext, Future }
 
 object Db {
 
@@ -19,33 +21,13 @@ object Db {
   val deploys = TableQuery[Deploys]
   val events = TableQuery[Events]
 
-  val ddl =  projects.schema ++ deploys.schema ++ events.schema
+  val ddl = projects.schema ++ deploys.schema ++ events.schema
 
 }
 
-class SlickPersistenceActor(dbUrl: String) extends PersistenceActor with LazyLogging {
+class SlickQueryingActor(db: Database) extends PersistenceActor {
 
   import Db._
-
-  var db: Database = _
-
-  override def preStart(): Unit ={
-
-
-    db = Database.forURL(dbUrl, driver = "org.sqlite.JDBC", keepAliveConnection = true)
-    Await.result(db.run(MTable.getTables), 1.seconds).headOption match {
-      case None => {
-        logger.info("Creating DB.")
-        Await.result(db.run(DBIO.seq(
-          ddl.create
-        )), 5.seconds)
-      }
-      case Some(_) =>
-        logger.info("Using existent DB.")
-    }
-
-  }
-
   override implicit def ec: ExecutionContext = context.dispatcher
 
   override def addDeploy(name: String, deploy: RequestDeploy): Future[Option[ResponseDeploy]] = {
@@ -66,22 +48,23 @@ class SlickPersistenceActor(dbUrl: String) extends PersistenceActor with LazyLog
         )
         val deployEvent = EventModel(currentTime, DeployStatus.Started, "", newDeploy.id)
         db.run(deploys += newDeploy).zip(
-          db.run(events += deployEvent)).map {
-          case _ =>
-            Some(ResponseDeploy(
-              newDeploy.user,
-              newDeploy.timestamp,
-              newDeploy.commit_branch,
-              newDeploy.commit_hash,
-              newDeploy.description,
-              List(Event(deployEvent.timestamp, deployEvent.status, deployEvent.description)),
-              newDeploy.changelog,
-              newDeploy.id,
-              newDeploy.version,
-              newDeploy.isAutomatic,
-              newDeploy.client
-            ))
-        }
+          db.run(events += deployEvent)
+        ).map {
+            case _ =>
+              Some(ResponseDeploy(
+                newDeploy.user,
+                newDeploy.timestamp,
+                newDeploy.commit_branch,
+                newDeploy.commit_hash,
+                newDeploy.description,
+                List(Event(deployEvent.timestamp, deployEvent.status, deployEvent.description)),
+                newDeploy.changelog,
+                newDeploy.id,
+                newDeploy.version,
+                newDeploy.isAutomatic,
+                newDeploy.client
+              ))
+          }
       }.getOrElse(Future.successful(None))
     }
   }
@@ -186,4 +169,43 @@ class SlickPersistenceActor(dbUrl: String) extends PersistenceActor with LazyLog
       }.toList)
     }.map(_.headOption)
   }
+}
+
+class SlickPersistenceActor(config: Config) extends Actor with LazyLogging with Stash {
+
+  import Db._
+  import context.dispatcher
+
+  override def preStart(): Unit = {
+    val db = Database.forConfig("persistence", config)
+    db.run(MTable.getTables.headOption).flatMap {
+      case None =>
+        logger.info("Creating DB.")
+        db.run(DBIO.seq(ddl.create)).map(_ => db)
+
+      case Some(_) =>
+        logger.info("Using existent DB.")
+        Future.successful(db)
+
+    }.map(DBConnected(_)).pipeTo(self)
+  }
+
+  def dbNotConnectedReceive: Receive = {
+    case DBConnected(db) =>
+      val queryActor = context.actorOf(Props(new SlickQueryingActor(db)))
+      context.become(dbConnectedReceive(queryActor))
+      unstashAll()
+
+    case _ => stash()
+  }
+
+  def dbConnectedReceive(queryActor: ActorRef): Receive = {
+    case msg => queryActor.forward(msg)
+  }
+
+  def receive: Receive = dbNotConnectedReceive
+}
+
+object SlickPersistenceActor {
+  case class DBConnected(db: Database)
 }

@@ -46,7 +46,7 @@ class MemoryPersistenceActor extends PersistenceActor {
       val newDeploy = Deploy(deploy.user, currentTime, deploy.commit, deploy.description, events, deploy.changelog, UUID.randomUUID().toString, deploy.version, deploy.isAutomatic, deploy.client)
       val newProj = p.copy(deploys = p.deploys :+ newDeploy)
       allProjects += (name -> newProj)
-      ResponseDeploy(newDeploy.user,newDeploy.timestamp,newDeploy.commit.branch, newDeploy.commit.hash, newDeploy.description,newDeploy.events,newDeploy.changelog,newDeploy.id,newDeploy.version,newDeploy.isAutomatic,newDeploy.client)
+      ResponseDeploy(newDeploy.user, newDeploy.timestamp, newDeploy.commit.branch, newDeploy.commit.hash, newDeploy.description, newDeploy.events, newDeploy.changelog, newDeploy.id, newDeploy.version, newDeploy.isAutomatic, newDeploy.client)
     }
   }
 
@@ -67,7 +67,7 @@ class MemoryPersistenceActor extends PersistenceActor {
         val newDeploys = p.deploys.filterNot(_ == d) :+ newDeploy
         val newProj = p.copy(deploys = newDeploys)
         allProjects += (projName -> newProj)
-        ResponseEvent(ev.timestamp,ev.status,ev.description)
+        ResponseEvent(ev.timestamp, ev.status, ev.description)
       }
 
     }
@@ -76,7 +76,7 @@ class MemoryPersistenceActor extends PersistenceActor {
   override def getDeploys(name: String, max: Int): Future[List[ResponseDeploy]] = Future {
     val proj: Option[Project] = allProjects.get(name)
     proj.map { p: Project =>
-      p.deploys.map{newDeploy => ResponseDeploy(newDeploy.user,newDeploy.timestamp,newDeploy.commit.branch, newDeploy.commit.hash, newDeploy.description,newDeploy.events,newDeploy.changelog,newDeploy.id,newDeploy.version,newDeploy.isAutomatic,newDeploy.client)
+      p.deploys.map { newDeploy => ResponseDeploy(newDeploy.user, newDeploy.timestamp, newDeploy.commit.branch, newDeploy.commit.hash, newDeploy.description, newDeploy.events, newDeploy.changelog, newDeploy.id, newDeploy.version, newDeploy.isAutomatic, newDeploy.client)
       }.take(max)
     }.getOrElse(List())
   }
@@ -85,7 +85,7 @@ class MemoryPersistenceActor extends PersistenceActor {
     val proj: Option[Project] = allProjects.get(projName)
     proj.flatMap { p: Project =>
       p.deploys find (_.id == deployId) match {
-        case Some(newDeploy) => Some(ResponseDeploy(newDeploy.user,newDeploy.timestamp,newDeploy.commit.branch, newDeploy.commit.hash, newDeploy.description,newDeploy.events,newDeploy.changelog,newDeploy.id,newDeploy.version,newDeploy.isAutomatic,newDeploy.client))
+        case Some(newDeploy) => Some(ResponseDeploy(newDeploy.user, newDeploy.timestamp, newDeploy.commit.branch, newDeploy.commit.hash, newDeploy.description, newDeploy.events, newDeploy.changelog, newDeploy.id, newDeploy.version, newDeploy.isAutomatic, newDeploy.client))
       }
     }
   }

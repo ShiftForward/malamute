@@ -8,10 +8,7 @@ import scala.concurrent.{ ExecutionContext, Future }
 
 case class DuplicatedEntry(error: String) extends RuntimeException
 
-trait PersistenceActor extends Actor {
-
-  implicit def ec: ExecutionContext
-
+trait API {
   def saveProject(project: RequestProject): Future[ResponseProject]
 
   def getProjects: Future[List[ResponseProject]]
@@ -27,6 +24,11 @@ trait PersistenceActor extends Actor {
   def addEvent(projName: String, deployId: String, event: RequestEvent): Future[Option[ResponseEvent]]
 
   def getDeploy(projName: String, deployId: String): Future[Option[ResponseDeploy]]
+}
+
+trait PersistenceActor extends Actor with API {
+
+  implicit def ec: ExecutionContext
 
   override def receive: Receive = {
     case SaveProject(project) =>

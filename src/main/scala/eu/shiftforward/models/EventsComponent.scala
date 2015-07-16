@@ -2,7 +2,7 @@ package eu.shiftforward.models
 
 import eu.shiftforward.entities.DeployStatus
 import eu.shiftforward.entities.DeployStatus._
-import eu.shiftforward.persistence.{Db, SlickPersistenceActor}
+import eu.shiftforward.persistence.{ Db, SlickPersistenceActor }
 import slick.driver.SQLiteDriver.api._
 
 case class EventModel(

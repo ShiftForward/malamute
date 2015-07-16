@@ -45,8 +45,8 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
               Some(ResponseDeploy(
                 newDeploy.user,
                 newDeploy.timestamp,
-                newDeploy.commit_branch,
-                newDeploy.commit_hash,
+                newDeploy.commitBranch,
+                newDeploy.commitHash,
                 newDeploy.description,
                 List(ResponseEvent(deployEvent.timestamp, deployEvent.status, deployEvent.description)),
                 newDeploy.changelog,
@@ -106,10 +106,6 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
     }
   }
 
-  def projExists(name: String): Future[Boolean] = {
-    db.run(projects.filter(_.name === name).result).map { f => f.nonEmpty }
-  }
-
   override def getDeploys(name: String, max: Int): Future[List[ResponseDeploy]] = {
     db.run(deploys.filter(_.projName === name).result).flatMap(f =>
       Future.sequence(f.map { d =>
@@ -117,8 +113,8 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
           ResponseDeploy(
             d.user,
             d.timestamp,
-            d.commit_branch,
-            d.commit_hash,
+            d.commitBranch,
+            d.commitHash,
             d.description,
             listEvents,
             d.changelog,
@@ -140,14 +136,14 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
   }
 
   override def getDeploy(projName: String, deployId: String): Future[Option[ResponseDeploy]] = {
-    db.run(deploys.filter(_.projName === projName).filter(_.id === deployId).result.headOption).flatMap { f =>
+    db.run(deploys.filter(d => d.projName === projName && d.id === deployId).result.headOption).flatMap { f =>
       Future.sequence(f.map { d =>
         getEvents(d.id).map { listEvents =>
           ResponseDeploy(
             d.user,
             d.timestamp,
-            d.commit_branch,
-            d.commit_hash,
+            d.commitBranch,
+            d.commitHash,
             d.description,
             listEvents,
             d.changelog,

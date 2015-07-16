@@ -3,31 +3,22 @@ package eu.shiftforward.persistence
 import java.util.UUID
 
 import akka.actor.{ Actor, ActorRef, Props, Stash }
-import akka.pattern.pipe
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.LazyLogging
+import eu.shiftforward.DBTables
 import eu.shiftforward.entities._
 import eu.shiftforward.models._
+import akka.pattern.pipe
 import eu.shiftforward.persistence.SlickPersistenceActor.DBConnected
 import slick.driver.SQLiteDriver.api._
 import slick.jdbc.meta.MTable
-
 import scala.compat.Platform._
 import scala.concurrent.{ ExecutionContext, Future }
 
-object Db {
-
-  val projects = TableQuery[Projects]
-  val deploys = TableQuery[Deploys]
-  val events = TableQuery[Events]
-
-  val ddl = projects.schema ++ deploys.schema ++ events.schema
-
-}
 
 class SlickQueryingActor(db: Database) extends PersistenceActor {
 
-  import Db._
+  import DBTables._
   override implicit def ec: ExecutionContext = context.dispatcher
 
   override def addDeploy(name: String, deploy: RequestDeploy): Future[Option[ResponseDeploy]] = {
@@ -173,20 +164,21 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
 
 class SlickPersistenceActor(config: Config) extends Actor with LazyLogging with Stash {
 
-  import Db._
+  import DBTables._
   import context.dispatcher
 
   override def preStart(): Unit = {
     val db = Database.forConfig("persistence", config)
     db.run(MTable.getTables.headOption).flatMap {
-      case None =>
+      case None => {
         logger.info("Creating DB.")
+        val ddl = projects.schema ++ deploys.schema ++ events.schema
         db.run(DBIO.seq(ddl.create)).map(_ => db)
-
-      case Some(_) =>
+      }
+      case Some(_) => {
         logger.info("Using existent DB.")
         Future.successful(db)
-
+      }
     }.map(DBConnected(_)).pipeTo(self)
   }
 

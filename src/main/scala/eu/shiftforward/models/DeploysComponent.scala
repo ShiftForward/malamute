@@ -1,6 +1,7 @@
 package eu.shiftforward.models
 
-import eu.shiftforward.persistence.{ Db, SlickPersistenceActor }
+import eu.shiftforward.DBTables
+import eu.shiftforward.persistence.SlickPersistenceActor
 import slick.driver.SQLiteDriver.api._
 
 case class DeployModel(
@@ -30,7 +31,7 @@ class Deploys(tag: Tag) extends Table[DeployModel](tag, "DEPLOYS") {
   def client = column[String]("CLIENT")
   def projName = column[String]("PROJNAME")
 
-  def project = foreignKey("PROJNAME", projName, Db.projects)(_.name)
+  def project = foreignKey("PROJNAME", projName, DBTables.projects)(_.name)
 
   def * = (
     id,

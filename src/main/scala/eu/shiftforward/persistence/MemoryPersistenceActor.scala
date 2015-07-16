@@ -75,10 +75,11 @@ class MemoryPersistenceActor extends PersistenceActor {
   override def getDeploys(name: String, max: Int): Future[List[ResponseDeploy]] = Future {
     val proj: Option[Project] = allProjects.get(name)
     proj.map { p: Project =>
-      p.deploys.map { newDeploy => ResponseDeploy(newDeploy.user, newDeploy.timestamp,
-        newDeploy.commit.branch, newDeploy.commit.hash, newDeploy.description,
-        newDeploy.events.map(ev => ResponseEvent(ev.timestamp,ev.status,ev.description)),
-        newDeploy.changelog, newDeploy.id, newDeploy.version, newDeploy.isAutomatic, newDeploy.client)
+      p.deploys.map { newDeploy =>
+        ResponseDeploy(newDeploy.user, newDeploy.timestamp,
+          newDeploy.commit.branch, newDeploy.commit.hash, newDeploy.description,
+          newDeploy.events.map(ev => ResponseEvent(ev.timestamp, ev.status, ev.description)),
+          newDeploy.changelog, newDeploy.id, newDeploy.version, newDeploy.isAutomatic, newDeploy.client)
       }.take(max)
     }.getOrElse(List())
   }
@@ -89,7 +90,7 @@ class MemoryPersistenceActor extends PersistenceActor {
       p.deploys find (_.id == deployId) match {
         case Some(newDeploy) => Some(ResponseDeploy(newDeploy.user, newDeploy.timestamp,
           newDeploy.commit.branch, newDeploy.commit.hash, newDeploy.description,
-          newDeploy.events.map(ev => ResponseEvent(ev.timestamp,ev.status,ev.description)),
+          newDeploy.events.map(ev => ResponseEvent(ev.timestamp, ev.status, ev.description)),
           newDeploy.changelog, newDeploy.id, newDeploy.version, newDeploy.isAutomatic, newDeploy.client))
       }
     }

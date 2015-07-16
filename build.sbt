@@ -24,8 +24,8 @@ libraryDependencies ++= {
     "com.gettyimages"     %%  "spray-swagger"     % "0.5.1",
     "ch.qos.logback"      %   "logback-classic"   % "1.1.3",
     "com.typesafe.slick"  %%  "slick"             % "3.0.0",
-    "org.xerial"          %  "sqlite-jdbc"        % "3.8.10.1",
-    "com.typesafe"        % "config"              % "1.3.0"
+    "org.xerial"          %   "sqlite-jdbc"       % "3.8.10.1",
+    "com.typesafe"        %   "config"            % "1.3.0"
   )
 }
 

@@ -131,7 +131,7 @@ function handleLogin() {
         }
       }
     }
-    var scopes = []
+    var scopes = [];
     var o = $('.api-popup-scopes').find('input:checked');
 
     for(k =0; k < o.length; k++) {
@@ -159,7 +159,7 @@ function handleLogin() {
 
   popupMask.show();
   popupDialog.show();
-  return;
+
 }
 
 
@@ -209,7 +209,7 @@ window.processOAuthCode = function processOAuthCode(data) {
     'code': data.code,
     'grant_type': 'authorization_code',
     'redirect_uri': redirect_uri
-  }
+  };
   $.ajax(
   {
     url : window.swaggerUi.tokenUrl,
@@ -224,12 +224,12 @@ window.processOAuthCode = function processOAuthCode(data) {
       onOAuthComplete("");
     }
   });
-}
+};
 
 window.onOAuthComplete = function onOAuthComplete(token) {
   if(token) {
     if(token.error) {
-      var checkbox = $('input[type=checkbox],.secured')
+      var checkbox = $('input[type=checkbox],.secured');
       checkbox.each(function(pos){
         checkbox[pos].checked = false;
       });
@@ -281,4 +281,4 @@ window.onOAuthComplete = function onOAuthComplete(token) {
       }
     }
   }
-}
+};

@@ -3,18 +3,18 @@ package eu.shiftforward.persistence
 import java.util.UUID
 
 import akka.actor.{ Actor, ActorRef, Props, Stash }
+import akka.pattern.pipe
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.LazyLogging
 import eu.shiftforward.DBTables
 import eu.shiftforward.entities._
 import eu.shiftforward.models._
-import akka.pattern.pipe
 import eu.shiftforward.persistence.SlickPersistenceActor.DBConnected
+import slick.dbio.DBIO
 import slick.driver.SQLiteDriver.api._
 import slick.jdbc.meta.MTable
 import scala.compat.Platform._
 import scala.concurrent.{ ExecutionContext, Future }
-
 
 class SlickQueryingActor(db: Database) extends PersistenceActor {
 
@@ -48,7 +48,7 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
                 newDeploy.commit_branch,
                 newDeploy.commit_hash,
                 newDeploy.description,
-                List(Event(deployEvent.timestamp, deployEvent.status, deployEvent.description)),
+                List(ResponseEvent(deployEvent.timestamp, deployEvent.status, deployEvent.description)),
                 newDeploy.changelog,
                 newDeploy.id,
                 newDeploy.version,
@@ -98,10 +98,10 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
     }
   }
 
-  def getEvents(id: String): Future[List[Event]] = {
+  def getEvents(id: String): Future[List[ResponseEvent]] = {
     db.run(events.filter(_.deployID === id).result).map {
       _.map { e =>
-        Event(e.timestamp, e.status, e.description)
+        ResponseEvent(e.timestamp, e.status, e.description)
       }.toList
     }
   }

@@ -2,8 +2,7 @@ package eu.shiftforward.persistence
 
 import java.util.UUID
 
-import eu.shiftforward.entities.{ Deploy, Event, Project, RequestProject, ResponseProject, _ }
-
+import eu.shiftforward.entities._
 import scala.collection.mutable
 import scala.compat.Platform._
 import scala.concurrent.{ ExecutionContext, Future }

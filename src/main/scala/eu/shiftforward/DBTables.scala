@@ -1,6 +1,6 @@
 package eu.shiftforward
 
-import eu.shiftforward.models.{Deploys, Events, Projects}
+import eu.shiftforward.models.{ Deploys, Events, Projects }
 import slick.lifted.TableQuery
 
 object DBTables {

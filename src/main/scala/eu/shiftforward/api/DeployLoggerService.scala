@@ -55,7 +55,7 @@ abstract class DeployLoggerService extends HttpService {
   }
 
   @Path("project")
-  @ApiOperation(httpMethod = "POST", response = classOf[Project], value = "Returns a Project", consumes = json, produces = "*/*")
+  @ApiOperation(httpMethod = "POST", response = classOf[ResponseProject], value = "Returns a Project", consumes = json, produces = "*/*")
   @ApiImplicitParams(Array(
     new ApiImplicitParam(name = "body", value = "Deploy Object", dataType = "eu.shiftforward.entities.RequestProject", required = true, paramType = "body")
   ))
@@ -77,7 +77,7 @@ abstract class DeployLoggerService extends HttpService {
   }
 
   @Path("project/{projName}/deploy")
-  @ApiOperation(httpMethod = "POST", response = classOf[Deploy], value = "Returns a Deploy", consumes = json, produces = "*/*")
+  @ApiOperation(httpMethod = "POST", response = classOf[ResponseDeploy], value = "Returns a Deploy", consumes = json, produces = "*/*")
   @ApiImplicitParams(Array(
     new ApiImplicitParam(name = "projName", required = true, dataType = "string", paramType = "path", value = "Name of project that needs to be fetched"),
     new ApiImplicitParam(name = "body", value = "Deploy Object", dataType = "eu.shiftforward.entities.RequestDeploy", required = true, paramType = "body")

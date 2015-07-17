@@ -32,7 +32,7 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
           deploy.description,
           deploy.changelog,
           deploy.version,
-          deploy.isAutomatic,
+          deploy.automatic,
           deploy.client,
           name
         )
@@ -51,7 +51,7 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
                 newDeploy.changelog,
                 newDeploy.id,
                 newDeploy.version,
-                newDeploy.isAutomatic,
+                newDeploy.automatic,
                 newDeploy.client
               ))
           }
@@ -120,7 +120,7 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
             d.changelog,
             d.id,
             d.version,
-            d.isAutomatic,
+            d.automatic,
             d.client
           )
         }
@@ -149,7 +149,7 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
             d.changelog,
             d.id,
             d.version,
-            d.isAutomatic,
+            d.automatic,
             d.client
           )
         }

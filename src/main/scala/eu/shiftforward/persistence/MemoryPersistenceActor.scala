@@ -42,10 +42,10 @@ class MemoryPersistenceActor extends PersistenceActor {
     val proj: Option[Project] = allProjects.get(name)
     proj.map { p: Project =>
       val events: List[Event] = List(Event(currentTime, DeployStatus.Started, ""))
-      val newDeploy = Deploy(deploy.user, currentTime, deploy.commit, deploy.description, events, deploy.changelog, UUID.randomUUID().toString, deploy.version, deploy.isAutomatic, deploy.client)
+      val newDeploy = Deploy(deploy.user, currentTime, deploy.commit, deploy.description, events, deploy.changelog, UUID.randomUUID().toString, deploy.version, deploy.automatic, deploy.client)
       val newProj = p.copy(deploys = p.deploys :+ newDeploy)
       allProjects += (name -> newProj)
-      ResponseDeploy(newDeploy.user, newDeploy.timestamp, newDeploy.commit.branch, newDeploy.commit.hash, newDeploy.description, List(ResponseEvent(currentTime, DeployStatus.Started, "")), newDeploy.changelog, newDeploy.id, newDeploy.version, newDeploy.isAutomatic, newDeploy.client)
+      ResponseDeploy(newDeploy.user, newDeploy.timestamp, newDeploy.commit.branch, newDeploy.commit.hash, newDeploy.description, List(ResponseEvent(currentTime, DeployStatus.Started, "")), newDeploy.changelog, newDeploy.id, newDeploy.version, newDeploy.automatic, newDeploy.client)
     }
   }
 
@@ -79,7 +79,7 @@ class MemoryPersistenceActor extends PersistenceActor {
         ResponseDeploy(newDeploy.user, newDeploy.timestamp,
           newDeploy.commit.branch, newDeploy.commit.hash, newDeploy.description,
           newDeploy.events.map(ev => ResponseEvent(ev.timestamp, ev.status, ev.description)),
-          newDeploy.changelog, newDeploy.id, newDeploy.version, newDeploy.isAutomatic, newDeploy.client)
+          newDeploy.changelog, newDeploy.id, newDeploy.version, newDeploy.automatic, newDeploy.client)
       }.take(max)
     }.getOrElse(List())
   }
@@ -91,7 +91,7 @@ class MemoryPersistenceActor extends PersistenceActor {
         case Some(newDeploy) => Some(ResponseDeploy(newDeploy.user, newDeploy.timestamp,
           newDeploy.commit.branch, newDeploy.commit.hash, newDeploy.description,
           newDeploy.events.map(ev => ResponseEvent(ev.timestamp, ev.status, ev.description)),
-          newDeploy.changelog, newDeploy.id, newDeploy.version, newDeploy.isAutomatic, newDeploy.client))
+          newDeploy.changelog, newDeploy.id, newDeploy.version, newDeploy.automatic, newDeploy.client))
         case None => None
       }
     }

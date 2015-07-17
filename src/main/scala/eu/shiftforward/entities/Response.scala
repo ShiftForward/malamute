@@ -22,7 +22,7 @@ case class ResponseDeploy(
   changelog: String,
   id: String,
   version: String,
-  isAutomatic: Boolean,
+  automatic: Boolean,
   client: String
 ) extends Response
 

@@ -58,8 +58,10 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
           responseAs[ResponseProject].name must beEqualTo("TestProj1")
           responseAs[ResponseProject].description must beEqualTo("Proj Description Test")
         }
-        Post("/project", RequestProject("TestProj1", "Proj Description Test", "http://bitbucket.com/abc")) ~> projectPostRoute ~> check {
-          status === UnprocessableEntity
+        eventually {
+          Post("/project", RequestProject("TestProj1", "Proj Description Test", "http://bitbucket.com/abc")) ~> projectPostRoute ~> check {
+            status === UnprocessableEntity
+          }
         }
       }
     }
@@ -126,10 +128,12 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
             responseAs[List[ResponseProject]].length must beEqualTo(2)
           }
         }
-        Delete("/project/TestProj6") ~> projectDeleteRoute ~> check {
-          status === OK
-          responseAs[ResponseProject].name must beEqualTo("TestProj6")
-          responseAs[ResponseProject].description must beEqualTo("Proj Description Test")
+        eventually {
+          Delete("/project/TestProj6") ~> projectDeleteRoute ~> check {
+            status === OK
+            responseAs[ResponseProject].name must beEqualTo("TestProj6")
+            responseAs[ResponseProject].description must beEqualTo("Proj Description Test")
+          }
         }
         eventually {
           Get("/projects") ~> projectsGetRoute ~> check {

@@ -13,7 +13,7 @@ case class DeployModel(
   description: String,
   changelog: String,
   version: String,
-  isAutomatic: Boolean,
+  automatic: Boolean,
   client: String,
   projName: String
 )
@@ -27,7 +27,7 @@ class Deploys(tag: Tag) extends Table[DeployModel](tag, "DEPLOYS") {
   def description = column[String]("DESCRIPTION")
   def changelog = column[String]("CHANGELOG")
   def version = column[String]("VERSION")
-  def isAutomatic = column[Boolean]("AUTOMATIC")
+  def automatic = column[Boolean]("AUTOMATIC")
   def client = column[String]("CLIENT")
   def projName = column[String]("PROJNAME")
 
@@ -42,7 +42,7 @@ class Deploys(tag: Tag) extends Table[DeployModel](tag, "DEPLOYS") {
     description,
     changelog,
     version,
-    isAutomatic,
+    automatic,
     client,
     projName
   ) <> (DeployModel.tupled, DeployModel.unapply)

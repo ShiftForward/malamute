@@ -20,7 +20,7 @@ class DeployLoggerActor(config: Config) extends Actor with HttpService with Lazy
 
   val swaggerService = new SwaggerHttpService {
     override def apiTypes = Seq(typeOf[DeployLoggerService])
-    override def apiVersion = config.getString("version")
+    override def apiVersion = config.getString("apiVerion")
     override def baseUrl = "/"
     override def docsPath = "api-docs"
     override def actorRefFactory = context

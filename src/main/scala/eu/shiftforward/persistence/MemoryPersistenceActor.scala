@@ -17,10 +17,9 @@ class MemoryPersistenceActor extends PersistenceActor {
     val proj = Project(project.name, project.description, currentTime, project.git, List())
     allProjects.get(proj.name) match {
       case Some(_) => throw new DuplicatedEntry(proj.name + " already exists.")
-      case None => {
+      case None =>
         allProjects += proj.name -> proj
         ResponseProject(proj.name, proj.description, proj.createdAt, proj.git)
-      }
     }
   }
 

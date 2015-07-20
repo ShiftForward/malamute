@@ -20,8 +20,12 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
   import DBTables._
   override implicit def ec: ExecutionContext = context.dispatcher
 
+  def getProjectExists(name: String) = {
+    db.run(projects.filter(_.name === name).result.headOption)
+  }
+
   override def addDeploy(name: String, deploy: RequestDeploy): Future[Option[ResponseDeploy]] = {
-    db.run(projects.filter(_.name === name).result.headOption).flatMap { projOpt =>
+    getProjectExists(name).flatMap { projOpt =>
       projOpt.map { p =>
         val newDeploy = DeployModel(
           UUID.randomUUID().toString,
@@ -60,7 +64,7 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
   }
 
   override def deleteProject(name: String): Future[Option[ResponseProject]] = {
-    db.run(projects.filter(_.name === name).result.headOption).map { list =>
+    getProjectExists(name).map { list =>
       db.run(projects.filter(_.name === name).delete)
       list.map { p =>
         ResponseProject(p.name, p.description, p.createdAt, p.git)
@@ -69,7 +73,7 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
   }
 
   override def getProject(name: String): Future[Option[ResponseProject]] = {
-    db.run(projects.filter(_.name === name).result.headOption).map { h =>
+    getProjectExists(name).map { h =>
       h.map { p =>
         ResponseProject(p.name, p.description, p.createdAt, p.git)
       }
@@ -77,7 +81,7 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
   }
 
   override def addEvent(projName: String, deployId: String, event: RequestEvent): Future[Option[ResponseEvent]] = {
-    db.run(projects.filter(_.name === projName).result.headOption).map {
+    getProjectExists(projName)map {
       case Some(_) => Some({
         val newEvent = EventModel(currentTime, event.status, event.description, deployId)
         db.run(events += newEvent)
@@ -89,7 +93,7 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
 
   override def saveProject(project: RequestProject): Future[ResponseProject] = {
     val proj = ProjectModel(project.name, project.description, currentTime, project.git)
-    db.run(projects.filter(_.name === proj.name).result.headOption).map {
+    getProjectExists(proj.name).map {
       case Some(_) => throw new DuplicatedEntry(proj.name + " already exists.")
       case None => {
         db.run(projects += proj)

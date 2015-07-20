@@ -20,7 +20,7 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
   import DBTables._
   override implicit def ec: ExecutionContext = context.dispatcher
 
-  def getProjectExists(name: String) = {
+  private def getProjectExists(name: String) = {
     db.run(projects.filter(_.name === name).result.headOption)
   }
 

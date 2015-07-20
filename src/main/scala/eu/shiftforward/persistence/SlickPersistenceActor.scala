@@ -81,7 +81,7 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
   }
 
   override def addEvent(projName: String, deployId: String, event: RequestEvent): Future[Option[ResponseEvent]] = {
-    getProjectExists(projName)map {
+    getProjectExists(projName) map {
       case Some(_) => Some({
         val newEvent = EventModel(currentTime, event.status, event.description, deployId)
         db.run(events += newEvent)

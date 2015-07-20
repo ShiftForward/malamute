@@ -62,7 +62,8 @@ abstract class DeployLoggerService extends HttpService {
   @ApiResponses(Array(
     new ApiResponse(code = 200, message = "OK"),
     new ApiResponse(code = 422, message = "UnprocessableEntity"),
-    new ApiResponse(code = 400, message = "BadRequest")
+    new ApiResponse(code = 400, message = "BadRequest"),
+    new ApiResponse(code = 500, message = "InternalServerError")
   ))
   def projectPostRoute = path("project") {
     post {
@@ -70,7 +71,7 @@ abstract class DeployLoggerService extends HttpService {
         onComplete((actorPersistence ? SaveProject(proj)).mapTo[ResponseProject]) {
           case Success(project) => complete(project)
           case Failure(ex: DuplicatedEntry) => complete(UnprocessableEntity, s"An error occurred: ${ex.error}")
-          case Failure(ex) => complete(BadRequest, s"An error occurred: ${ex.getMessage}")
+          case Failure(ex) => complete(InternalServerError, s"An error occurred: ${ex.getMessage}")
         }
       }
     }
@@ -85,15 +86,15 @@ abstract class DeployLoggerService extends HttpService {
   @ApiResponses(Array(
     new ApiResponse(code = 200, message = "OK"),
     new ApiResponse(code = 400, message = "BadRequest"),
-    new ApiResponse(code = 404, message = "NotFound")
+    new ApiResponse(code = 404, message = "NotFound"),
+    new ApiResponse(code = 500, message = "InternalServerError")
   ))
   def projectDeployPostRoute = path("project" / Segment / "deploy") { name =>
     post {
       entity(as[RequestDeploy]) { deploy =>
         onComplete((actorPersistence ? AddDeploy(name, deploy)).mapTo[Option[ResponseDeploy]]) {
           case Success(deploy) => complete(deploy)
-          case Failure(ex: MalformedURLException) => complete(BadRequest, s"An error occurred: ${ex.getMessage}")
-          case Failure(ex) => complete(BadRequest, s"An error occurred: ${ex.getMessage}")
+          case Failure(ex) => complete(InternalServerError, s"An error occurred: ${ex.getMessage}")
         }
       }
     }

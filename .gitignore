@@ -81,4 +81,4 @@ project/plugins/project/
 .worksheet
 
 rdvs.db
-db-*
+testdb*

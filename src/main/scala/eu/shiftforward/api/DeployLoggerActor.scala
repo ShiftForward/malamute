@@ -14,7 +14,6 @@ import scala.reflect.runtime.universe._
 
 class DeployLoggerActor(config: Config) extends Actor with HttpService with DeployLoggerService with LazyLogging {
 
-
   def actorRefFactory: ActorRefFactory = context
 
   val actorPersistence: ActorRef = context.system.actorOf(Props(new SlickPersistenceActor(config)))
@@ -37,7 +36,6 @@ class DeployLoggerActor(config: Config) extends Actor with HttpService with Depl
     ))
   }
 
-
   def receive = runRoute(
       pingRoute ~
       projectPostRoute ~
@@ -50,15 +48,11 @@ class DeployLoggerActor(config: Config) extends Actor with HttpService with Depl
       projectDeleteRoute ~
       swaggerService.routes ~
       get {
-        pathPrefix("") {
-          pathEndOrSingleSlash {
-            getFromResource("swagger-ui/index.html")
-          }
+        pathEndOrSingleSlash {
+          getFromResource("swagger-ui/index.html")
         } ~
           getFromResourceDirectory("swagger-ui")
       }
   )
-
-
 }
 

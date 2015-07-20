@@ -47,7 +47,9 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
     }
     "handle /project" in {
       "return a 'JSON obj Project' response for POST requests " in new MockDeployLoggerService {
-        Post("/project", RequestProject("TestProj", "Proj Description Test", "http://bitbucket.com/abc")) ~> projectPostRoute ~> check {
+        Post("/project",
+          RequestProject("TestProj", "Proj Description Test", "http://bitbucket.com/abc")
+        ) ~> projectPostRoute ~> check {
           status === OK
           responseAs[ResponseProject].name must beEqualTo("TestProj")
           responseAs[ResponseProject].description must beEqualTo("Proj Description Test")
@@ -55,13 +57,17 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
       }
 
       "return a 422 - UnprocessableEntity response for POST requests with a duplicated name" in new MockDeployLoggerService {
-        Post("/project", RequestProject("TestProj1", "Proj Description Test", "http://bitbucket.com/abc")) ~> projectPostRoute ~> check {
+        Post("/project",
+          RequestProject("TestProj1", "Proj Description Test", "http://bitbucket.com/abc")
+        ) ~> projectPostRoute ~> check {
           status === OK
           responseAs[ResponseProject].name must beEqualTo("TestProj1")
           responseAs[ResponseProject].description must beEqualTo("Proj Description Test")
         }
         eventually {
-          Post("/project", RequestProject("TestProj1", "Proj Description Test", "http://bitbucket.com/abc")) ~> projectPostRoute ~> check {
+          Post("/project",
+            RequestProject("TestProj1", "Proj Description Test", "http://bitbucket.com/abc")
+          ) ~> projectPostRoute ~> check {
             status === UnprocessableEntity
           }
         }
@@ -69,12 +75,16 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
     }
     "handle /projects" in {
       "return a 'JSON Array of Project' response for GET requests" in new MockDeployLoggerService {
-        Post("/project", RequestProject("TestProj2", "Proj Description Test", "http://bitbucket.com/abc")) ~> projectPostRoute ~> check {
+        Post("/project",
+          RequestProject("TestProj2", "Proj Description Test", "http://bitbucket.com/abc")
+        ) ~> projectPostRoute ~> check {
           status === OK
           responseAs[ResponseProject].name must beEqualTo("TestProj2")
           responseAs[ResponseProject].description must beEqualTo("Proj Description Test")
         }
-        Post("/project", RequestProject("TestProj20", "Proj Description Test 1", "http://bitbucket.com/abc")) ~> projectPostRoute ~> check {
+        Post("/project",
+          RequestProject("TestProj20", "Proj Description Test 1", "http://bitbucket.com/abc")
+        ) ~> projectPostRoute ~> check {
           status === OK
           responseAs[ResponseProject].name must beEqualTo("TestProj20")
           responseAs[ResponseProject].description must beEqualTo("Proj Description Test 1")
@@ -89,7 +99,9 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
     }
     "handle /project/:name" in {
       "return a 'JSON of Project' response for GET requests" in new MockDeployLoggerService {
-        Post("/project", RequestProject("TestProj4", "Proj Description Test", "http://bitbucket.com/abc")) ~> projectPostRoute ~> check {
+        Post("/project",
+          RequestProject("TestProj4", "Proj Description Test", "http://bitbucket.com/abc")
+        ) ~> projectPostRoute ~> check {
           status === OK
           responseAs[ResponseProject].name must beEqualTo("TestProj4")
           responseAs[ResponseProject].description must beEqualTo("Proj Description Test")
@@ -103,7 +115,9 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
         }
       }
       "return a 404 response for GET requests to /project/:name that doesn't exist" in new MockDeployLoggerService {
-        Post("/project", RequestProject("TestProj5", "Proj Description Test", "http://bitbucket.com/abc")) ~> projectPostRoute ~> check {
+        Post("/project",
+          RequestProject("TestProj5", "Proj Description Test", "http://bitbucket.com/abc")
+        ) ~> projectPostRoute ~> check {
           status === OK
           responseAs[ResponseProject].name must beEqualTo("TestProj5")
           responseAs[ResponseProject].description must beEqualTo("Proj Description Test")
@@ -113,12 +127,16 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
         }
       }
       "return a 'JSON Obj of Project' response for DELETE requests" in new MockDeployLoggerService {
-        Post("/project", RequestProject("TestProj6", "Proj Description Test", "http://bitbucket.com/abc")) ~> projectPostRoute ~> check {
+        Post("/project",
+          RequestProject("TestProj6", "Proj Description Test", "http://bitbucket.com/abc")
+        ) ~> projectPostRoute ~> check {
           status === OK
           responseAs[ResponseProject].name must beEqualTo("TestProj6")
           responseAs[ResponseProject].description must beEqualTo("Proj Description Test")
         }
-        Post("/project", RequestProject("TestProj7", "Proj Description Test 1", "http://bitbucket.com/abc")) ~> projectPostRoute ~> check {
+        Post("/project",
+          RequestProject("TestProj7", "Proj Description Test 1", "http://bitbucket.com/abc")
+        ) ~> projectPostRoute ~> check {
           status === OK
           responseAs[ResponseProject].name must beEqualTo("TestProj7")
           responseAs[ResponseProject].description must beEqualTo("Proj Description Test 1")
@@ -145,7 +163,9 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
         }
       }
       "return a 404 response for DELETE requests to a name that doesn't exist" in new MockDeployLoggerService {
-        Post("/project", RequestProject("TestProj8", "Proj Description Test", "http://bitbucket.com/abc")) ~> projectPostRoute ~> check {
+        Post("/project",
+          RequestProject("TestProj8", "Proj Description Test", "http://bitbucket.com/abc")
+        ) ~> projectPostRoute ~> check {
           status === OK
           responseAs[ResponseProject].name must beEqualTo("TestProj8")
           responseAs[ResponseProject].description must beEqualTo("Proj Description Test")
@@ -157,43 +177,57 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
     }
     "handle /project/:name/deploy" in {
       "return a 'JSON obj Project' response for POST requests" in new MockDeployLoggerService {
-        Post("/project", RequestProject("TestProj9", "Proj Description Test", "http://bitbucket.com/abc")) ~> projectPostRoute ~> check {
+        Post("/project",
+          RequestProject("TestProj9", "Proj Description Test", "http://bitbucket.com/abc")
+        ) ~> projectPostRoute ~> check {
           status === OK
           responseAs[ResponseProject].name must beEqualTo("TestProj9")
           responseAs[ResponseProject].description must beEqualTo("Proj Description Test")
         }
         eventually {
-          Post("/project/TestProj9/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente")) ~> projectDeployPostRoute ~> check {
+          Post("/project/TestProj9/deploy",
+            RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente")
+          ) ~> projectDeployPostRoute ~> check {
             status === OK
             responseAs[ResponseDeploy].user must beEqualTo("testUser")
           }
         }
       }
       "return a 404 response for POST requests to project that doesn't exist" in new MockDeployLoggerService {
-        Post("/project", RequestProject("TestProj10", "Proj Description Test", "http://bitbucket.com/abc")) ~> projectPostRoute ~> check {
+        Post("/project",
+          RequestProject("TestProj10", "Proj Description Test", "http://bitbucket.com/abc")
+        ) ~> projectPostRoute ~> check {
           status === OK
           responseAs[ResponseProject].name must beEqualTo("TestProj10")
           responseAs[ResponseProject].description must beEqualTo("Proj Description Test")
         }
-        Post("/project/abc/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente")) ~> projectDeployPostRoute ~> check {
+        Post("/project/abc/deploy",
+          RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente")
+        ) ~> projectDeployPostRoute ~> check {
           status === NotFound
         }
       }
     }
     "handle /project/:name/deploy/:id/event" in {
       "return a 'JSON obj Event' response for POST requests" in new MockDeployLoggerService {
-        Post("/project", RequestProject("TestProj11", "Proj Description Test", "http://bitbucket.com/abc")) ~> projectPostRoute ~> check {
+        Post("/project",
+          RequestProject("TestProj11", "Proj Description Test", "http://bitbucket.com/abc")
+        ) ~> projectPostRoute ~> check {
           status === OK
           responseAs[ResponseProject].name must beEqualTo("TestProj11")
           responseAs[ResponseProject].description must beEqualTo("Proj Description Test")
         }
         eventually {
-          Post("/project/TestProj11/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente")) ~> projectDeployPostRoute ~> check {
+          Post("/project/TestProj11/deploy",
+            RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente")
+          ) ~> projectDeployPostRoute ~> check {
             status === OK
             responseAs[ResponseDeploy].user must beEqualTo("testUser")
             val deployId = responseAs[ResponseDeploy].id
 
-            Post("/project/TestProj11/deploy/" + deployId + "/event", RequestEvent(DeployStatus.Success, "done")) ~> projectDeployEventPostRoute ~> check {
+            Post("/project/TestProj11/deploy/" + deployId + "/event",
+              RequestEvent(DeployStatus.Success, "done")
+            ) ~> projectDeployEventPostRoute ~> check {
               status === OK
               responseAs[ResponseEvent].status === DeployStatus.Success
             }
@@ -207,18 +241,24 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
     }
     "handle /project/:name/deploy/:id" in {
       "return a 'JSON obj Deploy' response for GET requests" in new MockDeployLoggerService {
-        Post("/project", RequestProject("TestProj", "Proj Description Test", "http://bitbucket.com/abc")) ~> projectPostRoute ~> check {
+        Post("/project",
+          RequestProject("TestProj", "Proj Description Test", "http://bitbucket.com/abc")
+        ) ~> projectPostRoute ~> check {
           status === OK
           responseAs[ResponseProject].name must beEqualTo("TestProj")
           responseAs[ResponseProject].description must beEqualTo("Proj Description Test")
         }
         eventually {
-          Post("/project/TestProj/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente")) ~> projectDeployPostRoute ~> check {
+          Post("/project/TestProj/deploy",
+            RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente")
+          ) ~> projectDeployPostRoute ~> check {
             status === OK
             responseAs[ResponseDeploy].user must beEqualTo("testUser")
             val deployId = responseAs[ResponseDeploy].id
 
-            Post("/project/TestProj/deploy/" + deployId + "/event", RequestEvent(DeployStatus.Success, "done")) ~> projectDeployEventPostRoute ~> check {
+            Post("/project/TestProj/deploy/" + deployId + "/event",
+              RequestEvent(DeployStatus.Success, "done")
+            ) ~> projectDeployEventPostRoute ~> check {
               status === OK
               responseAs[ResponseEvent].status === DeployStatus.Success
             }
@@ -232,17 +272,23 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
     }
     "handle /project/:name/deploys" in {
       "return a 'JSON Array obj Deploy' response for GET requests" in new MockDeployLoggerService {
-        Post("/project", RequestProject("TestProj13", "Proj Description Test", "http://bitbucket.com/abc")) ~> projectPostRoute ~> check {
+        Post("/project",
+          RequestProject("TestProj13", "Proj Description Test", "http://bitbucket.com/abc")
+        ) ~> projectPostRoute ~> check {
           status === OK
           responseAs[ResponseProject].name must beEqualTo("TestProj13")
           responseAs[ResponseProject].description must beEqualTo("Proj Description Test")
         }
         eventually {
-          Post("/project/TestProj13/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente")) ~> projectDeployPostRoute ~> check {
+          Post("/project/TestProj13/deploy",
+            RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente")
+          ) ~> projectDeployPostRoute ~> check {
             status === OK
             responseAs[ResponseDeploy].user must beEqualTo("testUser")
           }
-          Post("/project/TestProj13/deploy", RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente")) ~> projectDeployPostRoute ~> check {
+          Post("/project/TestProj13/deploy",
+            RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente")
+          ) ~> projectDeployPostRoute ~> check {
             status === OK
             responseAs[ResponseDeploy].user must beEqualTo("testUser")
           }

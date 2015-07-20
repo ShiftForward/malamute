@@ -13,12 +13,10 @@ end
 
 class Project
   
-  def initialize()
-    @@project_name = ""
-    @@lastdeployid = ""
-  end
-
-  def new_project(name, description, git)
+  @@project_name = ""
+  @@lastdeployid = ""
+  
+  def self.new_project(name, description, git)
     uri = URI.parse(URL+"project")
 
     req = Net::HTTP::Post.new(uri.request_uri)
@@ -34,14 +32,14 @@ class Project
       http.request(req)
     end
     
-    puts res.body
-    
     if res.kind_of?(Net::HTTPSuccess)
       @@project_name = name
     end
+    
+    return res.body
   end
 
-  def get_projects
+  def self.get_projects
     uri = URI.parse(URL+"projects")
 
     req = Net::HTTP::Get.new(uri.request_uri)
@@ -49,10 +47,11 @@ class Project
     res = Net::HTTP.start(uri.hostname, uri.port) do |http|
       http.request(req)
     end
-    puts res.body
+    
+    return res.body
   end
 
-  def open_project(name)
+  def self.open_project(name)
     uri = URI.parse(URL + "project/#{name}")
 
     req = Net::HTTP::Get.new(uri.request_uri)
@@ -64,9 +63,11 @@ class Project
     if res.kind_of?(Net::HTTPSuccess)
       @@project_name = name
     end
+    
+    return res.body
   end
 
-  def add_deploy(description, changelog, version, automatic, client)
+  def self.add_deploy(description, changelog, version, automatic, client)
     #git configurations for current folder
     user =  `git config --get user.name`.chomp!
     commit_branch = `git rev-parse --abbrev-ref HEAD`.chomp!
@@ -93,14 +94,14 @@ class Project
     res = Net::HTTP.start(uri.hostname, uri.port) do |http|
       http.request(req)
     end
-    puts res.body
-     if res.kind_of?(Net::HTTPSuccess)
-       @@lastdeployid = JSON.parse(res.body)['id']
-     end
+    if res.kind_of?(Net::HTTPSuccess)
+      @@lastdeployid = JSON.parse(res.body)['id']
+    end
+    return res.body
   end
 
   
-  def add_deploy_event(status, description)
+  def self.add_deploy_event(status, description)
     uri = URI.parse(URL + "project/#{@@project_name}/deploy/#{@@lastdeployid}/event")
 
     req = Net::HTTP::Post.new(uri.request_uri)
@@ -114,17 +115,26 @@ class Project
     res = Net::HTTP.start(uri.hostname, uri.port) do |http|
       http.request(req)
     end
-    puts res.body
+    
+    return res.body
   end
 end
 
 
 if __FILE__ == $0
-  p = Project.new()
-  #p.new_project('malamute','Deploy Logger Service','https://bitbucket.org/shiftforward/malamute')
-  p.open_project('malamute')
-  p.get_projects
-  p.add_deploy('Intial deploy version', 'https://bitbucket.org/shiftforward/malamute', 'v0.1', false, 'none')
-  p.add_deploy_event(DeployStatus::SKIPPED, "Done.")
-  p.add_deploy_event(DeployStatus::SUCCESS, "Done.")
+  Project.new_project('malamute','Deploy Logger Service','https://bitbucket.org/shiftforward/malamute')
+  sleep 5
+  puts Project.open_project('malamute')
+  puts Project.get_projects
+  puts Project.add_deploy('Intial deploy version', 'https://bitbucket.org/shiftforward/malamute', 'v0.1', false, 'none')
+  sleep 2
+  n = rand(0..2)
+  if n == 0
+    puts Project.add_deploy_event(DeployStatus::FAILED, "Done.")
+  elsif n == 1
+    puts Project.add_deploy_event(DeployStatus::SUCCESS, "Done.")
+  else
+    puts Project.add_deploy_event(DeployStatus::SKIPPED, "Done.")
+  #Project.add_deploy_event(DeployStatus::SUCCESS, "Done.")
+  end
 end

@@ -13,8 +13,8 @@ end
 
 class Project
   
-  @@project_name = ""
-  @@lastdeployid = ""
+  @project_name = ""
+  @lastdeployid = ""
   
   def self.new_project(name, description, git)
     uri = URI.parse(URL+"project")
@@ -33,10 +33,11 @@ class Project
     end
     
     if res.kind_of?(Net::HTTPSuccess)
-      @@project_name = name
+      @project_name = name
+      return res.body
+    else
+      return res.body
     end
-    
-    return res.body
   end
 
   def self.get_projects
@@ -48,7 +49,7 @@ class Project
       http.request(req)
     end
     
-    return res.body
+    res.body
   end
 
   def self.open_project(name)
@@ -61,10 +62,11 @@ class Project
       http.request(req)
     end
     if res.kind_of?(Net::HTTPSuccess)
-      @@project_name = name
+      @project_name = name
+      res.body
+    else
+      res.body
     end
-    
-    return res.body
   end
 
   def self.add_deploy(description, changelog, version, automatic, client)
@@ -73,7 +75,7 @@ class Project
     commit_branch = `git rev-parse --abbrev-ref HEAD`.chomp!
     commit_hash = `git rev-parse HEAD`.chomp!
     
-    uri = URI.parse(URL+"project/#{@@project_name}/deploy")
+    uri = URI.parse(URL+"project/#{@project_name}/deploy")
 
     req = Net::HTTP::Post.new(uri.request_uri)
     req['Content-Type'] = 'application/json'
@@ -95,14 +97,14 @@ class Project
       http.request(req)
     end
     if res.kind_of?(Net::HTTPSuccess)
-      @@lastdeployid = JSON.parse(res.body)['id']
+      @lastdeployid = JSON.parse(res.body)['id']
     end
-    return res.body
+    res.body
   end
 
   
   def self.add_deploy_event(status, description)
-    uri = URI.parse(URL + "project/#{@@project_name}/deploy/#{@@lastdeployid}/event")
+    uri = URI.parse(URL + "project/#{@project_name}/deploy/#{@lastdeployid}/event")
 
     req = Net::HTTP::Post.new(uri.request_uri)
     req['Content-Type'] = 'application/json'
@@ -115,7 +117,6 @@ class Project
     res = Net::HTTP.start(uri.hostname, uri.port) do |http|
       http.request(req)
     end
-    
     return res.body
   end
 end
@@ -135,6 +136,5 @@ if __FILE__ == $0
     puts Project.add_deploy_event(DeployStatus::SUCCESS, "Done.")
   else
     puts Project.add_deploy_event(DeployStatus::SKIPPED, "Done.")
-  #Project.add_deploy_event(DeployStatus::SUCCESS, "Done.")
   end
 end

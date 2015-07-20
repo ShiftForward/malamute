@@ -1,15 +1,13 @@
-package eu.shiftforward.api
+package eu.shiftforward.deploylogger.api
 
 import akka.actor._
-import akka.util.Timeout
 import com.gettyimages.spray.swagger._
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.LazyLogging
 import com.wordnik.swagger.model.ApiInfo
-import eu.shiftforward.persistence.{ SlickPersistenceActor, MemoryPersistenceActor }
+import eu.shiftforward.deploylogger.persistence.SlickPersistenceActor
 import spray.routing.HttpService
 import scala.concurrent.ExecutionContext
-import scala.concurrent.duration._
 import scala.reflect.runtime.universe._
 
 class DeployLoggerActor(config: Config) extends Actor with HttpService with DeployLoggerService with LazyLogging {
@@ -37,7 +35,7 @@ class DeployLoggerActor(config: Config) extends Actor with HttpService with Depl
   }
 
   def receive = runRoute(
-      pingRoute ~
+    pingRoute ~
       projectPostRoute ~
       projectsGetRoute ~
       projectDeployPostRoute ~

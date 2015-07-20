@@ -1,4 +1,4 @@
-package eu.shiftforward.models
+package eu.shiftforward.deploylogger.models
 
 import slick.driver.SQLiteDriver.api._
 

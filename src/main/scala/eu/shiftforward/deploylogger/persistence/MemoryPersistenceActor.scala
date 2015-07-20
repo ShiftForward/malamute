@@ -1,7 +1,7 @@
-package eu.shiftforward.persistence
+package eu.shiftforward.deploylogger.persistence
 
 import java.util.UUID
-import eu.shiftforward.entities._
+import eu.shiftforward.deploylogger.entities._
 import scala.collection.mutable
 import scala.compat.Platform._
 import scala.concurrent.{ ExecutionContext, Future }

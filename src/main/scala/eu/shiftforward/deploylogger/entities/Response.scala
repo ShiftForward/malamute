@@ -1,6 +1,6 @@
-package eu.shiftforward.entities
+package eu.shiftforward.deploylogger.entities
 
-import eu.shiftforward.entities.DeployStatus._
+import DeployStatus._
 import spray.json.{ RootJsonFormat, DefaultJsonProtocol }
 
 sealed trait Response

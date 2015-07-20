@@ -1,7 +1,7 @@
-package eu.shiftforward.models
+package eu.shiftforward.deploylogger.models
 
-import eu.shiftforward.DBTables
-import eu.shiftforward.persistence.SlickPersistenceActor
+import eu.shiftforward.deploylogger.DBTables
+import eu.shiftforward.deploylogger.persistence.SlickPersistenceActor
 import slick.driver.SQLiteDriver.api._
 
 case class DeployModel(

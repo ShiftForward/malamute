@@ -1,4 +1,4 @@
-package eu.shiftforward
+package eu.shiftforward.deploylogger
 
 import akka.actor.{ ActorSystem, Props }
 import akka.io.IO
@@ -6,7 +6,7 @@ import akka.pattern.ask
 import akka.util.Timeout
 import com.typesafe.config.{ ConfigFactory, Config }
 import com.typesafe.scalalogging.LazyLogging
-import eu.shiftforward.api.DeployLoggerActor
+import eu.shiftforward.deploylogger.api.DeployLoggerActor
 import spray.can.Http
 
 import scala.concurrent.duration._

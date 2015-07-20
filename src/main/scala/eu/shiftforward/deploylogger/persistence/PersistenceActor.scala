@@ -1,8 +1,8 @@
-package eu.shiftforward.persistence
+package eu.shiftforward.deploylogger.persistence
 
 import akka.actor.Actor
 import akka.pattern.pipe
-import eu.shiftforward.entities._
+import eu.shiftforward.deploylogger.entities._
 
 import scala.concurrent.{ ExecutionContext, Future }
 

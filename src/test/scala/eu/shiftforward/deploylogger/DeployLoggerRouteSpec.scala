@@ -1,12 +1,12 @@
-package eu.shiftforward
+package eu.shiftforward.deploylogger
 
 import java.util.UUID
 
 import akka.actor.Props
 import com.typesafe.config.ConfigFactory
-import eu.shiftforward.api.DeployLoggerService
-import eu.shiftforward.entities._
-import eu.shiftforward.persistence.{ MemoryPersistenceActor, SlickPersistenceActor }
+import eu.shiftforward.deploylogger.api.DeployLoggerService
+import eu.shiftforward.deploylogger.entities._
+import eu.shiftforward.deploylogger.persistence.SlickPersistenceActor
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
 import spray.http.StatusCodes._

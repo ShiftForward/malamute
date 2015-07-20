@@ -12,11 +12,13 @@ module DeployStatus
 end
 
 class Project
-
+  
   def initialize()
+    @@project_name = ""
+    @@lastdeployid = ""
   end
 
-  def post_project(name, description, git)
+  def new_project(name, description, git)
     uri = URI.parse(URL+"project")
 
     req = Net::HTTP::Post.new(uri.request_uri)
@@ -35,7 +37,7 @@ class Project
     puts res.body
     
     if res.kind_of?(Net::HTTPSuccess)
-      return JSON.parse(res.body)['name']
+      @@project_name = name
     end
   end
 
@@ -50,7 +52,7 @@ class Project
     puts res.body
   end
 
-  def get_project(name)
+  def open_project(name)
     uri = URI.parse(URL + "project/#{name}")
 
     req = Net::HTTP::Get.new(uri.request_uri)
@@ -59,16 +61,18 @@ class Project
     res = Net::HTTP.start(uri.hostname, uri.port) do |http|
       http.request(req)
     end
-    puts res.body
+    if res.kind_of?(Net::HTTPSuccess)
+      @@project_name = name
+    end
   end
 
-  def add_deploy(proj_name, description, changelog, version, automatic, client)
+  def add_deploy(description, changelog, version, automatic, client)
     #git configurations for current folder
     user =  `git config --get user.name`.chomp!
     commit_branch = `git rev-parse --abbrev-ref HEAD`.chomp!
     commit_hash = `git rev-parse HEAD`.chomp!
     
-    uri = URI.parse(URL+"project/#{proj_name}/deploy")
+    uri = URI.parse(URL+"project/#{@@project_name}/deploy")
 
     req = Net::HTTP::Post.new(uri.request_uri)
     req['Content-Type'] = 'application/json'
@@ -90,12 +94,14 @@ class Project
       http.request(req)
     end
     puts res.body
-    return JSON.parse(res.body)['id']
+     if res.kind_of?(Net::HTTPSuccess)
+       @@lastdeployid = JSON.parse(res.body)['id']
+     end
   end
 
   
-  def add_deploy_event(projname, deployid, status, description)
-    uri = URI.parse(URL + "project/#{projname}/deploy/#{deployid}/event")
+  def add_deploy_event(status, description)
+    uri = URI.parse(URL + "project/#{@@project_name}/deploy/#{@@lastdeployid}/event")
 
     req = Net::HTTP::Post.new(uri.request_uri)
     req['Content-Type'] = 'application/json'
@@ -114,13 +120,11 @@ end
 
 
 if __FILE__ == $0
-  proj_name = "Malamute_FINAL"
   p = Project.new()
-  p.post_project(proj_name,'Deploy Logger Service','https://bitbucket.org/shiftforward/malamute')
+  #p.new_project('malamute','Deploy Logger Service','https://bitbucket.org/shiftforward/malamute')
+  p.open_project('malamute')
   p.get_projects
-  p.get_project(proj_name)
-  lastdeployid = p.add_deploy(proj_name, 'Intial deploy version', 'https://bitbucket.org/shiftforward/malamute', 'v0.1', false, 'none')
-  puts lastdeployid
-  p.add_deploy_event(proj_name, lastdeployid, DeployStatus::SKIPPED, "Done.")
-  p.add_deploy_event(proj_name, lastdeployid, DeployStatus::SUCCESS, "Done.")
+  p.add_deploy('Intial deploy version', 'https://bitbucket.org/shiftforward/malamute', 'v0.1', false, 'none')
+  p.add_deploy_event(DeployStatus::SKIPPED, "Done.")
+  p.add_deploy_event(DeployStatus::SUCCESS, "Done.")
 end

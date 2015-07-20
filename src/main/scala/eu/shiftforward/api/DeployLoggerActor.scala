@@ -12,11 +12,14 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 import scala.reflect.runtime.universe._
 
-class DeployLoggerActor(config: Config) extends Actor with HttpService with LazyLogging {
+class DeployLoggerActor(config: Config) extends Actor with HttpService with DeployLoggerService with LazyLogging {
 
-  implicit val timeout = Timeout(5.seconds)
 
   def actorRefFactory: ActorRefFactory = context
+
+  val actorPersistence: ActorRef = context.system.actorOf(Props(new SlickPersistenceActor(config)))
+
+  override implicit def ec: ExecutionContext = context.system.dispatcher
 
   val swaggerService = new SwaggerHttpService {
     override def apiTypes = Seq(typeOf[DeployLoggerService])
@@ -34,22 +37,17 @@ class DeployLoggerActor(config: Config) extends Actor with HttpService with Lazy
     ))
   }
 
-  val projects = new DeployLoggerService() {
-    def actorRefFactory = context
-    val actorPersistence: ActorRef = context.system.actorOf(Props(new SlickPersistenceActor(config)))
-    override implicit def ec: ExecutionContext = context.system.dispatcher
-  }
 
   def receive = runRoute(
-    projects.pingRoute ~
-      projects.projectPostRoute ~
-      projects.projectsGetRoute ~
-      projects.projectDeployPostRoute ~
-      projects.projectDeploysGetRoute ~
-      projects.projectDeployEventPostRoute ~
-      projects.projectDeployGetRoute ~
-      projects.projectGetRoute ~
-      projects.projectDeleteRoute ~
+      pingRoute ~
+      projectPostRoute ~
+      projectsGetRoute ~
+      projectDeployPostRoute ~
+      projectDeploysGetRoute ~
+      projectDeployEventPostRoute ~
+      projectDeployGetRoute ~
+      projectGetRoute ~
+      projectDeleteRoute ~
       swaggerService.routes ~
       get {
         pathPrefix("") {
@@ -60,6 +58,7 @@ class DeployLoggerActor(config: Config) extends Actor with HttpService with Lazy
           getFromResourceDirectory("swagger-ui")
       }
   )
+
 
 }
 

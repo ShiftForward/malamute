@@ -23,7 +23,7 @@ object DeployLoggerService {
 }
 
 @Api(value = "/", description = "Deploy Logger Service")
-abstract class DeployLoggerService extends HttpService {
+trait DeployLoggerService extends HttpService {
 
   import DeployLoggerService._
 
@@ -35,10 +35,10 @@ abstract class DeployLoggerService extends HttpService {
 
   implicit def exceptionHandler(implicit log: LoggingContext) = {
     ExceptionHandler {
-      case DuplicatedEntry(error) =>
-        complete(UnprocessableEntity, s"An error occurred: ${error}")
-      case error =>
-        complete(InternalServerError, s"An error occurred: ${error.getMessage}")
+      case e: DuplicatedEntry =>
+        complete(UnprocessableEntity, s"An error occurred: ${e.error}")
+      case e =>
+        complete(InternalServerError, s"An error occurred: ${e.getMessage}")
     }
   }
 

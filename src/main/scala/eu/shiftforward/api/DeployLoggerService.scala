@@ -11,7 +11,8 @@ import eu.shiftforward.entities._
 import eu.shiftforward.persistence._
 import spray.http.StatusCodes._
 import spray.httpx.SprayJsonSupport._
-import spray.routing.HttpService
+import spray.routing.{ExceptionHandler, HttpService}
+import spray.util.LoggingContext
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
@@ -31,6 +32,15 @@ abstract class DeployLoggerService extends HttpService {
   implicit def ec: ExecutionContext
 
   implicit val timeout = Timeout(5.seconds)
+
+  implicit def exceptionHandler(implicit log: LoggingContext) = {
+    ExceptionHandler {
+      case DuplicatedEntry(error) =>
+        complete(UnprocessableEntity, s"An error occurred: ${error}")
+      case error =>
+        complete(InternalServerError, s"An error occurred: ${error.getMessage}")
+    }
+  }
 
   @Path("ping")
   @ApiOperation(httpMethod = "GET", response = classOf[String], value = "Returns a pong", produces = "text/plain")
@@ -68,11 +78,7 @@ abstract class DeployLoggerService extends HttpService {
   def projectPostRoute = path("project") {
     post {
       entity(as[RequestProject]) { proj =>
-        onComplete((actorPersistence ? SaveProject(proj)).mapTo[ResponseProject]) {
-          case Success(project) => complete(project)
-          case Failure(ex: DuplicatedEntry) => complete(UnprocessableEntity, s"An error occurred: ${ex.error}")
-          case Failure(ex) => complete(InternalServerError, s"An error occurred: ${ex.getMessage}")
-        }
+        complete((actorPersistence ? SaveProject(proj)).mapTo[ResponseProject])
       }
     }
   }
@@ -92,10 +98,7 @@ abstract class DeployLoggerService extends HttpService {
   def projectDeployPostRoute = path("project" / Segment / "deploy") { name =>
     post {
       entity(as[RequestDeploy]) { deploy =>
-        onComplete((actorPersistence ? AddDeploy(name, deploy)).mapTo[Option[ResponseDeploy]]) {
-          case Success(deploy) => complete(deploy)
-          case Failure(ex) => complete(InternalServerError, s"An error occurred: ${ex.getMessage}")
-        }
+        complete((actorPersistence ? AddDeploy(name, deploy)).mapTo[Option[ResponseDeploy]])
       }
     }
   }

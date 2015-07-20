@@ -1,14 +1,14 @@
-package eu.shiftforward.persistence
+package eu.shiftforward.deploylogger.persistence
 
 import java.util.UUID
 import akka.actor.{ Actor, ActorRef, Props, Stash }
 import akka.pattern.pipe
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.LazyLogging
-import eu.shiftforward.DBTables
-import eu.shiftforward.entities._
-import eu.shiftforward.models._
-import eu.shiftforward.persistence.SlickPersistenceActor.DBConnected
+import eu.shiftforward.deploylogger.DBTables
+import eu.shiftforward.deploylogger.entities._
+import eu.shiftforward.deploylogger.models.{ EventModel, DeployModel, ProjectModel }
+import SlickPersistenceActor.DBConnected
 import slick.dbio.DBIO
 import slick.driver.SQLiteDriver.api._
 import slick.jdbc.meta.MTable

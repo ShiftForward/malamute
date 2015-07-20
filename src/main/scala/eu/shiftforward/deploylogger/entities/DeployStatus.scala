@@ -1,4 +1,4 @@
-package eu.shiftforward.entities
+package eu.shiftforward.deploylogger.entities
 
 import spray.json.{ JsString, JsValue, RootJsonFormat }
 

@@ -1,4 +1,4 @@
-package eu.shiftforward.api
+package eu.shiftforward.deploylogger.api
 
 import java.net.MalformedURLException
 import javax.ws.rs.Path
@@ -7,11 +7,11 @@ import akka.actor.ActorRef
 import akka.pattern.ask
 import akka.util.Timeout
 import com.wordnik.swagger.annotations._
-import eu.shiftforward.entities._
-import eu.shiftforward.persistence._
+import eu.shiftforward.deploylogger.entities._
+import eu.shiftforward.deploylogger.persistence._
 import spray.http.StatusCodes._
 import spray.httpx.SprayJsonSupport._
-import spray.routing.{ExceptionHandler, HttpService}
+import spray.routing.{ ExceptionHandler, HttpService }
 import spray.util.LoggingContext
 
 import scala.concurrent.ExecutionContext
@@ -67,7 +67,7 @@ trait DeployLoggerService extends HttpService {
   @Path("project")
   @ApiOperation(httpMethod = "POST", response = classOf[ResponseProject], value = "Returns a Project", consumes = json, produces = "*/*")
   @ApiImplicitParams(Array(
-    new ApiImplicitParam(name = "body", value = "Deploy Object", dataType = "eu.shiftforward.entities.RequestProject", required = true, paramType = "body")
+    new ApiImplicitParam(name = "body", value = "Deploy Object", dataType = "eu.shiftforward.deploylogger.entities.RequestProject", required = true, paramType = "body")
   ))
   @ApiResponses(Array(
     new ApiResponse(code = 200, message = "OK"),
@@ -87,7 +87,7 @@ trait DeployLoggerService extends HttpService {
   @ApiOperation(httpMethod = "POST", response = classOf[ResponseDeploy], value = "Returns a Deploy", consumes = json, produces = "*/*")
   @ApiImplicitParams(Array(
     new ApiImplicitParam(name = "projName", required = true, dataType = "string", paramType = "path", value = "Name of project that needs to be fetched"),
-    new ApiImplicitParam(name = "body", value = "Deploy Object", dataType = "eu.shiftforward.entities.RequestDeploy", required = true, paramType = "body")
+    new ApiImplicitParam(name = "body", value = "Deploy Object", dataType = "eu.shiftforward.deploylogger.entities.RequestDeploy", required = true, paramType = "body")
   ))
   @ApiResponses(Array(
     new ApiResponse(code = 200, message = "OK"),
@@ -121,11 +121,11 @@ trait DeployLoggerService extends HttpService {
   }
 
   @Path("project/{projName}/deploys/{deployId}/event")
-  @ApiOperation(httpMethod = "GET", response = classOf[ResponseEvent], value = "Returns a List of Deploy", produces = json)
+  @ApiOperation(httpMethod = "POST", response = classOf[ResponseEvent], value = "Returns a List of Deploy", produces = json)
   @ApiImplicitParams(Array(
     new ApiImplicitParam(name = "projName", required = true, dataType = "string", paramType = "path", value = "Name of project that needs to be fetched"),
     new ApiImplicitParam(name = "deployId", required = true, dataType = "string", paramType = "path", value = "Id of deploy that needs to be fetched"),
-    new ApiImplicitParam(name = "body", value = "Event Object", dataType = "eu.shiftforward.entities.RequestEvent", required = true, paramType = "body")
+    new ApiImplicitParam(name = "body", value = "Event Object", dataType = "eu.shiftforward.deploylogger.entities.RequestEvent", required = true, paramType = "body")
   ))
   @ApiResponses(Array(
     new ApiResponse(code = 200, message = "OK"),

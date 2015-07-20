@@ -260,6 +260,7 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
     }
   }
   step {
-    new java.io.File("testdb").delete()
+    import java.io._
+    new File(".").listFiles().filter(_.getName.startsWith("testdb")).foreach(_.delete())
   }
 }

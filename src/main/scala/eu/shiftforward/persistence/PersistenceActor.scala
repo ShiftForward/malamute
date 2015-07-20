@@ -4,29 +4,31 @@ import akka.actor.Actor
 import akka.pattern.pipe
 import eu.shiftforward.entities._
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 case class DuplicatedEntry(error: String) extends RuntimeException
 
-trait PersistenceActor extends Actor {
-
-  implicit def ec: ExecutionContext
-
-  def saveProject(project: RequestProject): Future[Project]
+trait API {
+  def saveProject(project: RequestProject): Future[ResponseProject]
 
   def getProjects: Future[List[ResponseProject]]
 
   def deleteProject(name: String): Future[Option[ResponseProject]]
 
-  def addDeploy(name: String, deploy: RequestDeploy): Future[Option[Deploy]]
+  def addDeploy(name: String, deploy: RequestDeploy): Future[Option[ResponseDeploy]]
 
   def getProject(name: String): Future[Option[ResponseProject]]
 
-  def getDeploys(name: String, max: Int): Future[Option[List[Deploy]]]
+  def getDeploys(name: String, max: Int): Future[List[ResponseDeploy]]
 
-  def addEvent(projName: String, deployId: String, event: RequestEvent): Future[Option[Event]]
+  def addEvent(projName: String, deployId: String, event: RequestEvent): Future[Option[ResponseEvent]]
 
-  def getDeploy(projName: String, deployId: String): Future[Option[Deploy]]
+  def getDeploy(projName: String, deployId: String): Future[Option[ResponseDeploy]]
+}
+
+trait PersistenceActor extends Actor with API {
+
+  implicit def ec: ExecutionContext
 
   override def receive: Receive = {
     case SaveProject(project) =>

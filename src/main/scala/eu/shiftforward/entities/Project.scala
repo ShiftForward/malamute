@@ -31,7 +31,7 @@ case class Deploy(
   changelog: String,
   id: String,
   version: String,
-  isAutomatic: Boolean,
+  automatic: Boolean,
   client: String
 )
 

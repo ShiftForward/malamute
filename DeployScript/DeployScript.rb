@@ -4,6 +4,13 @@ require 'json'
 
 URL = 'http://localhost:8000/'
 
+module DeployStatus
+  STARTED = "STARTED"
+  SKIPPED = "SKIPPED"
+  FAILED = "FAILED"
+  SUCCESS = "SUCCESS"
+end
+
 class Project
 
   def initialize()
@@ -24,7 +31,12 @@ class Project
     res = Net::HTTP.start(uri.hostname, uri.port) do |http|
       http.request(req)
     end
+    
     puts res.body
+    
+    if res.kind_of?(Net::HTTPSuccess)
+      return JSON.parse(res.body)['name']
+    end
   end
 
   def get_projects
@@ -35,7 +47,6 @@ class Project
     res = Net::HTTP.start(uri.hostname, uri.port) do |http|
       http.request(req)
     end
-
     puts res.body
   end
 
@@ -48,7 +59,6 @@ class Project
     res = Net::HTTP.start(uri.hostname, uri.port) do |http|
       http.request(req)
     end
-    
     puts res.body
   end
 
@@ -58,7 +68,7 @@ class Project
     commit_branch = `git rev-parse --abbrev-ref HEAD`.chomp!
     commit_hash = `git rev-parse HEAD`.chomp!
     
-    uri = URI.parse(URL+"project" + "/" + proj_name + "/" + "deploy")
+    uri = URI.parse(URL+"project/#{proj_name}/deploy")
 
     req = Net::HTTP::Post.new(uri.request_uri)
     req['Content-Type'] = 'application/json'
@@ -104,11 +114,13 @@ end
 
 
 if __FILE__ == $0
+  proj_name = "Malamute_FINAL"
   p = Project.new()
-  p.post_project('Malamute','Deploy Logger Service','https://bitbucket.org/shiftforward/malamute')
+  p.post_project(proj_name,'Deploy Logger Service','https://bitbucket.org/shiftforward/malamute')
   p.get_projects
-  p.get_project('Malamute')
-  lastdeployid = p.add_deploy('Malamute', 'Intial deploy version', 'https://bitbucket.org/shiftforward/malamute', 'v0.1', false, 'none')
+  p.get_project(proj_name)
+  lastdeployid = p.add_deploy(proj_name, 'Intial deploy version', 'https://bitbucket.org/shiftforward/malamute', 'v0.1', false, 'none')
   puts lastdeployid
-  p.add_deploy_event('Malamute', lastdeployid, "SUCCESS", "Done.")
+  p.add_deploy_event(proj_name, lastdeployid, DeployStatus::SKIPPED, "Done.")
+  p.add_deploy_event(proj_name, lastdeployid, DeployStatus::SUCCESS, "Done.")
 end

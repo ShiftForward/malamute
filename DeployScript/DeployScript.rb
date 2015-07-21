@@ -17,7 +17,7 @@ class Project
   @lastdeployid = ""
   
   def self.new_project(name, description, git)
-    uri = URI.parse(URL+"project")
+    uri = URI.parse(URL + "project")
 
     req = Net::HTTP::Post.new(uri.request_uri)
     req['Content-Type'] = 'application/json'
@@ -34,21 +34,18 @@ class Project
     
     if res.kind_of?(Net::HTTPSuccess)
       @project_name = name
-      return res.body
-    else
-      return res.body
     end
+      res.body
   end
 
   def self.get_projects
-    uri = URI.parse(URL+"projects")
+    uri = URI.parse(URL + "projects")
 
     req = Net::HTTP::Get.new(uri.request_uri)
 
     res = Net::HTTP.start(uri.hostname, uri.port) do |http|
       http.request(req)
     end
-    
     res.body
   end
 
@@ -63,10 +60,8 @@ class Project
     end
     if res.kind_of?(Net::HTTPSuccess)
       @project_name = name
-      res.body
-    else
-      res.body
     end
+    res.body
   end
 
   def self.add_deploy(description, changelog, version, automatic, client)
@@ -75,7 +70,7 @@ class Project
     commit_branch = `git rev-parse --abbrev-ref HEAD`.chomp!
     commit_hash = `git rev-parse HEAD`.chomp!
     
-    uri = URI.parse(URL+"project/#{@project_name}/deploy")
+    uri = URI.parse(URL + "project/#{@project_name}/deploy")
 
     req = Net::HTTP::Post.new(uri.request_uri)
     req['Content-Type'] = 'application/json'
@@ -117,7 +112,7 @@ class Project
     res = Net::HTTP.start(uri.hostname, uri.port) do |http|
       http.request(req)
     end
-    return res.body
+    res.body
   end
 end
 

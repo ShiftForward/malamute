@@ -53,9 +53,9 @@ class DeployLoggerActor(config: Config) extends Actor with HttpService with Depl
       } ~
       get {
         pathEndOrSingleSlash {
-          getFromResource("deploy-logger-gui/index.html")
+          getFromResource("webapp/index.html")
         } ~
-          getFromResourceDirectory("deploy-logger-gui")
+          getFromResourceDirectory("webapp")
       }
   )
 }

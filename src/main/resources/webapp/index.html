@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Deploy Logger Service</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <link rel="stylesheet" href="css/bootstrap.css" media="screen">
+  </head>
+  <body>
+    <div class="navbar navbar-default navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <a href="/" class="navbar-brand">
+              <span class="glyphicon glyphicon-send" aria-hidden="true"></span>
+          Deploy Logger Service</a>
+        </div>
+        <div class="navbar-collapse collapse" id="navbar-main">
+          <ul class="nav navbar-nav navbar-right">
+            <li class="navbar-brand"><img src="resources/shiftforward.png" height="100%"></img></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div style="padding-top: 100px;" class="container">
+      
+      <!-- Projects Section -->
+      <div class="project-section">
+      </div>
+      
+      <!-- Deploys Section -->
+      <div class="deploy-section">
+        <table class="table table-striped table-hover deploys">
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>Description</th>
+              <th>Git</th>
+              <th>Version</th>
+              <th>User</th>
+              <th>Changelog</th>
+              <th>Client</th>
+              <th>Events</th>
+            </tr>
+          </thead>
+        </table>
+       </div>
+    </div>
+    <!-- Deploy Details -->
+    <div class="event-section">
+    </div>
+
+    <script src="js/jquery.js"></script>
+    <script src="js/bootstrap.js"></script>
+    <script src="js/underscore.js"></script>
+    <script src="js/backbone.js"></script>
+    
+    <script id="projectListTpl" type="text/template">
+      <div class="col-md-4">
+        <div class="panel panel-primary">
+          <div class="panel-heading">
+            <h2 class="panel-title"><a href="#<%= name %>">Project: <%= name %></a></h2>
+          </div>
+          <div class="panel-body">
+            <p>Description: <%= description %></p>
+            <p><a href="<%= git %>"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> <%= git %></a></p>
+          </div>
+        </div>
+      </div>
+    </script>
+    
+    <script id="projectTpl" type="text/template">
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <h2 class="panel-title">Project: <%= name %></a></h2>
+        </div>
+        <div class="panel-body">
+          <p>Description: <%= description %></p>
+          <p><a href="<%= git %>"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> <%= git %></a></p>
+        </div>
+      </div>
+    </script>
+    
+    <script id="deployTpl" type="text/template">
+      <th><%= timestamp %></th>
+      <th><%= description %></th>
+      <th><a href="https://bitbucket.org/shiftforward/<% location.hash.substring(1) %>/commits/<%= commitHash %>">
+            <span class="glyphicon glyphicon-random" aria-hidden="true"></span> <%= commitBranch %></a>
+      </th>
+      <th><%= version %></th>
+      <th><%= user %></th>
+      <th><a href="<%= changelog %>"><span class="glyphicon glyphicon-file" aria-hidden="true"></span> Open</a></th>
+      <th><%= client %></th>
+      <th><a class="btn btn-primary events" href="#<%=projname%>/<%=id%>">Details</a></th>
+    </script>
+    
+    <script id="deployDetailTpl" type="text/template">
+      <div class="col-md-12">
+        <%= description %>
+        <a href="https://bitbucket.org/shiftforward/<% location.hash.substring(1) %>/commits/<%=commitHash%>">
+              <span class="glyphicon glyphicon-random" aria-hidden="true"></span> <%= commitBranch %></a>
+              <%= timestamp %>
+        <%= version %>
+        <%= user %>
+        <a href="<%= changelog %>"><span class="glyphicon glyphicon-file" aria-hidden="true"></span> Open</a>
+        <%= client %>
+        <% _.each(events, function(ev){ %>
+            <%= _.escape(ev.status) %><%= _.escape(ev.timestamp) %>
+        <% }); %>
+      </div>
+    </script>
+    
+    <script id="eventTpl" type="text/template">
+      <div class="panel panel-<%= currentstatus %>">
+        <div class="panel-heading">
+          <h2 class="panel-title"><%= timestamp %></a></h2>
+        </div>
+        <div class="panel-body">
+          <p><%= description %></p>
+          <p><span class="glyphicon glyphicon-cog" aria-hidden="true"></span> <%= status %></p>
+        </div>
+      </div>
+    </script>
+    
+    <script src="js/application.js"></script>
+</body>
+</html>

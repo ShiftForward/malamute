@@ -46,9 +46,11 @@
           </thead>
         </table>
        </div>
-    </div>
-    <!-- Deploy Details -->
-    <div class="event-section">
+
+      <!-- Deploy Details -->
+      <div class="event-section">
+      </div>
+    
     </div>
 
     <script src="js/jquery.js"></script>
@@ -85,44 +87,55 @@
     <script id="deployTpl" type="text/template">
       <th><%= timestamp %></th>
       <th><%= description %></th>
-      <th><a href="https://bitbucket.org/shiftforward/<% location.hash.substring(1) %>/commits/<%= commitHash %>">
+      <th><a href="https://bitbucket.org/shiftforward/<%= projname %>/commits/<%= commitHash %>">
             <span class="glyphicon glyphicon-random" aria-hidden="true"></span> <%= commitBranch %></a>
       </th>
       <th><%= version %></th>
       <th><%= user %></th>
       <th><a href="<%= changelog %>"><span class="glyphicon glyphicon-file" aria-hidden="true"></span> Open</a></th>
       <th><%= client %></th>
-      <th><a class="btn btn-primary events" href="#<%=projname%>/<%=id%>">Details</a></th>
+      <th><a href="#<%= projname %>/<%=id%>">Details</a></th>
     </script>
     
     <script id="deployDetailTpl" type="text/template">
       <div class="col-md-12">
-        <%= description %>
-        <a href="https://bitbucket.org/shiftforward/<% location.hash.substring(1) %>/commits/<%=commitHash%>">
-              <span class="glyphicon glyphicon-random" aria-hidden="true"></span> <%= commitBranch %></a>
-              <%= timestamp %>
-        <%= version %>
-        <%= user %>
-        <a href="<%= changelog %>"><span class="glyphicon glyphicon-file" aria-hidden="true"></span> Open</a>
-        <%= client %>
-        <% _.each(events, function(ev){ %>
-            <%= _.escape(ev.status) %><%= _.escape(ev.timestamp) %>
-        <% }); %>
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">Deploy at <%= timestamp %></h1>
+          </div>
+            <div class="panel-body">
+            <p class="col-md-12"><%= description %></p>
+            <p>
+              <span class="col-md-4">Version: <%= version %></span>
+              <span class="col-md-4"> User: <%= user %></span>
+              <span class="col-md-4">
+                 <a href="https://bitbucket.org/shiftforward/<%= projname %>/commits/<%=commitHash%>">
+                <span class="glyphicon glyphicon-random" aria-hidden="true"></span> <%= commitBranch %></a>
+              </span>
+            </p>
+            <p>
+             <span class="col-md-4">
+               Changelog: <a href="<%= changelog %>"><span class="glyphicon glyphicon-file" aria-hidden="true"></span> Open</a>
+             </span>
+             <span class="col-md-4">
+              Cliente: <%= client %>
+             </span>
+            </p>
+          </div>
+        </div>
+        <h4>Events</h4>
+        <ul class="list-group">
+          <% _.each(events, function(ev){ %>
+          <li class="list-group-item">
+            <span class="badge"><%= _.escape(ev.status) %></span>
+            <p><%= _.escape(ev.description) %></p>
+            <p>DateTime: <%= _.escape(ev.timestamp) %></p>
+          </li>
+          <% }); %>
+        </ul>
       </div>
     </script>
-    
-    <script id="eventTpl" type="text/template">
-      <div class="panel panel-<%= currentstatus %>">
-        <div class="panel-heading">
-          <h2 class="panel-title"><%= timestamp %></a></h2>
-        </div>
-        <div class="panel-body">
-          <p><%= description %></p>
-          <p><span class="glyphicon glyphicon-cog" aria-hidden="true"></span> <%= status %></p>
-        </div>
-      </div>
-    </script>
-    
+        
     <script src="js/application.js"></script>
 </body>
 </html>

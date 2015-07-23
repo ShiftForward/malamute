@@ -111,7 +111,7 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
   }
 
   override def getDeploys(name: String, max: Int): Future[List[ResponseDeploy]] = {
-    db.run(deploys.filter(_.projName === name).result).flatMap(f =>
+    db.run(deploys.sortBy(_.timestamp.desc).filter(_.projName === name).result).flatMap(f =>
       Future.sequence(f.map { d =>
         getEvents(d.id).map { listEvents =>
           ResponseDeploy(

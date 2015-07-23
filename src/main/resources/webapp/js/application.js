@@ -11,21 +11,21 @@ window.ProjectCollection = Backbone.Collection.extend({
 window.ProjectModel = Backbone.Collection.extend({
     model : Project,
     initialize: function(id) {
-       this.url = "/project/"+id;
+        this.url = "/project/"+id;
     }
 });
 
 window.DeployModel = Backbone.Collection.extend({
     model : Deploy,
     initialize: function(proj,id) {
-       this.url = "/project/" + proj + "/deploy/" + id;
+        this.url = "/project/" + proj + "/deploy/" + id;
     }
 });
 
 window.DeployCollection = Backbone.Collection.extend({
     model : Deploy,
     initialize: function(id) {
-       this.url = "/project/"+id+"/deploys";
+        this.url = "/project/"+id+"/deploys";
     }
 });
 
@@ -38,9 +38,9 @@ window.ProjectListView = Backbone.View.extend({
     },
 
     render:function (eventName) {
-		this.model.models.reverse().forEach(function(proj) {
-		 	$(this.el).append(new ProjectListItemView({model:proj.attributes}).render().el);
-		}, this);
+        this.model.models.reverse().forEach(function(proj) {
+            $(this.el).append(new ProjectListItemView({model:proj.attributes}).render().el);
+        }, this);
         return this;
     }
 
@@ -68,23 +68,23 @@ window.DeployListView = Backbone.View.extend({
     render:function (eventName) {
         var deploysTableHeader = "<thead>"+
             "<tr>"+
-              "<th>Status</th>"+
-              "<th>Timestamp</th>"+
-              "<th>Description</th>"+
-              "<th>Version</th>"+
-              "<th>User</th>"+
-              "<th>Client</th>"+
-              "<th>Details</th>"+
+            "<th>Status</th>"+
+            "<th>Timestamp</th>"+
+            "<th>Description</th>"+
+            "<th>Version</th>"+
+            "<th>User</th>"+
+            "<th>Client</th>"+
+            "<th>Details</th>"+
             "</tr>"+
-          "</thead>";
+            "</thead>";
         $(this.el).append(deploysTableHeader);
         $(this.el).append("<tbody>");
-		this.model.models.forEach(function(deploy) {
+        this.model.models.forEach(function(deploy) {
             var currentDeploy = deploy.attributes;
             currentDeploy.projname = this.projname;
 
-		 	$(this.el).append(new DeployListItemView({model:currentDeploy}).render().el);
-		}, this);
+            $(this.el).append(new DeployListItemView({model:currentDeploy}).render().el);
+        }, this);
 
         $(this.el).append("</tbody>");
         return this;
@@ -100,14 +100,14 @@ window.DeployListItemView = Backbone.View.extend({
     render:function (eventName) {
         var deploy = this.model;
         deploy.timestamp = timeConverter(deploy.timestamp);
-            if(deploy.events[deploy.events.length - 1].status === "SUCCESS")
-                deploy.status = "ok";
-            else if(deploy.events[deploy.events.length - 1].status === "FAILED")
-                deploy.status = "remove";
-            else if(deploy.events[deploy.events.length - 1].status === "SKIPPED")
-                deploy.status = "question";
-            else
-                deploy.status = "info";
+        if(deploy.events[deploy.events.length - 1].status === "SUCCESS")
+            deploy.status = "ok";
+        else if(deploy.events[deploy.events.length - 1].status === "FAILED")
+            deploy.status = "remove";
+        else if(deploy.events[deploy.events.length - 1].status === "SKIPPED")
+            deploy.status = "question";
+        else
+            deploy.status = "info";
         $(this.el).html(this.template(deploy));
         return this;
     }
@@ -164,7 +164,7 @@ window.ProjectView = Backbone.View.extend({
 var AppRouter = Backbone.Router.extend({
 
     routes: {
-		"" 				: "home",
+        "" 				: "home",
         ":projname"		: "project",
         ":project/:id"	: "deploy"
     },
@@ -172,7 +172,7 @@ var AppRouter = Backbone.Router.extend({
     home: function () {
         projectList = new ProjectCollection();
         projectList.fetch({
-           // reset:"true",
+            // reset:"true",
             success:  (function () {
                 this.projectListView = new ProjectListView({model: projectList});
                 $('.content-section').html("");
@@ -203,7 +203,7 @@ var AppRouter = Backbone.Router.extend({
             error: (function (xhr, status, error) {errorWindow(error)})
         });
 
-      
+
     },
 
     deploy: function (projname, id) {
@@ -219,9 +219,9 @@ var AppRouter = Backbone.Router.extend({
                     success:  (function () {
                         this.deployDetailsView = new DeployView({model: this.deployDetails, proj: projname});
                         $('.content-section').html(this.deployDetailsView.render().el);
-                }),
-                error: (function (xhr, status, error) {errorWindow(error)})
-        });
+                    }),
+                    error: (function (xhr, status, error) {errorWindow(error)})
+                });
             }),
             error: (function (xhr, status, error) {errorWindow(error)})
         });
@@ -234,12 +234,12 @@ Backbone.history.start();
 
 function errorWindow(err){
     console.log(err);
-    var error =        
-    '<div class="alert alert-dismissible alert-danger">'+
-      '<strong>Oh snap!</strong><br>'+err.xhr.status+ ": " + err.xhr.statusText
+    var error =
+        '<div class="alert alert-dismissible alert-danger">'+
+        '<strong>Oh snap!</strong><br>'+err.xhr.status+ ": " + err.xhr.statusText
     '</div>'
-     $('.content-section').html("<p></p>");
-     $('.project-section').html(error);
+    $('.content-section').html("<p></p>");
+    $('.project-section').html(error);
 }
 
 function timeConverter(timestamp) {

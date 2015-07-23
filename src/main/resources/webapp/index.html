@@ -84,9 +84,9 @@
       </div>
       <div class="panel-body">
         <% if (deploy.running) { %>
-           <div class="progress progress-striped active" style="margin-bottom:0px"> 
-              <div class="progress-bar" style="width: 100%"></div>
-            </div>
+        <div class="progress progress-striped active" style="margin-bottom:0px">
+          <div class="progress-bar" style="width: 100%"></div>
+        </div>
         <% } %>
         <h6 class="col-md-12"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Description: <%= description %></h6>
         </br>
@@ -114,9 +114,9 @@
       <% _.each(events, function(ev){ %>
       <li class="list-group-item">
         <span style="float:right" class="label label-<%= ev.color %>"><%= _.escape(ev.status) %></span>
-          <% if (ev.description !== "") { %>
-             <p><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Description: <%= _.escape(ev.description) %></p>
-          <% } %>
+        <% if (ev.description !== "") { %>
+        <p><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Description: <%= _.escape(ev.description) %></p>
+        <% } %>
         <p><span class="glyphicon glyphicon-time" aria-hidden="true"></span>
           DateTime: <%= _.escape(ev.timestamp) %></p>
       </li>

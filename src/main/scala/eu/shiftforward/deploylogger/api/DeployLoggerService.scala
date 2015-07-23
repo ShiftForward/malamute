@@ -120,7 +120,7 @@ trait DeployLoggerService extends HttpService {
     }
   }
 
-  @Path("project/{projName}/deploys/{deployId}/event")
+  @Path("project/{projName}/deploy/{deployId}/event")
   @ApiOperation(httpMethod = "POST", response = classOf[ResponseEvent], value = "Returns a List of Deploy", produces = json)
   @ApiImplicitParams(Array(
     new ApiImplicitParam(name = "projName", required = true, dataType = "string", paramType = "path", value = "Name of project that needs to be fetched"),

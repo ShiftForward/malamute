@@ -30,6 +30,19 @@ window.DeployCollection = Backbone.Collection.extend({
 }); 
 
 // Views
+var deploysTableHeader = "<thead>"+
+            "<tr>"+
+              "<th>Timestamp</th>"+
+              "<th>Description</th>"+
+              "<th>Git</th>"+
+              "<th>Version</th>"+
+              "<th>User</th>"+
+              "<th>Changelog</th>"+
+              "<th>Client</th>"+
+              "<th>Details</th>"+
+            "</tr>"+
+          "</thead>";
+
 window.ProjectListView = Backbone.View.extend({
  
     initialize:function () {
@@ -144,36 +157,60 @@ var AppRouter = Backbone.Router.extend({
 	 
     home: function () {
         $('.deploy-section').hide();
-        this.ProjectList = new ProjectCollection();
-        this.ProjectListView = new ProjectListView({model: this.ProjectList});
-        this.ProjectList.fetch({async:false});
-        $('.project-section').html(this.ProjectListView.render().el);
+        ProjectList = new ProjectCollection();
+        ProjectList.fetch({
+            reset:"true",
+            success:  (function () {
+                this.ProjectListView = new ProjectListView({model: this.ProjectList});
+                $('.project-section').html(this.ProjectListView.render().el);
+            })
+        });
+       
     },
  
     project: function (projname) {
-        this.proj = new ProjectModel(projname);
-        this.projView = new ProjectView({model: this.proj});
-        this.proj.fetch({async:false});
-        $('.project-section').html(this.projView.render().el);
-        this.deployList = new DeployCollection(projname);
-        this.deployListView = new DeployListView({model: this.deployList, proj: projname});
-        this.deployList.fetch({async:false});
-        $('.event-section').hide();
-        $('.deploy-section').show();
-        $('.deploys').html(this.deployListView.render().el);
+        proj = new ProjectModel(projname);
+        proj.fetch({
+            reset:"true",
+            success:  (function () {
+                this.projView = new ProjectView({model: proj});
+                $('.project-section').html(this.projView.render().el);
+            })
+        });
+
+        deployList = new DeployCollection(projname);
+        deployList.fetch({
+            reset:"true",
+            success:  (function () {
+                this.deployListView = new DeployListView({model: this.deployList, proj: projname});
+                $('.event-section').hide();
+                $('.deploy-section').show();
+                $('.deploys').html("");
+                $('.deploys').append(deploysTableHeader);
+                $('.deploys').append(this.deployListView.render().el);
+            })
+        });
     },
  
     deploy: function (projname, id) {
-        this.proj = new ProjectModel(projname);
-        this.projView = new ProjectView({model: this.proj});
-        this.proj.fetch({async:false});
-        $('.project-section').html(this.projView.render().el);
-        this.deployDetails = new DeployModel(projname,id);
-        this.deployDetailsView = new DeployView({model: this.deployDetails, proj: projname});
-        this.deployDetails.fetch({async:false});
-        $('.deploy-section').hide();
-        $('.event-section').show();
-        $('.event-section').html(this.deployDetailsView.render().el);
+        proj = new ProjectModel(projname);
+        proj.fetch({
+            reset:"true",
+            success:  (function () {
+                this.projView = new ProjectView({model: proj});
+                $('.project-section').html(this.projView.render().el);
+            })
+        });
+        deployDetails = new DeployModel(projname,id);
+        deployDetails.fetch({
+            reset:"true",
+            success:  (function () {
+                this.deployDetailsView = new DeployView({model: this.deployDetails, proj: projname});
+                $('.deploy-section').hide();
+                $('.event-section').show();
+                $('.event-section').html(this.deployDetailsView.render().el);
+            })
+        });
     }
 });
  

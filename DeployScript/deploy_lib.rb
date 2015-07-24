@@ -12,10 +12,12 @@ module DeployStatus
 end
 
 class Project
-  
-  @project_name = ""
-  @lastdeployid = ""
-  
+
+  def initialize(project_name)
+    @project_name = project_name
+    @last_deploy_id = ""
+  end
+
   def self.new_project(name, description, git)
     uri = URI.parse(URL + "project")
 
@@ -31,11 +33,11 @@ class Project
     res = Net::HTTP.start(uri.hostname, uri.port) do |http|
       http.request(req)
     end
-    
+
     if res.kind_of?(Net::HTTPSuccess)
-      @project_name = name
+      return Project.new(name)
     end
-      res.body
+    res.body
   end
 
   def self.get_projects
@@ -59,17 +61,17 @@ class Project
       http.request(req)
     end
     if res.kind_of?(Net::HTTPSuccess)
-      @project_name = name
+      return Project.new(name)
     end
     res.body
   end
 
-  def self.add_deploy(description, changelog, version, automatic, client)
+  def add_deploy(description, changelog, version, automatic, client)
     #git configurations for current folder
     user =  `git config --get user.name`.chomp!
     commit_branch = `git rev-parse --abbrev-ref HEAD`.chomp!
     commit_hash = `git rev-parse HEAD`.chomp!
-    
+
     uri = URI.parse(URL + "project/#{@project_name}/deploy")
 
     req = Net::HTTP::Post.new(uri.request_uri)
@@ -92,14 +94,14 @@ class Project
       http.request(req)
     end
     if res.kind_of?(Net::HTTPSuccess)
-      @lastdeployid = JSON.parse(res.body)['id']
+      @last_deploy_id = JSON.parse(res.body)['id']
     end
     res.body
   end
 
-  
-  def self.add_deploy_event(status, description)
-    uri = URI.parse(URL + "project/#{@project_name}/deploy/#{@lastdeployid}/event")
+
+  def add_deploy_event(status, description)
+    uri = URI.parse(URL + "project/#{@project_name}/deploy/#{@last_deploy_id}/event")
 
     req = Net::HTTP::Post.new(uri.request_uri)
     req['Content-Type'] = 'application/json'

@@ -1,18 +1,22 @@
-require_relative 'deploy_lib'  
+require_relative 'deploy_lib'
 
 if __FILE__ == $0
-  Project.new_project('malamute','Deploy Logger Service','https://bitbucket.org/shiftforward/malamute')
+  p1 = Project.new_project('malamute','Deploy Logger Service','https://bitbucket.org/shiftforward/malamute')
+  p2 = Project.new_project('adstax','adstax','https://bitbucket.org/shiftforward/adstax')
   sleep 5
-  puts Project.open_project('malamute')
   puts Project.get_projects
-  puts Project.add_deploy('Intial deploy version', 'https://bitbucket.org/shiftforward/malamute', 'v0.1', false, 'none')
+  puts p1.add_deploy('Intial deploy version', 'https://bitbucket.org/shiftforward/malamute', 'v0.1', false, 'none')
+  puts p2.add_deploy('Intial deploy version', 'https://bitbucket.org/shiftforward/adstax', 'v0.1', false, 'xpto')
   sleep 2
   n = rand(0..2)
   if n == 0
-    puts Project.add_deploy_event(DeployStatus::FAILED, "Done.")
+    puts p1.add_deploy_event(DeployStatus::FAILED, "Done.")
+    puts p2.add_deploy_event(DeployStatus::FAILED, "Done.")
   elsif n == 1
-    puts Project.add_deploy_event(DeployStatus::SUCCESS, "Done.")
+    puts p1.add_deploy_event(DeployStatus::FAILED, "Done.")
+    puts p2.add_deploy_event(DeployStatus::FAILED, "Done.")
   else
-    puts Project.add_deploy_event(DeployStatus::SKIPPED, "Done.")
+    puts p1.add_deploy_event(DeployStatus::SKIPPED, "Done.")
+    puts p2.add_deploy_event(DeployStatus::SKIPPED, "Done.")
   end
 end

@@ -48,7 +48,7 @@ window.ProjectListView = Backbone.View.extend({
             }, this);
             return this;
         }
-        
+
     }
 
 });

@@ -49,7 +49,7 @@ class Project
     res = Net::HTTP.start(uri.hostname, uri.port) do |http|
       http.request(req)
     end
-      "Code: #{res.code} : #{res.body}"
+    "Code: #{res.code} : #{res.body}"
   end
 
   def self.open_project(name)
@@ -122,6 +122,6 @@ class Project
     else
       raise "Code: #{res.code} : #{res.body}"
     end
-  
+
   end
 end

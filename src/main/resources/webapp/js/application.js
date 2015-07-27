@@ -113,8 +113,10 @@ window.DeployListItemView = Backbone.View.extend({
             deploy.status = "remove";
         else if (deploy.events[deploy.events.length - 1].status === "SKIPPED")
             deploy.status = "question";
-        else
+        else if (deploy.events[deploy.events.length - 1].status === "LOG")
             deploy.status = "info";
+        else
+            deploy.status = "exclamation";
         $(this.el).html(this.template(deploy));
         return this;
     }
@@ -145,6 +147,8 @@ window.DeployView = Backbone.View.extend({
                 ev.color = "danger";
             else if (ev.status === "SKIPPED")
                 ev.color = "warning";
+            else if (ev.status === "LOG")
+                ev.color = "info"
             else
                 ev.color = "default";
             events.push(ev);
@@ -154,9 +158,9 @@ window.DeployView = Backbone.View.extend({
         return this;
     },
     events: {
-        'click #addEvent': 'addevent'
+        'click #addEvent': 'addEvent'
     },
-    addevent: function(e) {
+    addEvent: function(e) {
         $.ajax({
             url: $(e.currentTarget).data("url"),
             type:"POST",
@@ -167,7 +171,8 @@ window.DeployView = Backbone.View.extend({
             contentType:"application/json",
             dataType:"json",
             success: function(){
-                $("#eventModal").modal('hide')
+                Backbone.history.loadUrl(Backbone.history.fragment);
+                $("#eventModal").modal('hide');
             }
         })
     }

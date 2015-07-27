@@ -36,8 +36,9 @@ class Project
 
     if res.kind_of?(Net::HTTPSuccess)
       return Project.new(name)
+    else
+      raise "Code: #{res.code} : #{res.body}"
     end
-    res.body
   end
 
   def self.get_projects
@@ -48,7 +49,7 @@ class Project
     res = Net::HTTP.start(uri.hostname, uri.port) do |http|
       http.request(req)
     end
-    res.body
+      "Code: #{res.code} : #{res.body}"
   end
 
   def self.open_project(name)
@@ -62,8 +63,9 @@ class Project
     end
     if res.kind_of?(Net::HTTPSuccess)
       return Project.new(name)
+    else
+      raise "Code: #{res.code} : #{res.body}"
     end
-    res.body
   end
 
   def add_deploy(description, changelog, version, automatic, client)
@@ -95,8 +97,9 @@ class Project
     end
     if res.kind_of?(Net::HTTPSuccess)
       @last_deploy_id = JSON.parse(res.body)['id']
+    else
+      raise "Code: #{res.code} : #{res.body}"
     end
-    res.body
   end
 
 
@@ -114,6 +117,11 @@ class Project
     res = Net::HTTP.start(uri.hostname, uri.port) do |http|
       http.request(req)
     end
-    res.body
+    if res.kind_of?(Net::HTTPSuccess)
+      res.body
+    else
+      raise "Code: #{res.code} : #{res.body}"
+    end
+  
   end
 end

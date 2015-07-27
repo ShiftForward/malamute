@@ -1,8 +1,10 @@
 require_relative 'deploy_lib'
 
 if __FILE__ == $0
-  p1 = Project.new_project('malamute','Deploy Logger Service','https://bitbucket.org/shiftforward/malamute')
-  p2 = Project.new_project('adstax','adstax','https://bitbucket.org/shiftforward/adstax')
+  p1 = Project.open_project('malamute')
+  p2 = Project.open_project('adstax')
+  #p1 = Project.open_project('malamute','Deploy Logger Service','https://bitbucket.org/shiftforward/malamute')
+  #p2 = Project.open_project('adstax','adstax','https://bitbucket.org/shiftforward/adstax')
   sleep 5
   puts Project.get_projects
   puts p1.add_deploy('Intial deploy version', 'https://bitbucket.org/shiftforward/malamute', 'v0.1', false, 'none')

@@ -105,9 +105,44 @@
                 <a href="<%= changelog %>"> <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Changelog</a>
              </span>
              <span class="col-md-4">
-              <span class="glyphicon glyphicon-user" aria-hidden="true"></span> Client: <%= client %>
+                <span class="glyphicon glyphicon-user" aria-hidden="true"></span> Client: <%= client %>
+             </span>
+             <span class="col-md-4">
+                  <button type="button" class="btn btn-primary btn-md" data-toggle="modal" data-target="#eventModal">
+                    Add Event
+                </button>
              </span>
         </h6>
+        <div class="modal fade" id="eventModal" tabindex="-1" role="dialog" aria-labelledby="eventModal">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Add new event</h4>
+              </div>
+              <div class="modal-body">
+                <form class="bs-component">
+                  <div class="form-group">
+                    <label class="control-label" for="status">Type</label>
+                    <select class="form-control" id="status">
+                      <option>SKIPPED</option>
+                      <option>FAILED</option>
+                      <option>SUCCESS</option>
+                      <option>LOG</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label class="control-label" for="msg">Message</label>
+                    <input type="text" class="form-control" id="msg" placeholder="Example">
+                  </div>
+                    <button  class="btn btn-primary" data-url="/project/<%= projname %>/deploy/<%= id %>/event" id="addEvent">
+                        Add Event
+                    </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <h4>Events</h4>
@@ -125,7 +160,7 @@
     </ul>
   </div>
 </script>
-
+<script src="js/utils.js"></script>
 <script src="js/application.js"></script>
 </body>
 </html>

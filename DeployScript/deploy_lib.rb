@@ -8,6 +8,7 @@ module DeployStatus
   STARTED = "STARTED"
   SKIPPED = "SKIPPED"
   FAILED = "FAILED"
+  LOG = "LOG"
   SUCCESS = "SUCCESS"
 end
 

@@ -150,7 +150,7 @@ window.DeployView = Backbone.View.extend({
         }
         deploy.events.reverse().forEach(function (ev) {
             ev.timestamp = $.format.date(ev.timestamp, DateFormat);
-            switch(ev.status){
+            switch (ev.status){
                 case "SUCCESS":
                     ev.color = "success";
                     break;

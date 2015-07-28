@@ -46,10 +46,16 @@ class DeployLoggerActor(config: Config) extends Actor with HttpService with Depl
       projectDeleteRoute ~
       swaggerService.routes ~
       get {
-        pathEndOrSingleSlash {
+        path("swagger") {
           getFromResource("swagger-ui/index.html")
         } ~
           getFromResourceDirectory("swagger-ui")
+      } ~
+      get {
+        pathEndOrSingleSlash {
+          getFromResource("webapp/index.html")
+        } ~
+          getFromResourceDirectory("webapp")
       }
   )
 }

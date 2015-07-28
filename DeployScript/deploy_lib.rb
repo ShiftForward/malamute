@@ -92,9 +92,9 @@ class Project
     req.body = {
         user: user,
         commit: {
-          branch: commit_branch,
-          hash: commit_hash
-        },
+        branch: commit_branch,
+        hash: commit_hash
+    },
         description: description,
         changelog: changelog,
         version: version,

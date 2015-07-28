@@ -173,9 +173,11 @@ window.DeployView = Backbone.View.extend({
             switch (m.state){
                 case "ADD":
                     m.icon = "ok";
+                    m.color = "success";
                     break;
                 default:
                     m.icon = "remove";
+                    m.color = "danger";
             }
             modules.push(m);
         }, this);

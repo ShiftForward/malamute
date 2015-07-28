@@ -186,8 +186,8 @@ window.DeployView = Backbone.View.extend({
             contentType:"application/json",
             dataType:"json",
             success: function(){
+                $('#eventModal').modal('toggle');
                 Backbone.history.loadUrl(Backbone.history.fragment);
-                $("#eventModal").modal('hide');
             }
         })
     }

@@ -107,11 +107,6 @@
              <span class="col-md-4">
                 <span class="glyphicon glyphicon-user" aria-hidden="true"></span> Client: <%= client %>
              </span>
-             <span class="col-md-4">
-                  <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#eventModal">
-                    Add Event
-                </button>
-             </span>
         </h6>
           <div class="col-md-12">
               <h5>Modules</h5>
@@ -119,7 +114,7 @@
               <div class="col-md-4">
                   <div class="list-group-item" style="padding: 7px;">
                       <h6><span style="float:right; margin-left: 2px" class="label label-primary"><%= m.version %></span></h6>
-                      <h6><span style="float:right" class="label label-<%= m.color %>"><span class="glyphicon glyphicon-<%= m.icon %>-circle" aria-hidden="true"></span></span></h6>
+                      <h6><span style="float:right" class="label label-<%= m.color %>"><span class="glyphicon glyphicon-<%= m.icon %>" aria-hidden="true"></span></span></h6>
                       <h6><%= m.name %></h6>
                   </div>
               </div>
@@ -158,7 +153,11 @@
       </div>
     </div>
 
-    <h4>Events</h4>
+    <h4>Events
+        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#eventModal">
+            <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+        </button>
+    </h4>
       <div class="row">
         <ul class="list-group">
           <% _.each(events, function(ev){ %>

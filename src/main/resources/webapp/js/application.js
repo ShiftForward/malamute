@@ -201,8 +201,13 @@ window.DeployView = Backbone.View.extend({
             contentType:"application/json",
             dataType:"json",
             success: function(){
-                $('#eventModal').modal('toggle');
+                $('#eventModal').modal('hide');
                 Backbone.history.loadUrl(Backbone.history.fragment);
+            },
+            failure: function(){
+                $('#eventModal').modal('hide');
+                Backbone.history.loadUrl(Backbone.history.fragment);
+                alert("Error on processing request.")
             }
         })
     }

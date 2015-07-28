@@ -145,6 +145,7 @@ window.DeployView = Backbone.View.extend({
         deploy = this.model.models[0].attributes;
         deploy.projname = this.projname;
         events = [];
+        modules = [];
         if (deploy.events.length <= 1) {
             deploy.running = true;
         }
@@ -168,6 +169,18 @@ window.DeployView = Backbone.View.extend({
             }
             events.push(ev);
         }, this);
+        deploy.modules.forEach(function (m) {
+            switch (m.state){
+                case "ADD":
+                    m.icon = "ok";
+                    break;
+                default:
+                    m.icon = "remove";
+            }
+            modules.push(m);
+        }, this);
+        deploy.modules = modules;
+        deploy.events = events;
         deploy.timestamp = $.format.date(deploy.timestamp, DateFormat);
         $(this.el).html(this.template(deploy));
         return this;

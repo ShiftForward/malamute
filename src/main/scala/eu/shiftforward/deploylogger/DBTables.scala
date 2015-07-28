@@ -1,6 +1,6 @@
 package eu.shiftforward.deploylogger
 
-import eu.shiftforward.deploylogger.models.{Modules, Projects, Events, Deploys}
+import eu.shiftforward.deploylogger.models.{ Modules, Projects, Events, Deploys }
 import slick.lifted.TableQuery
 
 object DBTables {

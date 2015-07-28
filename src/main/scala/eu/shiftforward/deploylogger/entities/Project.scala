@@ -24,10 +24,10 @@ case class Event(
 )
 
 case class Module(
- version: String,
- state: ModuleStatus,
- name: String,
- client: String
+  version: String,
+  state: ModuleStatus,
+  name: String,
+  client: String
 )
 
 case class Deploy(
@@ -63,5 +63,4 @@ object Commit extends DefaultJsonProtocol {
 object Module extends DefaultJsonProtocol {
   implicit val commitFormat: RootJsonFormat[Module] = jsonFormat4(Module.apply)
 }
-
 

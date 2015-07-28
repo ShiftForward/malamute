@@ -8,14 +8,16 @@ sealed trait Request
 
 case class RequestProject(name: String, description: String, git: String) extends Request
 
-case class RequestDeploy(user: String,
-                         commit: Commit,
-                         description: String,
-                         changelog: String,
-                         version: String,
-                         automatic: Boolean,
-                         client: String,
-                          modules: List[RequestModule]) extends Request
+case class RequestDeploy(
+  user: String,
+  commit: Commit,
+  description: String,
+  changelog: String,
+  version: String,
+  automatic: Boolean,
+  client: String,
+  modules: List[RequestModule]
+) extends Request
 
 case class RequestEvent(status: DeployStatus, description: String) extends Request
 

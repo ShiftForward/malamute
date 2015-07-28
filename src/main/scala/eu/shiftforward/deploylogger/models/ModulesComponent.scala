@@ -6,11 +6,11 @@ import eu.shiftforward.deploylogger.entities.ModuleStatus.ModuleStatus
 import slick.driver.SQLiteDriver.api._
 
 case class ModuleModel(
-   version: String,
-   state: ModuleStatus,
-   name: String,
-   client: String,
-   deployID: String
+  version: String,
+  state: ModuleStatus,
+  name: String,
+  client: String,
+  deployID: String
 )
 
 class Modules(tag: Tag) extends Table[ModuleModel](tag, "MODULES") {

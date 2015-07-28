@@ -40,7 +40,7 @@ class MemoryPersistenceActor extends PersistenceActor {
     val proj: Option[Project] = allProjects.get(name)
     proj.map { p: Project =>
       val events: List[Event] = List(Event(currentTime, DeployStatus.Started, ""))
-      val modules = deploy.modules.map{m => Module(m.version,m.state,m.name,deploy.client)}
+      val modules = deploy.modules.map { m => Module(m.version, m.state, m.name, deploy.client) }
       val newDeploy = Deploy(
         deploy.user,
         currentTime,
@@ -56,7 +56,7 @@ class MemoryPersistenceActor extends PersistenceActor {
       )
       val newProj = p.copy(deploys = p.deploys :+ newDeploy)
       allProjects += (name -> newProj)
-      val responseModules = newDeploy.modules.map{m => ResponseModule(m.name,m.version,m.state)}
+      val responseModules = newDeploy.modules.map { m => ResponseModule(m.name, m.version, m.state) }
       ResponseDeploy(
         newDeploy.user,
         newDeploy.timestamp,
@@ -112,7 +112,7 @@ class MemoryPersistenceActor extends PersistenceActor {
           newDeploy.version,
           newDeploy.automatic,
           newDeploy.client,
-          newDeploy.modules.map{m => ResponseModule(m.name,m.version,m.state)}
+          newDeploy.modules.map { m => ResponseModule(m.name, m.version, m.state) }
         )
       }.take(max)
     }.getOrElse(List())
@@ -135,7 +135,7 @@ class MemoryPersistenceActor extends PersistenceActor {
             newDeploy.version,
             newDeploy.automatic,
             newDeploy.client,
-            newDeploy.modules.map{m => ResponseModule(m.name,m.version,m.state)}
+            newDeploy.modules.map { m => ResponseModule(m.name, m.version, m.state) }
           )
         )
         case None => None

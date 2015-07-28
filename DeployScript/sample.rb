@@ -6,6 +6,8 @@ if __FILE__ == $0
   #p1 = Project.new_project('malamute','Deploy Logger Service','https://bitbucket.org/shiftforward/malamute')
   #p2 = Project.new_project('adstax','adstax','https://bitbucket.org/shiftforward/adstax')
   sleep 5
+  p1.add_module("XPTO","SNAPSHOT 1.0",ModuleState::ADD)
+  p2.add_module("XPTO","SNAPSHOT 1.0",ModuleState::REMOVE)
   puts Project.get_projects
   puts p1.add_deploy('Last deploy version', 'https://bitbucket.org/shiftforward/malamute', 'v0.1', false, 'none')
   sleep 5

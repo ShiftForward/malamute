@@ -7,7 +7,7 @@ import com.typesafe.config.Config
 import com.typesafe.scalalogging.LazyLogging
 import eu.shiftforward.deploylogger.DBTables
 import eu.shiftforward.deploylogger.entities._
-import eu.shiftforward.deploylogger.models.{ModuleModel, EventModel, DeployModel, ProjectModel}
+import eu.shiftforward.deploylogger.models.{ ModuleModel, EventModel, DeployModel, ProjectModel }
 import SlickPersistenceActor.DBConnected
 import slick.dbio.DBIO
 import slick.driver.SQLiteDriver.api._
@@ -41,29 +41,29 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
           name
         )
         val deployEvent = EventModel(currentTime, DeployStatus.Started, "", newDeploy.id)
-        val newModules = deploy.modules.map{m =>
-          ModuleModel(m.version,m.state,m.name,deploy.client,newDeploy.id)
+        val newModules = deploy.modules.map { m =>
+          ModuleModel(m.version, m.state, m.name, deploy.client, newDeploy.id)
         }
         newModules.map(m => db.run(modules += m))
         db.run(deploys += newDeploy).zip(
           db.run(events += deployEvent)
-          ).map {
+        ).map {
             case _ =>
-                Some(ResponseDeploy(
-                  newDeploy.user,
-                  newDeploy.timestamp,
-                  newDeploy.commitBranch,
-                  newDeploy.commitHash,
-                  newDeploy.description,
-                  List(ResponseEvent(deployEvent.timestamp, deployEvent.status, deployEvent.description)),
-                  newDeploy.changelog,
-                  newDeploy.id,
-                  newDeploy.version,
-                  newDeploy.automatic,
-                  newDeploy.client,
-                  newModules.map(m => ResponseModule(m.name,m.version,m.state))
-                ))
-            }
+              Some(ResponseDeploy(
+                newDeploy.user,
+                newDeploy.timestamp,
+                newDeploy.commitBranch,
+                newDeploy.commitHash,
+                newDeploy.description,
+                List(ResponseEvent(deployEvent.timestamp, deployEvent.status, deployEvent.description)),
+                newDeploy.changelog,
+                newDeploy.id,
+                newDeploy.version,
+                newDeploy.automatic,
+                newDeploy.client,
+                newModules.map(m => ResponseModule(m.name, m.version, m.state))
+              ))
+          }
       }.getOrElse(Future.successful(None))
     }
   }
@@ -118,13 +118,13 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
   def getModules(id: String): Future[List[ResponseModule]] = {
     db.run(modules.filter(_.deployID === id).result).map {
       _.map { m =>
-        ResponseModule(m.name,m.version,m.state)
+        ResponseModule(m.name, m.version, m.state)
       }.toList
     }
   }
 
   override def getDeploys(name: String, max: Int): Future[List[ResponseDeploy]] = {
-    db.run(deploys.filter(_.projName === name).sortBy(_.timestamp.desc).result).flatMap{f =>
+    db.run(deploys.filter(_.projName === name).sortBy(_.timestamp.desc).result).flatMap { f =>
       Future.sequence(f.map { d =>
         getEvents(d.id).flatMap { listEvents =>
           getModules(d.id).map { listModules =>
@@ -160,7 +160,7 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
     db.run(deploys.filter(d => d.projName === projName && d.id === deployId).result.headOption).flatMap { f =>
       Future.sequence(f.map { d =>
         getEvents(d.id).flatMap { listEvents =>
-          getModules(d.id).map{ listModules =>
+          getModules(d.id).map { listModules =>
             ResponseDeploy(
               d.user,
               d.timestamp,

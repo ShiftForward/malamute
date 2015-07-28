@@ -1,3 +1,6 @@
+// DateFormat
+var DateFormat  = 'dd/MM/yyyy HH:mm:ss';
+
 // Models
 window.Project = Backbone.Model.extend();
 
@@ -106,17 +109,23 @@ window.DeployListItemView = Backbone.View.extend({
 
     render: function (eventName) {
         var deploy = this.model;
-        deploy.timestamp = timeConverter(deploy.timestamp);
-        if (deploy.events[deploy.events.length - 1].status === "SUCCESS")
-            deploy.status = "ok";
-        else if (deploy.events[deploy.events.length - 1].status === "FAILED")
-            deploy.status = "remove";
-        else if (deploy.events[deploy.events.length - 1].status === "SKIPPED")
-            deploy.status = "question";
-        else if (deploy.events[deploy.events.length - 1].status === "LOG")
-            deploy.status = "info";
-        else
-            deploy.status = "exclamation";
+        deploy.timestamp = $.format.date(deploy.timestamp, DateFormat);
+        switch (deploy.events[deploy.events.length - 1].status){
+            case "SUCCESS":
+                deploy.status = "ok";
+                break;
+            case "FAILED":
+                deploy.status = "remove";
+                break;
+            case "SKIPPED":
+                deploy.status = "question";
+                break;
+            case "LOG":
+                deploy.status = "info";
+                break;
+            default:
+                deploy.status = "exclamation";
+        }
         $(this.el).html(this.template(deploy));
         return this;
     }
@@ -140,20 +149,26 @@ window.DeployView = Backbone.View.extend({
             deploy.running = true;
         }
         deploy.events.reverse().forEach(function (ev) {
-            ev.timestamp = timeConverter(ev.timestamp);
-            if (ev.status === "SUCCESS")
-                ev.color = "success";
-            else if (ev.status === "FAILED")
-                ev.color = "danger";
-            else if (ev.status === "SKIPPED")
-                ev.color = "warning";
-            else if (ev.status === "LOG")
-                ev.color = "info"
-            else
-                ev.color = "default";
+            ev.timestamp = $.format.date(ev.timestamp, DateFormat);
+            switch(ev.status){
+                case "SUCCESS":
+                    ev.color = "success";
+                    break;
+                case "FAILED":
+                    ev.color = "danger";
+                    break;
+                case "SKIPPED":
+                    ev.color = "warning";
+                    break;
+                case "LOG":
+                    ev.color = "info";
+                    break;
+                default:
+                    ev.color = "default";
+            }
             events.push(ev);
         }, this);
-        deploy.timestamp = timeConverter(deploy.timestamp);
+        deploy.timestamp = $.format.date(deploy.timestamp, DateFormat);
         $(this.el).html(this.template(deploy));
         return this;
     },

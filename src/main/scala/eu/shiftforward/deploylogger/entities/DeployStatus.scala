@@ -8,6 +8,7 @@ object DeployStatus extends Enumeration {
   val Skipped = Value("SKIPPED")
   val Failed = Value("FAILED")
   val Success = Value("SUCCESS")
+  val Log = Value("LOG")
   implicit object DeployStatusJsonFormat extends RootJsonFormat[DeployStatus.DeployStatus] {
     def write(obj: DeployStatus.DeployStatus): JsValue = JsString(obj.toString)
 

@@ -1,3 +1,6 @@
+// DateFormat
+var DateFormat  = 'dd/MM/yyyy HH:mm:ss';
+
 // Models
 window.Project = Backbone.Model.extend();
 
@@ -48,7 +51,7 @@ window.ProjectListView = Backbone.View.extend({
             }, this);
             return this;
         }
-        
+
     }
 
 });
@@ -106,15 +109,23 @@ window.DeployListItemView = Backbone.View.extend({
 
     render: function (eventName) {
         var deploy = this.model;
-        deploy.timestamp = timeConverter(deploy.timestamp);
-        if (deploy.events[deploy.events.length - 1].status === "SUCCESS")
-            deploy.status = "ok";
-        else if (deploy.events[deploy.events.length - 1].status === "FAILED")
-            deploy.status = "remove";
-        else if (deploy.events[deploy.events.length - 1].status === "SKIPPED")
-            deploy.status = "question";
-        else
-            deploy.status = "info";
+        deploy.timestamp = $.format.date(deploy.timestamp, DateFormat);
+        switch (deploy.events[deploy.events.length - 1].status){
+            case "SUCCESS":
+                deploy.status = "ok";
+                break;
+            case "FAILED":
+                deploy.status = "remove";
+                break;
+            case "SKIPPED":
+                deploy.status = "question";
+                break;
+            case "LOG":
+                deploy.status = "info";
+                break;
+            default:
+                deploy.status = "exclamation";
+        }
         $(this.el).html(this.template(deploy));
         return this;
     }
@@ -138,22 +149,48 @@ window.DeployView = Backbone.View.extend({
             deploy.running = true;
         }
         deploy.events.reverse().forEach(function (ev) {
-            ev.timestamp = timeConverter(ev.timestamp);
-            if (ev.status === "SUCCESS")
-                ev.color = "success";
-            else if (ev.status === "FAILED")
-                ev.color = "danger";
-            else if (ev.status === "SKIPPED")
-                ev.color = "warning";
-            else
-                ev.color = "default";
+            ev.timestamp = $.format.date(ev.timestamp, DateFormat);
+            switch (ev.status){
+                case "SUCCESS":
+                    ev.color = "success";
+                    break;
+                case "FAILED":
+                    ev.color = "danger";
+                    break;
+                case "SKIPPED":
+                    ev.color = "warning";
+                    break;
+                case "LOG":
+                    ev.color = "info";
+                    break;
+                default:
+                    ev.color = "default";
+            }
             events.push(ev);
         }, this);
-        deploy.timestamp = timeConverter(deploy.timestamp);
+        deploy.timestamp = $.format.date(deploy.timestamp, DateFormat);
         $(this.el).html(this.template(deploy));
         return this;
+    },
+    events: {
+        'click #addEvent': 'addEvent'
+    },
+    addEvent: function(e) {
+        $.ajax({
+            url: $(e.currentTarget).data("url"),
+            type:"POST",
+            data: JSON.stringify({
+                status: $("#status").find("option:selected").text(),
+                description: $("#msg").val()
+            }),
+            contentType:"application/json",
+            dataType:"json",
+            success: function(){
+                $('#eventModal').modal('toggle');
+                Backbone.history.loadUrl(Backbone.history.fragment);
+            }
+        })
     }
-
 });
 
 window.ProjectView = Backbone.View.extend({
@@ -249,17 +286,3 @@ function errorWindow(err) {
     $('.project-section').html(error);
 }
 
-function timeConverter(timestamp) {
-    var d = new Date(timestamp),	// Convert the passed timestamp to milliseconds
-        yyyy = d.getFullYear(),
-        mm = ('0' + (d.getMonth() + 1)).slice(-2),	// Months are zero based. Add leading 0.
-        dd = ('0' + d.getDate()).slice(-2),			// Add leading 0.
-        hh = d.getHours(),
-        h = hh,
-        min = ('0' + d.getMinutes()).slice(-2),		// Add leading 0.
-        time;
-
-    time = dd + '-' + mm + '-' + yyyy + ', ' + hh + ':' + min;
-
-    return time;
-}

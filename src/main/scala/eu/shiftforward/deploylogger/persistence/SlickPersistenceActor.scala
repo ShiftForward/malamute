@@ -38,7 +38,8 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
           deploy.version,
           deploy.automatic,
           deploy.client,
-          name
+          name,
+          deploy.configuration
         )
         val deployEvent = EventModel(currentTime, DeployStatus.Started, "", newDeploy.id)
         val newModules = deploy.modules.map { m =>
@@ -61,7 +62,8 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
                 newDeploy.version,
                 newDeploy.automatic,
                 newDeploy.client,
-                newModules.map(m => ResponseModule(m.name, m.version, m.state))
+                newModules.map(m => ResponseModule(m.name, m.version, m.state)),
+                newDeploy.configuration
               ))
           }
       }.getOrElse(Future.successful(None))
@@ -140,7 +142,8 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
               d.version,
               d.automatic,
               d.client,
-              listModules
+              listModules,
+              d.configuration
             )
           }
         }
@@ -173,7 +176,8 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
               d.version,
               d.automatic,
               d.client,
-              listModules
+              listModules,
+              d.configuration
             )
           }
         }

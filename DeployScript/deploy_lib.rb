@@ -78,7 +78,7 @@ class Project
   end
 
 
-  def add_deploy(description, changelog, version, automatic, client)
+  def add_deploy(description, changelog, version, automatic, client, config)
     #git configurations for current folder
     user =  `git config --get user.name`.chomp!
     commit_branch = `git rev-parse --abbrev-ref HEAD`.chomp!
@@ -92,15 +92,16 @@ class Project
     req.body = {
         user: user,
         commit: {
-        branch: commit_branch,
-        hash: commit_hash
-    },
+            branch: commit_branch,
+            hash: commit_hash
+        },
         description: description,
         changelog: changelog,
         version: version,
         automatic: automatic,
         client: client,
-        modules: @modules
+        modules: @modules,
+        configuration: config
     }.to_json
 
     res = Net::HTTP.start(uri.hostname, uri.port) do |http|

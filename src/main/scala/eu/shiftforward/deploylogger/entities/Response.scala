@@ -31,7 +31,8 @@ case class ResponseDeploy(
   version: String,
   automatic: Boolean,
   client: String,
-  modules: List[ResponseModule]
+  modules: List[ResponseModule],
+  configuration: String
 ) extends Response
 
 case class ResponseEvent(
@@ -45,7 +46,7 @@ object ResponseProject extends DefaultJsonProtocol {
 }
 
 object ResponseDeploy extends DefaultJsonProtocol {
-  implicit val deployFormat: RootJsonFormat[ResponseDeploy] = jsonFormat12(ResponseDeploy.apply)
+  implicit val deployFormat: RootJsonFormat[ResponseDeploy] = jsonFormat13(ResponseDeploy.apply)
 }
 
 object ResponseEvent extends DefaultJsonProtocol {

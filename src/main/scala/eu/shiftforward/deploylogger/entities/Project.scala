@@ -41,7 +41,8 @@ case class Deploy(
   version: String,
   automatic: Boolean,
   client: String,
-  modules: List[Module]
+  modules: List[Module],
+  configuration: String
 )
 
 object Project extends DefaultJsonProtocol {
@@ -49,7 +50,7 @@ object Project extends DefaultJsonProtocol {
 }
 
 object Deploy extends DefaultJsonProtocol {
-  implicit val deployFormat: RootJsonFormat[Deploy] = jsonFormat11(Deploy.apply)
+  implicit val deployFormat: RootJsonFormat[Deploy] = jsonFormat12(Deploy.apply)
 }
 
 object Event extends DefaultJsonProtocol {

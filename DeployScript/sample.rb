@@ -9,10 +9,10 @@ if __FILE__ == $0
   p1.add_module("XPTO","SNAPSHOT 1.0",ModuleState::ADD)
   p2.add_module("XPTO","SNAPSHOT 1.0",ModuleState::REMOVE)
   puts Project.get_projects
-  puts p1.add_deploy('Last deploy version', 'https://bitbucket.org/shiftforward/malamute', 'v0.1', false, 'none')
+  puts p1.add_deploy('Last deploy version', 'https://bitbucket.org/shiftforward/malamute', 'v0.1', false, 'none', "This config")
   sleep 5
   puts p1.add_deploy_event(DeployStatus::LOG, "Information.")
-  puts p2.add_deploy('Last deploy version', 'https://bitbucket.org/shiftforward/adstax', 'v0.1', false, 'xpto')
+  puts p2.add_deploy('Last deploy version', 'https://bitbucket.org/shiftforward/adstax', 'v0.1', false, 'xpto', "This config")
   sleep 5
   puts p2.add_deploy_event(DeployStatus::LOG, "Information.")
   n = rand(0..2)

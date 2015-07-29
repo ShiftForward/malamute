@@ -16,7 +16,8 @@ case class RequestDeploy(
   version: String,
   automatic: Boolean,
   client: String,
-  modules: List[RequestModule]
+  modules: List[RequestModule],
+  configuration: String
 ) extends Request
 
 case class RequestEvent(status: DeployStatus, description: String) extends Request
@@ -28,7 +29,7 @@ object RequestEvent extends DefaultJsonProtocol {
 }
 
 object RequestDeploy extends DefaultJsonProtocol {
-  implicit val simpleDeployFormat: RootJsonFormat[RequestDeploy] = jsonFormat8(RequestDeploy.apply)
+  implicit val simpleDeployFormat: RootJsonFormat[RequestDeploy] = jsonFormat9(RequestDeploy.apply)
 }
 
 object RequestProject extends DefaultJsonProtocol {

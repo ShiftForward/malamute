@@ -52,7 +52,8 @@ class MemoryPersistenceActor extends PersistenceActor {
         deploy.version,
         deploy.automatic,
         deploy.client,
-        modules
+        modules,
+        deploy.configuration
       )
       val newProj = p.copy(deploys = p.deploys :+ newDeploy)
       allProjects += (name -> newProj)
@@ -68,7 +69,8 @@ class MemoryPersistenceActor extends PersistenceActor {
         newDeploy.id, newDeploy.version,
         newDeploy.automatic,
         newDeploy.client,
-        responseModules
+        responseModules,
+        newDeploy.configuration
       )
     }
   }
@@ -112,7 +114,8 @@ class MemoryPersistenceActor extends PersistenceActor {
           newDeploy.version,
           newDeploy.automatic,
           newDeploy.client,
-          newDeploy.modules.map { m => ResponseModule(m.name, m.version, m.state) }
+          newDeploy.modules.map { m => ResponseModule(m.name, m.version, m.state) },
+          newDeploy.configuration
         )
       }.take(max)
     }.getOrElse(List())
@@ -135,7 +138,8 @@ class MemoryPersistenceActor extends PersistenceActor {
             newDeploy.version,
             newDeploy.automatic,
             newDeploy.client,
-            newDeploy.modules.map { m => ResponseModule(m.name, m.version, m.state) }
+            newDeploy.modules.map { m => ResponseModule(m.name, m.version, m.state) },
+            newDeploy.configuration
           )
         )
         case None => None

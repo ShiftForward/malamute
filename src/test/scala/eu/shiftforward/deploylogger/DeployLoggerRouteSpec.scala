@@ -316,6 +316,36 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
         }
       }
     }
+    "handle /project/:name/client/:clientName" in {
+      "return a 'JSON list obj Module' response for GET requests" in new MockDeployLoggerService {
+        Post("/project",
+          RequestProject("TestProj", "Proj Description Test", "http://bitbucket.com/abc")
+        ) ~> projectPostRoute ~> check {
+          status === OK
+          responseAs[ResponseProject].name must beEqualTo("TestProj")
+          responseAs[ResponseProject].description must beEqualTo("Proj Description Test")
+        }
+        eventually {
+          Post("/project/TestProj/deploy",
+            RequestDeploy("testUser",
+              Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente",
+              List(
+                RequestModule("ModuleX","v0.1",ModuleStatus.Add),
+                RequestModule("ModuleX","v0.1",ModuleStatus.Remove),
+                RequestModule("ModuleX","v0.2",ModuleStatus.Add)
+              ), "This config")
+          ) ~> projectDeployPostRoute ~> check {
+            status === OK
+            responseAs[ResponseDeploy].user must beEqualTo("testUser")
+
+            Get("/project/TestProj/client/Cliente") ~> projectGetModules ~> check {
+              status === OK
+              responseAs[List[ResponseModule]].head === ResponseModule("ModuleX","v0.2",ModuleStatus.Add)
+            }
+          }
+        }
+      }
+    }
   }
   step {
     import java.io._

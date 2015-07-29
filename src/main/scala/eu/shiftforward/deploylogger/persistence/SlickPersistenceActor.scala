@@ -43,7 +43,7 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
         )
         val deployEvent = EventModel(currentTime, DeployStatus.Started, "", newDeploy.id)
         val newModules = deploy.modules.map { m =>
-          ModuleModel(m.version, m.state, m.name, deploy.client, newDeploy.id)
+          ModuleModel(m.version, m.state, m.name, deploy.client, newDeploy.id, name)
         }
         newModules.map(m => db.run(modules += m))
         db.run(deploys += newDeploy).zip(
@@ -183,6 +183,18 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
         }
       }.toList)
     }.map(_.headOption)
+  }
+// Future[Option[List[ResponseModule]]]
+  override def getModules(projName: String, clientName: String): Future[List[ResponseModule]] =  {
+    db.run(modules.filter(m => m.projName === projName && m.client === clientName).result).map{ f => {
+        val res = f.map{ mod =>
+          ResponseModule(mod.name,mod.version,mod.state)
+        }.toList
+        val removed = res.filter(m => m.state == ModuleStatus.Remove).distinct
+        val added = res.filter(m => m.state == ModuleStatus.Add).distinct
+        added.filter(m => !removed.exists(x => x.name == m.name && x.version == m.version))
+      }
+    }
   }
 }
 

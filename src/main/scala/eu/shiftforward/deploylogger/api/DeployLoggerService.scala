@@ -11,7 +11,7 @@ import eu.shiftforward.deploylogger.entities._
 import eu.shiftforward.deploylogger.persistence._
 import spray.http.StatusCodes._
 import spray.httpx.SprayJsonSupport._
-import spray.routing.{ ExceptionHandler, HttpService }
+import spray.routing.{Route, ExceptionHandler, HttpService}
 import spray.util.LoggingContext
 
 import scala.concurrent.ExecutionContext
@@ -139,7 +139,7 @@ trait DeployLoggerService extends HttpService {
     }
   }
 
-  @Path("project/{projName}/deploys/{deployId}")
+  @Path("project/{projName}/deploy/{deployId}")
   @ApiOperation(httpMethod = "GET", response = classOf[ResponseDeploy], value = "Returns a Deploy", produces = json)
   @ApiImplicitParams(Array(
     new ApiImplicitParam(name = "projName", required = true, dataType = "string", paramType = "path", value = "Name of project that needs to be fetched"),
@@ -152,6 +152,22 @@ trait DeployLoggerService extends HttpService {
   def projectDeployGetRoute = path("project" / Segment / "deploy" / Rest) { (projName, deployId) =>
     get {
       complete((actorPersistence ? GetDeploy(projName, deployId)).mapTo[Option[ResponseDeploy]])
+    }
+  }
+
+  @Path("project/{projName}/client/{clientName}")
+  @ApiOperation(httpMethod = "GET", response = classOf[List[ResponseModule]], value = "Returns a Module List", produces = json)
+  @ApiImplicitParams(Array(
+    new ApiImplicitParam(name = "projName", required = true, dataType = "string", paramType = "path", value = "Name of project that needs to be fetched"),
+    new ApiImplicitParam(name = "clientName", required = true, dataType = "string", paramType = "path", value = "Client of modules that needs to be fetched")
+  ))
+  @ApiResponses(Array(
+    new ApiResponse(code = 200, message = "OK"),
+    new ApiResponse(code = 404, message = "NotFound")
+  ))
+  def projectGetModules = path("project" / Segment / "client" / Rest) { (projName, clientName) =>
+    get {
+      complete((actorPersistence ? GetModules(projName, clientName)).mapTo[List[ResponseModule]])
     }
   }
 

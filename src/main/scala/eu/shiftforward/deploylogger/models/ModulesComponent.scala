@@ -10,7 +10,8 @@ case class ModuleModel(
   state: ModuleStatus,
   name: String,
   client: String,
-  deployID: String
+  deployID: String,
+  projName: String
 )
 
 class Modules(tag: Tag) extends Table[ModuleModel](tag, "MODULES") {
@@ -26,8 +27,10 @@ class Modules(tag: Tag) extends Table[ModuleModel](tag, "MODULES") {
   def client = column[String]("CLIENT")
   def name = column[String]("NAME")
   def deployID = column[String]("DEPLOY_ID")
+  def projName = column[String]("PROJ_NAME")
 
-  def project = foreignKey("DEPLOY_ID", deployID, DBTables.deploys)(_.id)
+  def deploy = foreignKey("DEPLOY_ID", deployID, DBTables.deploys)(_.id)
+  def project = foreignKey("PROJ_NAME", projName, DBTables.projects)(_.name)
 
-  def * = (version, state, name, client, deployID) <> (ModuleModel.tupled, ModuleModel.unapply)
+  def * = (version, state, name, client, deployID, projName) <> (ModuleModel.tupled, ModuleModel.unapply)
 }

@@ -120,6 +120,22 @@ trait DeployLoggerService extends HttpService {
     }
   }
 
+  @Path("project/{projName}/clients")
+  @ApiOperation(httpMethod = "GET", response = classOf[List[String]], value = "Returns a List of Deploy", produces = json)
+  @ApiImplicitParams(Array(
+    new ApiImplicitParam(name = "projName", required = true, dataType = "string", paramType = "path", value = "Name of project that needs to be fetched")
+  ))
+  @ApiResponses(Array(
+    new ApiResponse(code = 200, message = "OK"),
+    new ApiResponse(code = 404, message = "NotFound")
+  ))
+  def projectGetClients = path("project" / Segment / "clients") { projName =>
+    get {
+      import spray.json.DefaultJsonProtocol._
+      complete((actorPersistence ? GetClients(projName)).mapTo[List[String]])
+    }
+  }
+
   @Path("project/{projName}/deploy/{deployId}/event")
   @ApiOperation(httpMethod = "POST", response = classOf[ResponseEvent], value = "Add a event to a deploy", produces = json)
   @ApiImplicitParams(Array(

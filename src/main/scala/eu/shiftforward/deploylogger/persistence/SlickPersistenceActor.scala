@@ -196,6 +196,14 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
       }
     }
   }
+
+  override def getClients(projName: String): Future[List[String]] = {
+    db.run(deploys.filter(_.projName === projName).sortBy(_.timestamp.desc).result).map { f =>
+      f.map {
+        d => d.client
+      }.toList.distinct
+    }
+  }
 }
 
 class SlickPersistenceActor(config: Config) extends Actor with LazyLogging with Stash {

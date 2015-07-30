@@ -121,12 +121,19 @@
                     <h5>Modules</h5>
                     <% _.each(modules, function(m){ %>
                     <div class="col-md-4">
-                        <div class="list-group-item text-center" style="padding: 7px;margin-bottom:5px">
-                            <h6><span style="float:right; margin-left: 2px"
-                                      class="label label-primary"><%= m.version %></span></h6>
-                            <h6><span style="float:left" class="label label-<%= m.color %>"><span
-                                    class="glyphicon glyphicon-<%= m.icon %>" aria-hidden="true"></span></span></h6>
-                            <h6><%= m.name %></h6>
+                        <div class="list-group-item" style="padding: 7px;margin-bottom:5px">
+                            <h6>
+                                <span style="float:right; margin-left: 2px" class="label label-primary">
+                                    <%= m.version %>
+                                </span>
+                            </h6>
+                            <h6>
+                                <span style="float:left" class="label label-<%= m.color %>">
+                                    <span class="glyphicon glyphicon-<%= m.icon %>" aria-hidden="true">
+                                    </span>
+                                </span>
+                            </h6>
+                            <h6> <%= m.name %></h6>
                         </div>
                     </div>
                     <% }); %>

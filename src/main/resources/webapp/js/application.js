@@ -207,7 +207,7 @@ window.DeployView = Backbone.View.extend({
             failure: function () {
                 $('#eventModal').modal('hide');
                 Backbone.history.loadUrl(Backbone.history.fragment);
-                alert("Error on processing request.")
+                simpleError("Error on processing request.");
             }
         })
     }
@@ -316,3 +316,11 @@ function errorWindow(err) {
     $('.project-section').html(error);
 }
 
+function simpleError(err){
+    var error = '<div class="alert alert-dismissible alert-danger">'+
+    '<button type="button" class="close" data-dismiss="alert">×</button>'+
+    '<h4>Error!</h4>'+
+    '<p>'+err+'</p>'+
+    '</div>"';
+    $('.content-section').append(error);
+}

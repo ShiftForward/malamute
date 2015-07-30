@@ -12,7 +12,7 @@ module DeployStatus
   SUCCESS = "SUCCESS"
 end
 
-module ModuleState
+module ModuleStatus
   REMOVE = "REMOVE"
   ADD = "ADD"
 end
@@ -48,7 +48,6 @@ class Project
     end
   end
 
-
   def self.get_projects
     uri = URI.parse(URL + "projects")
 
@@ -77,8 +76,7 @@ class Project
     end
   end
 
-
-  def add_deploy(description, changelog, version, automatic, client, config)
+  def start_deploy(description, changelog, version, automatic, client, config)
     #git configurations for current folder
     user =  `git config --get user.name`.chomp!
     commit_branch = `git rev-parse --abbrev-ref HEAD`.chomp!
@@ -114,11 +112,9 @@ class Project
     end
   end
 
-
-  def add_module(name,version,state)
+  def with_module(name,version,state)
     @modules.push({:name => "#{name}", :version =>  "#{version}", :state =>  "#{state}"})
   end
-
 
   def add_deploy_event(status, description)
     uri = URI.parse(URL + "project/#{@project_name}/deploy/#{@last_deploy_id}/event")

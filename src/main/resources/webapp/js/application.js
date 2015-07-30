@@ -46,9 +46,9 @@ window.DeployCollection = Backbone.Collection.extend({
 
 var tabs = '<div class="col-md-12">'+
     '<ul class="nav nav-tabs">'+
-    '<li class=""><a aria-expanded="true" href="#deploys" data-toggle="tab">Deploys</a></li>'+
-    '<li class="active"><a aria-expanded="false" href="#clients" data-toggle="tab">Clients</a></li>'+
-    '</ul></div><br>';
+    '<li class="active"><a aria-expanded="true" href="#deploys" data-toggle="tab">Deploys</a></li>'+
+    '<li class=""><a aria-expanded="false" href="#clients" data-toggle="tab">Clients</a></li>'+
+    '</ul><br></div>';
 
 window.ProjectListView = Backbone.View.extend({
 
@@ -119,8 +119,7 @@ window.ModulesListItemView = Backbone.View.extend({
 
 window.DeployListView = Backbone.View.extend({
     tagName: 'table',
-    id: 'deploys',
-    className: 'table table-striped table-hover tab-pane fade',
+    className: 'table table-striped table-hover col-md-12',
     initialize: function (options) {
         this.model.bind("reset", this.render, this);
         this.projname = options.proj
@@ -281,8 +280,6 @@ var AppRouter = Backbone.Router.extend({
     routes: {
         "": "home",
         ":projname": "project",
-        ":project/clients": "clients",
-        ":project/clients/:clientname": "clientModules",
         ":project/:id": "deploy"
     },
 
@@ -314,83 +311,33 @@ var AppRouter = Backbone.Router.extend({
                 deployList.fetch({
                     reset: "true",
                     success: (function () {
-                        this.deployListView = new DeployListView({model: this.deployList, proj: projname});
-                        $('.content-section').html(this.deployListView.render().el);
-                        $.get("/api/project/" + projname +  "/clients", function(result){
+                        deployListView = new DeployListView({model: this.deployList, proj: projname});
+                        $.get("/api/project/" + projname + "/clients", function(result){
                             var tpl =  _.template($("#clientsTpl").html());
                             console.log(result)
+                            $('.content-section').html(deployListView.render().el);
+                            $('.content-section').html(
+                                '<div class="tab-pane fade active in" id="deploys">' +
+                                $('.content-section').html()
+                                + '</div>'
+                            )
                             $('.content-section').append(
-                                '<div class="tab-pane fade" id="clients">'
-                                +tpl({clients: result,projName:projname})+
-                                +'</div>'
+                                '<div class="tab-pane fade" id="clients">' +
+                                tpl({clients: result,projName:projname}) +
+                                '</div>'
                             );
                             $(".dropdown-menu li a").click(function(){
+                                showModules(projname,$(this).text())
                                 $("#current").text($(this).text());
                                 $("#current").val($(this).text());
-                            });
-                        })
+                            })
+                        });
+
                     }),
                     error: (function (xhr, status, error) {
                         errorWindow(error)
                     })
                 });
-            }),
-            error: (function (xhr, status, error) {
-                errorWindow(error)
-            })
-        });
-    },
-
-    clients: function (projname) {
-        proj = new ProjectModel(projname);
-        proj.fetch({
-            reset: "true",
-            success: (function () {
-                this.projView = new ProjectView({model: proj});
-                $('.project-section').html(this.projView.render().el);
-                 $.get("/api/project/" + projname +  "/clients", function(result){
-                     var tpl =  _.template($("#clientsTpl").html());
-                     console.log(result)
-                     $('.content-section').append(
-                         '<div class="tab-pane fade" id="clients">' +
-                         tpl({clients: result,projName:projname}) +
-                         '</div>'
-                     );
-                     $(".dropdown-menu li a").click(function(){
-                         modulesList = new ClientModulesModel(projname, $(this).text());
-                         modulesList.fetch({
-                             // reset:"true",
-                             success: (function () {
-                                 this.modulesListView = new ModulesListView({model: modulesList});
-                                 $('.currentModules').remove();
-                                 $('#clients').append(this.modulesListView.render().el);
-                                 $("#current").text($(this).text());
-                                 $("#current").val($(this).text());
-                             }),
-                             error: (function (xhr, status, error) {
-                                 errorWindow(error)
-                             })
-                         });
-
-
-                     });
-                 })
-
-            }),
-            error: (function (xhr, status, error) {
-                errorWindow(error)
-            })
-        });
-    },
-
-    clientModules: function (projname, client) {
-        modulesList = new ClientModulesModel(projname, client);
-        modulesList.fetch({
-            // reset:"true",
-            success: (function () {
-                this.modulesListView = new ModulesListView({model: modulesList});
-                $('.currentModules').remove();
-                $('#clients').append(this.modulesListView.render().el);
             }),
             error: (function (xhr, status, error) {
                 errorWindow(error)
@@ -436,4 +383,19 @@ function errorWindow(err) {
     '</div>'
     $('.content-section').html("<p></p>");
     $('.project-section').html(error);
+}
+
+function showModules (projname, client) {
+    modulesList = new ClientModulesModel(projname, client);
+    modulesList.fetch({
+        // reset:"true",
+        success: (function () {
+            this.modulesListView = new ModulesListView({model: modulesList});
+            $('.currentModules').remove();
+            $('#clients').append(this.modulesListView.render().el);
+        }),
+        error: (function (xhr, status, error) {
+            errorWindow(error)
+        })
+    })
 }

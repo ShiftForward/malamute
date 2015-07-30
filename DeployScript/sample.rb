@@ -13,13 +13,13 @@ if __FILE__ == $0
   p2.add_module("XPTO","SNAPSHOT 1.0",ModuleState::REMOVE)
   p2.add_module("XPTO","SNAPSHOT 3.0",ModuleState::ADD)
   p2.add_module("XPTO","SNAPSHOT 2.0",ModuleState::ADD)
-  p2.add_module("XPTO","SNAPSHOT 3.0",ModuleState::REMOVE)
-  p2.add_module("XPTO","SNAPSHOT 2.1",ModuleState::ADD)
+  p2.add_module("abcd","SNAPSHOT 3.0",ModuleState::REMOVE)
+  p2.add_module("abcd","SNAPSHOT 2.1",ModuleState::ADD)
   puts Project.get_projects
   puts p1.add_deploy('Last deploy version', 'https://bitbucket.org/shiftforward/malamute', 'v0.1', false, 'none', "This config")
   sleep 5
   puts p1.add_deploy_event(DeployStatus::LOG, "Information.")
-  puts p2.add_deploy('Last deploy version', 'https://bitbucket.org/shiftforward/adstax', 'v0.1', false, 'xpto', "This config")
+  puts p2.add_deploy('Last deploy version', 'https://bitbucket.org/shiftforward/adstax', 'v0.1', false, 'abcd', "This config")
   sleep 5
   puts p2.add_deploy_event(DeployStatus::LOG, "Information.")
   n = rand(0..2)

@@ -80,6 +80,36 @@
     <th><a href="#<%= projname %>/<%=id%>">Details</a></th>
 </script>
 
+<script id="modulesListTpl" type="text/template">
+    <div class="col-md-4 currentModules">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h2 class="panel-title">Module: <%= name %></h2>
+            </div>
+            <div class="panel-body">
+                <p>Version: <%= version %></p>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script id="clientsTpl" type="text/template">
+    <div class="col-lg-12">
+        <div>
+            <div class="btn-group">
+                <a id="current" class="btn btn-default">Select Client</a>
+                <a aria-expanded="false" href="#" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                    <% _.each(clients, function(c){ %>
+                        <li><a href='#<%= projName %>/clients/<%= c %>'><%= c %></a></li>
+                    <% }); %>
+                </ul>
+                <hr>
+            </div>
+        </div>
+    </div>
+</script>
+
 <script id="deployDetailTpl" type="text/template">
     <div class="col-md-12">
         <div class="panel panel-default">

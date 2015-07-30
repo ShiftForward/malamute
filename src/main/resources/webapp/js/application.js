@@ -6,6 +6,9 @@ window.Project = Backbone.Model.extend();
 
 window.Deploy = Backbone.Model.extend();
 
+window.Modules = Backbone.Model.extend();
+
+
 window.ProjectCollection = Backbone.Collection.extend({
     model: Project,
     url: "/api/projects"
@@ -15,6 +18,13 @@ window.ProjectModel = Backbone.Collection.extend({
     model: Project,
     initialize: function (id) {
         this.url = "/api/project/" + id;
+    }
+});
+
+window.ClientModulesModel = Backbone.Collection.extend({
+    model: Modules,
+    initialize: function (id,clientName) {
+        this.url = "/api/project/"+id+"/client/"+clientName
     }
 });
 
@@ -56,9 +66,43 @@ window.ProjectListView = Backbone.View.extend({
 
 });
 
+window.ModulesListView = Backbone.View.extend({
+
+    initialize: function () {
+        this.model.bind("reset", this.render, this);
+    },
+
+    render: function (eventName) {
+        if (this.model.models.length == 0) {
+            var nocontent = {xhr: {status: "204", statusText: "No modules found"}}
+            errorWindow(nocontent);
+        }
+        else {
+            this.model.models.reverse().forEach(function (mod) {
+                $(this.el).append(new ModulesListItemView({model: mod.attributes}).render().el);
+            }, this);
+            return this;
+        }
+
+    }
+
+});
+
+
 window.ProjectListItemView = Backbone.View.extend({
 
     template: _.template($('#projectListTpl').html()),
+
+    render: function (eventName) {
+        $(this.el).html(this.template(this.model));
+        return this;
+    }
+
+});
+
+window.ModulesListItemView = Backbone.View.extend({
+
+    template: _.template($('#modulesListTpl').html()),
 
     render: function (eventName) {
         $(this.el).html(this.template(this.model));
@@ -230,6 +274,8 @@ var AppRouter = Backbone.Router.extend({
     routes: {
         "": "home",
         ":projname": "project",
+        ":project/clients": "clients",
+        ":project/clients/:clientname": "clientModules",
         ":project/:id": "deploy"
     },
 
@@ -272,8 +318,45 @@ var AppRouter = Backbone.Router.extend({
                 errorWindow(error)
             })
         });
+    },
 
+    clients: function (projname) {
+        proj = new ProjectModel(projname);
+        proj.fetch({
+            reset: "true",
+            success: (function () {
+                this.projView = new ProjectView({model: proj});
+                $('.project-section').html(this.projView.render().el);
+                 $.get("/api/project/" + projname +  "/clients", function(result){
+                     var tpl =  _.template($("#clientsTpl").html());
+                     console.log(result)
+                     $('.content-section').html(tpl({clients: result,projName:projname}));
+                     $(".dropdown-menu li a").click(function(){
+                         $("#current").text($(this).text());
+                         $("#current").val($(this).text());
+                     });
+                 })
 
+            }),
+            error: (function (xhr, status, error) {
+                errorWindow(error)
+            })
+        });
+    },
+
+    clientModules: function (projname, client) {
+        modulesList = new ClientModulesModel(projname, client);
+        modulesList.fetch({
+            // reset:"true",
+            success: (function () {
+                this.modulesListView = new ModulesListView({model: modulesList});
+                $('.currentModules').remove();
+                $('.content-section').append(this.modulesListView.render().el);
+            }),
+            error: (function (xhr, status, error) {
+                errorWindow(error)
+            })
+        });
     },
 
     deploy: function (projname, id) {
@@ -315,4 +398,3 @@ function errorWindow(err) {
     $('.content-section').html("<p></p>");
     $('.project-section').html(error);
 }
-

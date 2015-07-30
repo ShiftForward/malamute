@@ -8,27 +8,27 @@ window.Deploy = Backbone.Model.extend();
 
 window.ProjectCollection = Backbone.Collection.extend({
     model: Project,
-    url: "/projects"
+    url: "/api/projects"
 });
 
 window.ProjectModel = Backbone.Collection.extend({
     model: Project,
     initialize: function (id) {
-        this.url = "/project/" + id;
+        this.url = "/api/project/" + id;
     }
 });
 
 window.DeployModel = Backbone.Collection.extend({
     model: Deploy,
     initialize: function (proj, id) {
-        this.url = "/project/" + proj + "/deploy/" + id;
+        this.url = "/api/project/" + proj + "/deploy/" + id;
     }
 });
 
 window.DeployCollection = Backbone.Collection.extend({
     model: Deploy,
     initialize: function (id) {
-        this.url = "/project/" + id + "/deploys";
+        this.url = "/api/project/" + id + "/deploys";
     }
 });
 

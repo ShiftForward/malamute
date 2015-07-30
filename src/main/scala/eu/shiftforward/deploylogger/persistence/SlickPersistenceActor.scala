@@ -45,7 +45,17 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
         val newModules = deploy.modules.map { m =>
           ModuleModel(m.version, m.state, m.name, deploy.client, newDeploy.id, name)
         }
-        newModules.map(m => db.run(modules += m))
+
+        newModules.map{ m =>
+          db.run(DBIO.seq(
+              modules.filter(mod => mod.name === m.name &&
+                mod.version != m.version &&
+                mod.state != ModuleStatus.Remove)
+                .delete,
+              modules += m
+            )
+          )
+        }
         db.run(deploys += newDeploy).zip(
           db.run(events += deployEvent)
         ).map {

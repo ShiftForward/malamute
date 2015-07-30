@@ -44,8 +44,8 @@ window.DeployCollection = Backbone.Collection.extend({
 
 // Views
 
-var tabs = '<div class="col-md-12">'+
-    '<ul class="nav nav-tabs">'+
+var tabs = '<div>'+
+    '<ul class="nav nav-tabs" style="border-bottom: 1px solid #DDD">'+
     '<li class="active"><a aria-expanded="true" href="#deploys" data-toggle="tab">Deploys</a></li>'+
     '<li class=""><a aria-expanded="false" href="#clients" data-toggle="tab">Clients</a></li>'+
     '</ul><br></div>';

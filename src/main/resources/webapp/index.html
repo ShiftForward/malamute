@@ -26,11 +26,11 @@
 <div style="padding-top: 100px;" class="container">
 
     <!-- Projects Section -->
-    <div class="project-section">
+    <div class="project-section col-md-12">
     </div>
 
     <!-- Deploy Details -->
-    <div class="content-section">
+    <div class="content-section col-md-12">
     </div>
 
 </div>
@@ -60,11 +60,10 @@
 <script id="projectTpl" type="text/template">
     <div class="panel panel-primary">
         <div class="panel-heading">
-            <a href='#<%= name %>' style="color:white"><h2 class="panel-title">Project: <%= name %></h2></a>
+           <h2 class="panel-title">Project: <%= name %></h2></a>
         </div>
         <div class="panel-body">
             <p>Description: <%= description %></p>
-
             <p><a href="<%= git %>"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> <%= git %></a></p>
         </div>
     </div>
@@ -101,7 +100,7 @@
                 <a aria-expanded="false" href="#" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></a>
                 <ul class="dropdown-menu">
                     <% _.each(clients, function(c){ %>
-                        <li><a href='#<%= projName %>/clients/<%= c %>'><%= c %></a></li>
+                        <li><a><%= c %></a></li>
                     <% }); %>
                 </ul>
                 <hr>

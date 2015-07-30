@@ -44,6 +44,12 @@ window.DeployCollection = Backbone.Collection.extend({
 
 // Views
 
+var tabs = '<div class="col-md-12">'+
+    '<ul class="nav nav-tabs">'+
+    '<li class=""><a aria-expanded="true" href="#deploys" data-toggle="tab">Deploys</a></li>'+
+    '<li class="active"><a aria-expanded="false" href="#clients" data-toggle="tab">Clients</a></li>'+
+    '</ul></div><br>';
+
 window.ProjectListView = Backbone.View.extend({
 
     initialize: function () {
@@ -113,7 +119,8 @@ window.ModulesListItemView = Backbone.View.extend({
 
 window.DeployListView = Backbone.View.extend({
     tagName: 'table',
-    className: 'table table-striped table-hover',
+    id: 'deploys',
+    className: 'table table-striped table-hover tab-pane fade',
     initialize: function (options) {
         this.model.bind("reset", this.render, this);
         this.projname = options.proj
@@ -302,12 +309,26 @@ var AppRouter = Backbone.Router.extend({
             success: (function () {
                 this.projView = new ProjectView({model: proj});
                 $('.project-section').html(this.projView.render().el);
+                $('.project-section').append(tabs);
                 deployList = new DeployCollection(projname);
                 deployList.fetch({
                     reset: "true",
                     success: (function () {
                         this.deployListView = new DeployListView({model: this.deployList, proj: projname});
                         $('.content-section').html(this.deployListView.render().el);
+                        $.get("/api/project/" + projname +  "/clients", function(result){
+                            var tpl =  _.template($("#clientsTpl").html());
+                            console.log(result)
+                            $('.content-section').append(
+                                '<div class="tab-pane fade" id="clients">'
+                                +tpl({clients: result,projName:projname})+
+                                +'</div>'
+                            );
+                            $(".dropdown-menu li a").click(function(){
+                                $("#current").text($(this).text());
+                                $("#current").val($(this).text());
+                            });
+                        })
                     }),
                     error: (function (xhr, status, error) {
                         errorWindow(error)
@@ -330,10 +351,28 @@ var AppRouter = Backbone.Router.extend({
                  $.get("/api/project/" + projname +  "/clients", function(result){
                      var tpl =  _.template($("#clientsTpl").html());
                      console.log(result)
-                     $('.content-section').html(tpl({clients: result,projName:projname}));
+                     $('.content-section').append(
+                         '<div class="tab-pane fade" id="clients">' +
+                         tpl({clients: result,projName:projname}) +
+                         '</div>'
+                     );
                      $(".dropdown-menu li a").click(function(){
-                         $("#current").text($(this).text());
-                         $("#current").val($(this).text());
+                         modulesList = new ClientModulesModel(projname, $(this).text());
+                         modulesList.fetch({
+                             // reset:"true",
+                             success: (function () {
+                                 this.modulesListView = new ModulesListView({model: modulesList});
+                                 $('.currentModules').remove();
+                                 $('#clients').append(this.modulesListView.render().el);
+                                 $("#current").text($(this).text());
+                                 $("#current").val($(this).text());
+                             }),
+                             error: (function (xhr, status, error) {
+                                 errorWindow(error)
+                             })
+                         });
+
+
                      });
                  })
 
@@ -351,7 +390,7 @@ var AppRouter = Backbone.Router.extend({
             success: (function () {
                 this.modulesListView = new ModulesListView({model: modulesList});
                 $('.currentModules').remove();
-                $('.content-section').append(this.modulesListView.render().el);
+                $('#clients').append(this.modulesListView.render().el);
             }),
             error: (function (xhr, status, error) {
                 errorWindow(error)

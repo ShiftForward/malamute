@@ -333,19 +333,19 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
             RequestDeploy("testUser",
               Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente",
               List(
-                RequestModule("ModuleX","v0.1",ModuleStatus.Add),
-                RequestModule("ModuleX","v0.1",ModuleStatus.Remove),
-                RequestModule("ModuleX","v0.2",ModuleStatus.Add)
+                RequestModule("ModuleX", "v0.1", ModuleStatus.Add),
+                RequestModule("ModuleX", "v0.1", ModuleStatus.Remove),
+                RequestModule("ModuleX", "v0.2", ModuleStatus.Add)
               ), "This config")
           ) ~> projectDeployPostRoute ~> check {
             status === OK
             responseAs[ResponseDeploy].user must beEqualTo("testUser")
-            eventually {
-              Get("/project/TestProj/client/Cliente") ~> projectGetModules ~> check {
-                status === OK
-                responseAs[List[ResponseModule]].head === ResponseModule("ModuleX","v0.2",ModuleStatus.Add)
-              }
-            }
+          }
+        }
+        eventually {
+          Get("/project/TestProj/client/Cliente") ~> projectGetModules ~> check {
+            status === OK
+            responseAs[List[ResponseModule]].head === ResponseModule("ModuleX","v0.2",ModuleStatus.Add)
           }
         }
       }
@@ -371,12 +371,24 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
           ) ~> projectDeployPostRoute ~> check {
             status === OK
             responseAs[ResponseDeploy].user must beEqualTo("testUser")
-
-            Get("/project/TestProj/clients") ~> projectGetClients ~> check {
-              status === OK
-              import spray.json.DefaultJsonProtocol._
-              responseAs[List[String]].head === "Cliente"
-            }
+          }
+          Post("/project/TestProj/deploy",
+            RequestDeploy("testUser",
+              Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente1",
+              List(
+                RequestModule("ModuleX","v0.1",ModuleStatus.Add),
+                RequestModule("ModuleX","v0.1",ModuleStatus.Remove),
+                RequestModule("ModuleX","v0.2",ModuleStatus.Add)
+              ), "This config")
+          ) ~> projectDeployPostRoute ~> check {
+            status === OK
+            responseAs[ResponseDeploy].user must beEqualTo("testUser")
+          }
+          Get("/project/TestProj/clients") ~> projectGetClients ~> check {
+            status === OK
+            import spray.json.DefaultJsonProtocol._
+            responseAs[List[String]].length === 2
+            responseAs[List[String]] must contain("Cliente","Cliente1")
           }
         }
       }

@@ -12,6 +12,7 @@ import SlickPersistenceActor.DBConnected
 import slick.dbio.DBIO
 import slick.driver.SQLiteDriver.api._
 import slick.jdbc.meta.MTable
+import scala.collection.mutable
 import scala.compat.Platform._
 import scala.concurrent.{ ExecutionContext, Future }
 
@@ -42,11 +43,17 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
           deploy.configuration
         )
         val deployEvent = EventModel(currentTime, DeployStatus.Started, "", newDeploy.id)
+
+        val inserts: mutable.Buffer[DBIO[Int]] = mutable.Buffer()
+
         val newModules = deploy.modules.map { m =>
-          ModuleModel(m.version, m.status, m.name, deploy.client, newDeploy.id, name)
+          val newModule = ModuleModel(m.version, m.status, m.name, deploy.client, newDeploy.id, name)
+          inserts += (modules += newModule)
+          newModule
         }
-        newModules.map(m => db.run(modules += m))
-        db.run(deploys += newDeploy).zip(
+        inserts += (deploys += newDeploy)
+        val sql = DBIO.sequence(inserts.toSeq)
+        db.run(sql).zip(
           db.run(events += deployEvent)
         ).map {
             case _ =>

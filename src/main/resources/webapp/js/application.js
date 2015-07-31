@@ -220,7 +220,7 @@ window.DeployView = Backbone.View.extend({
             events.push(ev);
         }, this);
         deploy.modules.forEach(function (m) {
-            switch (m.state) {
+            switch (m.status) {
                 case "ADD":
                     m.icon = "ok";
                     m.color = "success";
@@ -257,7 +257,7 @@ window.DeployView = Backbone.View.extend({
             failure: function () {
                 $('#eventModal').modal('hide');
                 Backbone.history.loadUrl(Backbone.history.fragment);
-                alert("Error on processing request.")
+                simpleError("Error on processing request.");
             }
         })
     }
@@ -385,6 +385,14 @@ function errorWindow(err) {
     $('.project-section').html(error);
 }
 
+function simpleError(err){
+    var error = '<div class="alert alert-dismissible alert-danger">'+
+    '<button type="button" class="close" data-dismiss="alert">×</button>'+
+    '<h4>Error!</h4>'+
+    '<p>'+err+'</p>'+
+    '</div>"';
+    $('.content-section').append(error);
+}
 function showModules (projname, client) {
     modulesList = new ClientModulesModel(projname, client);
     modulesList.fetch({

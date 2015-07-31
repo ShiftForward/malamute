@@ -31,4 +31,11 @@ object ModuleStatus extends Enumeration {
       case _ => throw new Exception("Enum string expected")
     }
   }
+
+  import slick.driver.SQLiteDriver.api._
+  implicit def statusFormat =
+    MappedColumnType.base[ModuleStatus, String](
+      ds => ds.toString,
+      s => ModuleStatus.withName(s)
+    )
 }

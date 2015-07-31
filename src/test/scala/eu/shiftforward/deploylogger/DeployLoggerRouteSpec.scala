@@ -270,9 +270,12 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
               status === OK
               responseAs[ResponseEvent].status === DeployStatus.Success
             }
-            Get("/api/project/TestProj/deploy/" + deployId) ~> projectDeployGetRoute ~> check {
-              status === OK
-              responseAs[ResponseDeploy].id === deployId
+            eventually {
+              Get("/api/project/TestProj/deploy/" + deployId) ~> projectDeployGetRoute ~> check {
+                status === OK
+                responseAs[ResponseDeploy].id === deployId
+                responseAs[ResponseDeploy].modules ===  List(ResponseModule("ModuleX","v0.1",ModuleStatus.Add))
+              }
             }
           }
         }
@@ -337,16 +340,17 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
           ) ~> projectDeployPostRoute ~> check {
             status === OK
             responseAs[ResponseDeploy].user must beEqualTo("testUser")
-
-            Get("/api/project/TestProj/client/Cliente") ~> projectGetModules ~> check {
-              status === OK
-              responseAs[List[ResponseModule]].head === ResponseModule("ModuleX","v0.2",ModuleStatus.Add)
+            eventually {
+              Get("/api/project/TestProj/client/Cliente") ~> projectGetModules ~> check {
+                status === OK
+                responseAs[List[ResponseModule]].head === ResponseModule("ModuleX", "v0.2", ModuleStatus.Add)
+              }
             }
           }
         }
       }
     }
-    "handle /project/:name/clients" in {
+    "handle /api/project/:name/clients" in {
       "return a 'JSON list string' response for GET requests" in new MockDeployLoggerService {
         Post("/api/project",
           RequestProject("TestProj", "Proj Description Test", "http://bitbucket.com/abc")
@@ -367,12 +371,24 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
           ) ~> projectDeployPostRoute ~> check {
             status === OK
             responseAs[ResponseDeploy].user must beEqualTo("testUser")
-
-            Get("/api/project/TestProj/clients") ~> projectGetClients ~> check {
-              status === OK
-              import spray.json.DefaultJsonProtocol._
-              responseAs[List[String]].head === "Cliente"
-            }
+          }
+          Post("/api/project/TestProj/deploy",
+            RequestDeploy("testUser",
+              Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente1",
+              List(
+                RequestModule("ModuleX","v0.1",ModuleStatus.Add),
+                RequestModule("ModuleX","v0.1",ModuleStatus.Remove),
+                RequestModule("ModuleX","v0.2",ModuleStatus.Add)
+              ), "This config")
+          ) ~> projectDeployPostRoute ~> check {
+            status === OK
+            responseAs[ResponseDeploy].user must beEqualTo("testUser")
+          }
+          Get("/api/project/TestProj/clients") ~> projectGetClients ~> check {
+            status === OK
+            import spray.json.DefaultJsonProtocol._
+            responseAs[List[String]].length === 2
+            responseAs[List[String]] must contain("Cliente","Cliente1")
           }
         }
       }

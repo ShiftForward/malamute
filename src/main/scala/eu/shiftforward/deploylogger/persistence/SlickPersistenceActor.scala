@@ -12,6 +12,7 @@ import SlickPersistenceActor.DBConnected
 import slick.dbio.DBIO
 import slick.driver.SQLiteDriver.api._
 import slick.jdbc.meta.MTable
+import scala.collection.mutable
 import scala.compat.Platform._
 import scala.concurrent.{ ExecutionContext, Future }
 
@@ -42,21 +43,21 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
           deploy.configuration
         )
         val deployEvent = EventModel(currentTime, DeployStatus.Started, "", newDeploy.id)
+
+        val inserts: mutable.Buffer[DBIO[Int]] = mutable.Buffer()
+
         val newModules = deploy.modules.map { m =>
-          ModuleModel(m.version, m.state, m.name, deploy.client, newDeploy.id, name)
+          val newModule = ModuleModel(m.version, m.status, m.name, deploy.client, newDeploy.id, name)
+          inserts += modules.filter(mod => mod.name === m.name &&
+            mod.version != m.version &&
+            mod.status != ModuleStatus.Remove).map(_.status).update(ModuleStatus.Remove)
+          inserts += (modules += newModule)
+          newModule
         }
 
-        newModules.map{ m =>
-          db.run(DBIO.seq(
-              modules.filter(mod => mod.name === m.name &&
-                mod.version != m.version &&
-                mod.state != ModuleStatus.Remove)
-                .delete,
-              modules += m
-            )
-          )
-        }
-        db.run(deploys += newDeploy).zip(
+        inserts += (deploys += newDeploy)
+        val sql = DBIO.sequence(inserts.toSeq)
+        db.run(sql).zip(
           db.run(events += deployEvent)
         ).map {
             case _ =>
@@ -72,7 +73,7 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
                 newDeploy.version,
                 newDeploy.automatic,
                 newDeploy.client,
-                newModules.map(m => ResponseModule(m.name, m.version, m.state)),
+                newModules.map(m => ResponseModule(m.name, m.version, m.status)),
                 newDeploy.configuration
               ))
           }
@@ -130,7 +131,7 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
   def getModules(id: String): Future[List[ResponseModule]] = {
     db.run(modules.filter(_.deployID === id).result).map {
       _.map { m =>
-        ResponseModule(m.name, m.version, m.state)
+        ResponseModule(m.name, m.version, m.status)
       }.toList
     }
   }
@@ -194,15 +195,15 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
       }.toList)
     }.map(_.headOption)
   }
-// Future[Option[List[ResponseModule]]]
+
   override def getModules(projName: String, clientName: String): Future[List[ResponseModule]] =  {
     db.run(modules.filter(m => m.projName === projName && m.client === clientName).result).map{ f => {
         val res = f.map{ mod =>
-          ResponseModule(mod.name,mod.version,mod.state)
+          ResponseModule(mod.name,mod.version,mod.status)
         }.toList
-        val removed = res.filter(m => m.state == ModuleStatus.Remove).distinct
-        val added = res.filter(m => m.state == ModuleStatus.Add).distinct
-        added.filter(m => !removed.exists(x => x.name == m.name && x.version == m.version))
+        val removed = res.filter(_.status == ModuleStatus.Remove).distinct
+        val added = res.filter(_.status == ModuleStatus.Add).distinct
+        added.filterNot(m => removed.exists(x => x.name == m.name && x.version == m.version))
       }
     }
   }

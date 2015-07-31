@@ -2,7 +2,7 @@ require 'net/http'
 require 'uri'
 require 'json'
 
-URL = 'http://localhost:8000/'
+URL = 'http://localhost:8000/api/'
 
 module DeployStatus
   STARTED = "STARTED"

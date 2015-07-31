@@ -270,9 +270,12 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
               status === OK
               responseAs[ResponseEvent].status === DeployStatus.Success
             }
-            Get("/project/TestProj/deploy/" + deployId) ~> projectDeployGetRoute ~> check {
-              status === OK
-              responseAs[ResponseDeploy].id === deployId
+            eventually {
+              Get("/project/TestProj/deploy/" + deployId) ~> projectDeployGetRoute ~> check {
+                status === OK
+                responseAs[ResponseDeploy].id === deployId
+                responseAs[ResponseDeploy].modules ===  List(ResponseModule("ModuleX","v0.1",ModuleStatus.Add))
+              }
             }
           }
         }
@@ -337,10 +340,11 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
           ) ~> projectDeployPostRoute ~> check {
             status === OK
             responseAs[ResponseDeploy].user must beEqualTo("testUser")
-
-            Get("/project/TestProj/client/Cliente") ~> projectGetModules ~> check {
-              status === OK
-              responseAs[List[ResponseModule]].head === ResponseModule("ModuleX","v0.2",ModuleStatus.Add)
+            eventually {
+              Get("/project/TestProj/client/Cliente") ~> projectGetModules ~> check {
+                status === OK
+                responseAs[List[ResponseModule]].head === ResponseModule("ModuleX","v0.2",ModuleStatus.Add)
+              }
             }
           }
         }

@@ -43,7 +43,7 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
         )
         val deployEvent = EventModel(currentTime, DeployStatus.Started, "", newDeploy.id)
         val newModules = deploy.modules.map { m =>
-          ModuleModel(m.version, m.state, m.name, deploy.client, newDeploy.id, name)
+          ModuleModel(m.version, m.status, m.name, deploy.client, newDeploy.id, name)
         }
         newModules.map(m => db.run(modules += m))
         db.run(deploys += newDeploy).zip(
@@ -62,7 +62,7 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
                 newDeploy.version,
                 newDeploy.automatic,
                 newDeploy.client,
-                newModules.map(m => ResponseModule(m.name, m.version, m.state)),
+                newModules.map(m => ResponseModule(m.name, m.version, m.status)),
                 newDeploy.configuration
               ))
           }
@@ -120,7 +120,7 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
   def getModules(id: String): Future[List[ResponseModule]] = {
     db.run(modules.filter(_.deployID === id).result).map {
       _.map { m =>
-        ResponseModule(m.name, m.version, m.state)
+        ResponseModule(m.name, m.version, m.status)
       }.toList
     }
   }
@@ -188,10 +188,10 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
   override def getModules(projName: String, clientName: String): Future[List[ResponseModule]] =  {
     db.run(modules.filter(m => m.projName === projName && m.client === clientName).result).map{ f => {
         val res = f.map{ mod =>
-          ResponseModule(mod.name,mod.version,mod.state)
+          ResponseModule(mod.name,mod.version,mod.status)
         }.toList
-        val removed = res.filter(_.state == ModuleStatus.Remove).distinct
-        val added = res.filter(_.state == ModuleStatus.Add).distinct
+        val removed = res.filter(_.status == ModuleStatus.Remove).distinct
+        val added = res.filter(_.status == ModuleStatus.Add).distinct
         added.filterNot(m => removed.exists(x => x.name == m.name && x.version == m.version))
       }
     }

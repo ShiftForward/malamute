@@ -371,12 +371,24 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
           ) ~> projectDeployPostRoute ~> check {
             status === OK
             responseAs[ResponseDeploy].user must beEqualTo("testUser")
-
-            Get("/api/project/TestProj/clients") ~> projectGetClients ~> check {
-              status === OK
-              import spray.json.DefaultJsonProtocol._
-              responseAs[List[String]].head === "Cliente"
-            }
+          }
+          Post("/api/project/TestProj/deploy",
+            RequestDeploy("testUser",
+              Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente1",
+              List(
+                RequestModule("ModuleX","v0.1",ModuleStatus.Add),
+                RequestModule("ModuleX","v0.1",ModuleStatus.Remove),
+                RequestModule("ModuleX","v0.2",ModuleStatus.Add)
+              ), "This config")
+          ) ~> projectDeployPostRoute ~> check {
+            status === OK
+            responseAs[ResponseDeploy].user must beEqualTo("testUser")
+          }
+          Get("/api/project/TestProj/clients") ~> projectGetClients ~> check {
+            status === OK
+            import spray.json.DefaultJsonProtocol._
+            responseAs[List[String]].length === 2
+            responseAs[List[String]] must contain("Cliente","Cliente1")
           }
         }
       }

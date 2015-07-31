@@ -32,7 +32,5 @@ class Modules(tag: Tag) extends Table[ModuleModel](tag, "MODULES") {
   def deploy = foreignKey("DEPLOY_ID", deployID, DBTables.deploys)(_.id)
   def project = foreignKey("PROJ_NAME", projName, DBTables.projects)(_.name)
 
-  def pk = primaryKey("pk_a", (name, deployID))
-
   def * = (version, status, name, client, deployID, projName) <> (ModuleModel.tupled, ModuleModel.unapply)
 }

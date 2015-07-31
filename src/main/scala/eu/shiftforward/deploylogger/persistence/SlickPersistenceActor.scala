@@ -49,7 +49,7 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
         val newModules = deploy.modules.map { m =>
           val newModule = ModuleModel(m.version, m.status, m.name, deploy.client, newDeploy.id, name)
           inserts += modules.filter(mod => mod.name === m.name &&
-            mod.version != m.version &&
+            mod.version.toString() != m.version &&
             mod.status != ModuleStatus.Remove).map(_.status).update(ModuleStatus.Remove)
           inserts += (modules += newModule)
           newModule

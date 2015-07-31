@@ -81,7 +81,7 @@ window.ModulesListView = Backbone.View.extend({
     render: function (eventName) {
         if (this.model.models.length == 0) {
             var nocontent = {xhr: {status: "204", statusText: "No modules found"}}
-            errorWindow(nocontent);
+            simpleErrorModules(nocontent);
         }
         else {
             this.model.models.reverse().forEach(function (mod) {
@@ -307,6 +307,10 @@ var AppRouter = Backbone.Router.extend({
                 this.projView = new ProjectView({model: proj});
                 $('.project-section').html(this.projView.render().el);
                 $('.project-section').append(tabs);
+                $('.nav').on('click',function(){
+                    $('.modulesError').remove();
+                    $('.simpleError').remove();
+                });
                 deployList = new DeployCollection(projname);
                 deployList.fetch({
                     reset: "true",
@@ -314,7 +318,6 @@ var AppRouter = Backbone.Router.extend({
                         deployListView = new DeployListView({model: this.deployList, proj: projname});
                         $.get("/api/project/" + projname + "/clients", function(result){
                             var tpl =  _.template($("#clientsTpl").html());
-                            console.log(result)
                             $('.content-section').html(deployListView.render().el);
                             $('.content-section').html(
                                 '<div class="tab-pane fade active in" id="deploys">' +
@@ -386,13 +389,29 @@ function errorWindow(err) {
 }
 
 function simpleError(err){
-    var error = '<div class="alert alert-dismissible alert-danger">'+
+    $('.simpleError').remove();
+    var error = '<div class="alert alert-dismissible alert-danger simpleError">'+
     '<button type="button" class="close" data-dismiss="alert">×</button>'+
     '<h4>Error!</h4>'+
     '<p>'+err+'</p>'+
     '</div>"';
     $('.content-section').append(error);
 }
+
+function simpleErrorModules(err){
+    $('.modulesError').remove();
+    var error = '<br><div class="alert alert-dismissible alert-danger modulesError" style="margin-top: 10px;">'+
+        '<button type="button" class="close" data-dismiss="alert">' +
+        '&times;' +
+        '</button>'+
+        '<h4>Error!</h4>'+
+        '<p>' + err.xhr.status + ": " + err.xhr.statusText+'</p>'+
+        '</div>';
+    $('.content-section').append(error);
+}
+
+
+
 function showModules (projname, client) {
     modulesList = new ClientModulesModel(projname, client);
     modulesList.fetch({

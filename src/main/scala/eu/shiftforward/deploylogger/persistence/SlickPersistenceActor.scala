@@ -184,15 +184,15 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
       }.toList)
     }.map(_.headOption)
   }
-// Future[Option[List[ResponseModule]]]
+
   override def getModules(projName: String, clientName: String): Future[List[ResponseModule]] =  {
     db.run(modules.filter(m => m.projName === projName && m.client === clientName).result).map{ f => {
         val res = f.map{ mod =>
           ResponseModule(mod.name,mod.version,mod.state)
         }.toList
-        val removed = res.filter(m => m.state == ModuleStatus.Remove).distinct
-        val added = res.filter(m => m.state == ModuleStatus.Add).distinct
-        added.filter(m => !removed.exists(x => x.name == m.name && x.version == m.version))
+        val removed = res.filter(_.state == ModuleStatus.Remove).distinct
+        val added = res.filter(_.state == ModuleStatus.Add).distinct
+        added.filterNot(m => removed.exists(x => x.name == m.name && x.version == m.version))
       }
     }
   }

@@ -186,7 +186,9 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
         }
         eventually {
           Post("/project/TestProj9/deploy",
-            RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente")
+            RequestDeploy("testUser",
+              Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente",
+              List(RequestModule("ModuleX","v0.1",ModuleStatus.Add)), "This config")
           ) ~> projectDeployPostRoute ~> check {
             status === OK
             responseAs[ResponseDeploy].user must beEqualTo("testUser")
@@ -202,7 +204,9 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
           responseAs[ResponseProject].description must beEqualTo("Proj Description Test")
         }
         Post("/project/abc/deploy",
-          RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente")
+          RequestDeploy("testUser",
+            Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente",
+            List(RequestModule("ModuleX","v0.1",ModuleStatus.Add)), "This config")
         ) ~> projectDeployPostRoute ~> check {
           status === NotFound
         }
@@ -219,7 +223,9 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
         }
         eventually {
           Post("/project/TestProj11/deploy",
-            RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente")
+            RequestDeploy("testUser",
+              Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente",
+              List(RequestModule("ModuleX","v0.1",ModuleStatus.Add)), "This config")
           ) ~> projectDeployPostRoute ~> check {
             status === OK
             responseAs[ResponseDeploy].user must beEqualTo("testUser")
@@ -250,7 +256,9 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
         }
         eventually {
           Post("/project/TestProj/deploy",
-            RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente")
+            RequestDeploy("testUser",
+              Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente",
+              List(RequestModule("ModuleX","v0.1",ModuleStatus.Add)), "This config")
           ) ~> projectDeployPostRoute ~> check {
             status === OK
             responseAs[ResponseDeploy].user must beEqualTo("testUser")
@@ -262,9 +270,12 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
               status === OK
               responseAs[ResponseEvent].status === DeployStatus.Success
             }
-            Get("/project/TestProj/deploy/" + deployId) ~> projectDeployGetRoute ~> check {
-              status === OK
-              responseAs[ResponseDeploy].id === deployId
+            eventually {
+              Get("/project/TestProj/deploy/" + deployId) ~> projectDeployGetRoute ~> check {
+                status === OK
+                responseAs[ResponseDeploy].id === deployId
+                responseAs[ResponseDeploy].modules ===  List(ResponseModule("ModuleX","v0.1",ModuleStatus.Add))
+              }
             }
           }
         }
@@ -281,13 +292,17 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
         }
         eventually {
           Post("/project/TestProj13/deploy",
-            RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente")
+            RequestDeploy("testUser",
+              Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente",
+              List(RequestModule("ModuleX","v0.1",ModuleStatus.Add)), "This config")
           ) ~> projectDeployPostRoute ~> check {
             status === OK
             responseAs[ResponseDeploy].user must beEqualTo("testUser")
           }
           Post("/project/TestProj13/deploy",
-            RequestDeploy("testUser", Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente")
+            RequestDeploy("testUser",
+              Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente",
+              List(RequestModule("ModuleX","v0.1",ModuleStatus.Add)), "This config")
           ) ~> projectDeployPostRoute ~> check {
             status === OK
             responseAs[ResponseDeploy].user must beEqualTo("testUser")

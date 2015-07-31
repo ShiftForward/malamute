@@ -1,5 +1,5 @@
 // DateFormat
-var DateFormat  = 'dd/MM/yyyy HH:mm:ss';
+var DateFormat = 'dd/MM/yyyy HH:mm:ss';
 
 // Models
 window.Project = Backbone.Model.extend();
@@ -41,13 +41,13 @@ window.ProjectListView = Backbone.View.extend({
     },
 
     render: function (eventName) {
-        if(this.model.models.length == 0){
+        if (this.model.models.length == 0) {
             var nocontent = {xhr: {status: "204", statusText: "No projects found"}}
             errorWindow(nocontent);
         }
-        else{
+        else {
             this.model.models.reverse().forEach(function (proj) {
-                $(this.el).append(new ProjectListItemView({ model: proj.attributes }).render().el);
+                $(this.el).append(new ProjectListItemView({model: proj.attributes}).render().el);
             }, this);
             return this;
         }
@@ -93,7 +93,7 @@ window.DeployListView = Backbone.View.extend({
             var currentDeploy = deploy.attributes;
             currentDeploy.projname = this.projname;
 
-            $(this.el).append(new DeployListItemView({ model: currentDeploy }).render().el);
+            $(this.el).append(new DeployListItemView({model: currentDeploy}).render().el);
         }, this);
 
         $(this.el).append("</tbody>");
@@ -110,7 +110,7 @@ window.DeployListItemView = Backbone.View.extend({
     render: function (eventName) {
         var deploy = this.model;
         deploy.timestamp = $.format.date(deploy.timestamp, DateFormat);
-        switch (deploy.events[deploy.events.length - 1].status){
+        switch (deploy.events[deploy.events.length - 1].status) {
             case "SUCCESS":
                 deploy.status = "ok";
                 break;
@@ -145,12 +145,13 @@ window.DeployView = Backbone.View.extend({
         deploy = this.model.models[0].attributes;
         deploy.projname = this.projname;
         events = [];
+        modules = [];
         if (deploy.events.length <= 1) {
             deploy.running = true;
         }
         deploy.events.reverse().forEach(function (ev) {
             ev.timestamp = $.format.date(ev.timestamp, DateFormat);
-            switch (ev.status){
+            switch (ev.status) {
                 case "SUCCESS":
                     ev.color = "success";
                     break;
@@ -168,6 +169,20 @@ window.DeployView = Backbone.View.extend({
             }
             events.push(ev);
         }, this);
+        deploy.modules.forEach(function (m) {
+            switch (m.status) {
+                case "ADD":
+                    m.icon = "ok";
+                    m.color = "success";
+                    break;
+                default:
+                    m.icon = "remove";
+                    m.color = "danger";
+            }
+            modules.push(m);
+        }, this);
+        deploy.modules = modules;
+        deploy.events = events;
         deploy.timestamp = $.format.date(deploy.timestamp, DateFormat);
         $(this.el).html(this.template(deploy));
         return this;
@@ -175,19 +190,24 @@ window.DeployView = Backbone.View.extend({
     events: {
         'click #addEvent': 'addEvent'
     },
-    addEvent: function(e) {
+    addEvent: function (e) {
         $.ajax({
             url: $(e.currentTarget).data("url"),
-            type:"POST",
+            type: "POST",
             data: JSON.stringify({
                 status: $("#status").find("option:selected").text(),
                 description: $("#msg").val()
             }),
-            contentType:"application/json",
-            dataType:"json",
-            success: function(){
-                $('#eventModal').modal('toggle');
+            contentType: "application/json",
+            dataType: "json",
+            success: function () {
+                $('#eventModal').modal('hide');
                 Backbone.history.loadUrl(Backbone.history.fragment);
+            },
+            failure: function () {
+                $('#eventModal').modal('hide');
+                Backbone.history.loadUrl(Backbone.history.fragment);
+                simpleError("Error on processing request.");
             }
         })
     }
@@ -218,11 +238,13 @@ var AppRouter = Backbone.Router.extend({
         projectList.fetch({
             // reset:"true",
             success: (function () {
-                this.projectListView = new ProjectListView({ model: projectList });
+                this.projectListView = new ProjectListView({model: projectList});
                 $('.content-section').html("");
                 $('.project-section').html(this.projectListView.render().el);
             }),
-            error: (function (xhr, status, error) { errorWindow(error) })
+            error: (function (xhr, status, error) {
+                errorWindow(error)
+            })
         });
 
     },
@@ -232,19 +254,23 @@ var AppRouter = Backbone.Router.extend({
         proj.fetch({
             reset: "true",
             success: (function () {
-                this.projView = new ProjectView({ model: proj });
+                this.projView = new ProjectView({model: proj});
                 $('.project-section').html(this.projView.render().el);
                 deployList = new DeployCollection(projname);
                 deployList.fetch({
                     reset: "true",
                     success: (function () {
-                        this.deployListView = new DeployListView({ model: this.deployList, proj: projname });
+                        this.deployListView = new DeployListView({model: this.deployList, proj: projname});
                         $('.content-section').html(this.deployListView.render().el);
                     }),
-                    error: (function (xhr, status, error) { errorWindow(error) })
+                    error: (function (xhr, status, error) {
+                        errorWindow(error)
+                    })
                 });
             }),
-            error: (function (xhr, status, error) { errorWindow(error) })
+            error: (function (xhr, status, error) {
+                errorWindow(error)
+            })
         });
 
 
@@ -255,19 +281,23 @@ var AppRouter = Backbone.Router.extend({
         proj.fetch({
             reset: "true",
             success: (function () {
-                this.projView = new ProjectView({ model: proj });
+                this.projView = new ProjectView({model: proj});
                 $('.project-section').html(this.projView.render().el);
                 deployDetails = new DeployModel(projname, id);
                 deployDetails.fetch({
                     reset: "true",
                     success: (function () {
-                        this.deployDetailsView = new DeployView({ model: this.deployDetails, proj: projname });
+                        this.deployDetailsView = new DeployView({model: this.deployDetails, proj: projname});
                         $('.content-section').html(this.deployDetailsView.render().el);
                     }),
-                    error: (function (xhr, status, error) { errorWindow(error) })
+                    error: (function (xhr, status, error) {
+                        errorWindow(error)
+                    })
                 });
             }),
-            error: (function (xhr, status, error) { errorWindow(error) })
+            error: (function (xhr, status, error) {
+                errorWindow(error)
+            })
         });
 
     }
@@ -286,3 +316,11 @@ function errorWindow(err) {
     $('.project-section').html(error);
 }
 
+function simpleError(err){
+    var error = '<div class="alert alert-dismissible alert-danger">'+
+    '<button type="button" class="close" data-dismiss="alert">×</button>'+
+    '<h4>Error!</h4>'+
+    '<p>'+err+'</p>'+
+    '</div>"';
+    $('.content-section').append(error);
+}

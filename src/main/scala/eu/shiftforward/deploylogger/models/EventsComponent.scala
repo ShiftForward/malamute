@@ -2,7 +2,6 @@ package eu.shiftforward.deploylogger.models
 
 import eu.shiftforward.deploylogger.DBTables
 import eu.shiftforward.deploylogger.entities.DeployStatus
-import eu.shiftforward.deploylogger.persistence.SlickPersistenceActor
 import DeployStatus._
 import slick.driver.SQLiteDriver.api._
 

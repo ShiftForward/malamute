@@ -15,7 +15,8 @@ case class DeployModel(
   version: String,
   automatic: Boolean,
   client: String,
-  projName: String
+  projName: String,
+  configuration: String
 )
 
 class Deploys(tag: Tag) extends Table[DeployModel](tag, "DEPLOYS") {
@@ -30,6 +31,7 @@ class Deploys(tag: Tag) extends Table[DeployModel](tag, "DEPLOYS") {
   def automatic = column[Boolean]("AUTOMATIC")
   def client = column[String]("CLIENT")
   def projName = column[String]("PROJNAME")
+  def configuration = column[String]("CONFIGURATION")
 
   def project = foreignKey("PROJNAME", projName, DBTables.projects)(_.name)
 
@@ -44,6 +46,7 @@ class Deploys(tag: Tag) extends Table[DeployModel](tag, "DEPLOYS") {
     version,
     automatic,
     client,
-    projName
+    projName,
+    configuration
   ) <> (DeployModel.tupled, DeployModel.unapply)
 }

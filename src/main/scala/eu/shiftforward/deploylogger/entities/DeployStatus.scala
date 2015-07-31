@@ -18,3 +18,17 @@ object DeployStatus extends Enumeration {
     }
   }
 }
+
+object ModuleStatus extends Enumeration {
+  type ModuleStatus = Value
+  val Add = Value("ADD")
+  val Remove = Value("REMOVE")
+  implicit object ModuleStatusJsonFormat extends RootJsonFormat[ModuleStatus.ModuleStatus] {
+    def write(obj: ModuleStatus.ModuleStatus): JsValue = JsString(obj.toString)
+
+    def read(json: JsValue): ModuleStatus.Value = json match {
+      case JsString(str) => ModuleStatus.withName(str)
+      case _ => throw new Exception("Enum string expected")
+    }
+  }
+}

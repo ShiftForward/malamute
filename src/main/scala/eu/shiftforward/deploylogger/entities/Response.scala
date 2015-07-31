@@ -1,9 +1,16 @@
 package eu.shiftforward.deploylogger.entities
 
 import DeployStatus._
+import eu.shiftforward.deploylogger.entities.ModuleStatus._
 import spray.json.{ RootJsonFormat, DefaultJsonProtocol }
 
 sealed trait Response
+
+case class ResponseModule(
+  name: String,
+  version: String,
+  status: ModuleStatus
+)
 
 case class ResponseProject(
   name: String,
@@ -23,7 +30,9 @@ case class ResponseDeploy(
   id: String,
   version: String,
   automatic: Boolean,
-  client: String
+  client: String,
+  modules: List[ResponseModule],
+  configuration: String
 ) extends Response
 
 case class ResponseEvent(
@@ -37,9 +46,13 @@ object ResponseProject extends DefaultJsonProtocol {
 }
 
 object ResponseDeploy extends DefaultJsonProtocol {
-  implicit val deployFormat: RootJsonFormat[ResponseDeploy] = jsonFormat11(ResponseDeploy.apply)
+  implicit val deployFormat: RootJsonFormat[ResponseDeploy] = jsonFormat13(ResponseDeploy.apply)
 }
 
 object ResponseEvent extends DefaultJsonProtocol {
   implicit val eventFormat: RootJsonFormat[ResponseEvent] = jsonFormat3(ResponseEvent.apply)
+}
+
+object ResponseModule extends DefaultJsonProtocol {
+  implicit val moduleFormat: RootJsonFormat[ResponseModule] = jsonFormat3(ResponseModule.apply)
 }

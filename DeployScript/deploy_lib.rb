@@ -12,11 +12,17 @@ module DeployStatus
   SUCCESS = "SUCCESS"
 end
 
+module ModuleStatus
+  REMOVE = "REMOVE"
+  ADD = "ADD"
+end
+
 class Project
 
   def initialize(project_name)
     @project_name = project_name
     @last_deploy_id = ""
+    @modules = Array.new
   end
 
   def self.new_project(name, description, git)
@@ -69,7 +75,7 @@ class Project
     end
   end
 
-  def add_deploy(description, changelog, version, automatic, client)
+  def start_deploy(description, changelog, version, automatic, client, config)
     #git configurations for current folder
     user =  `git config --get user.name`.chomp!
     commit_branch = `git rev-parse --abbrev-ref HEAD`.chomp!
@@ -83,14 +89,16 @@ class Project
     req.body = {
         user: user,
         commit: {
-        branch: commit_branch,
-        hash: commit_hash
-    },
+            branch: commit_branch,
+            hash: commit_hash
+        },
         description: description,
         changelog: changelog,
         version: version,
         automatic: automatic,
-        client: client
+        client: client,
+        modules: @modules,
+        configuration: config
     }.to_json
 
     res = Net::HTTP.start(uri.hostname, uri.port) do |http|
@@ -103,6 +111,9 @@ class Project
     end
   end
 
+  def with_module(name,version,status)
+    @modules.push({:name => "#{name}", :version =>  "#{version}", :status =>  "#{status}"})
+  end
 
   def add_deploy_event(status, description)
     uri = URI.parse(URL + "project/#{@project_name}/deploy/#{@last_deploy_id}/event")

@@ -7,7 +7,7 @@ import com.typesafe.config.Config
 import com.typesafe.scalalogging.LazyLogging
 import eu.shiftforward.deploylogger.DBTables
 import eu.shiftforward.deploylogger.entities._
-import eu.shiftforward.deploylogger.models.{ EventModel, DeployModel, ProjectModel }
+import eu.shiftforward.deploylogger.models.{ ModuleModel, EventModel, DeployModel, ProjectModel }
 import SlickPersistenceActor.DBConnected
 import slick.dbio.DBIO
 import slick.driver.SQLiteDriver.api._
@@ -38,9 +38,14 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
           deploy.version,
           deploy.automatic,
           deploy.client,
-          name
+          name,
+          deploy.configuration
         )
         val deployEvent = EventModel(currentTime, DeployStatus.Started, "", newDeploy.id)
+        val newModules = deploy.modules.map { m =>
+          ModuleModel(m.version, m.status, m.name, deploy.client, newDeploy.id)
+        }
+        newModules.map(m => db.run(modules += m))
         db.run(deploys += newDeploy).zip(
           db.run(events += deployEvent)
         ).map {
@@ -56,7 +61,9 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
                 newDeploy.id,
                 newDeploy.version,
                 newDeploy.automatic,
-                newDeploy.client
+                newDeploy.client,
+                newModules.map(m => ResponseModule(m.name, m.version, m.status)),
+                newDeploy.configuration
               ))
           }
       }.getOrElse(Future.successful(None))
@@ -110,25 +117,38 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
     }
   }
 
+  def getModules(id: String): Future[List[ResponseModule]] = {
+    db.run(modules.filter(_.deployID === id).result).map {
+      _.map { m =>
+        ResponseModule(m.name, m.version, m.status)
+      }.toList
+    }
+  }
+
   override def getDeploys(name: String, max: Int): Future[List[ResponseDeploy]] = {
-    db.run(deploys.filter(_.projName === name).sortBy(_.timestamp.desc).result).flatMap(f =>
+    db.run(deploys.filter(_.projName === name).sortBy(_.timestamp.desc).result).flatMap { f =>
       Future.sequence(f.map { d =>
-        getEvents(d.id).map { listEvents =>
-          ResponseDeploy(
-            d.user,
-            d.timestamp,
-            d.commitBranch,
-            d.commitHash,
-            d.description,
-            listEvents,
-            d.changelog,
-            d.id,
-            d.version,
-            d.automatic,
-            d.client
-          )
+        getEvents(d.id).flatMap { listEvents =>
+          getModules(d.id).map { listModules =>
+            ResponseDeploy(
+              d.user,
+              d.timestamp,
+              d.commitBranch,
+              d.commitHash,
+              d.description,
+              listEvents,
+              d.changelog,
+              d.id,
+              d.version,
+              d.automatic,
+              d.client,
+              listModules,
+              d.configuration
+            )
+          }
         }
-      }.toList.take(max)))
+      }.toList.take(max))
+    }
   }
 
   override def getProjects: Future[List[ResponseProject]] = {
@@ -142,20 +162,24 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
   override def getDeploy(projName: String, deployId: String): Future[Option[ResponseDeploy]] = {
     db.run(deploys.filter(d => d.projName === projName && d.id === deployId).result.headOption).flatMap { f =>
       Future.sequence(f.map { d =>
-        getEvents(d.id).map { listEvents =>
-          ResponseDeploy(
-            d.user,
-            d.timestamp,
-            d.commitBranch,
-            d.commitHash,
-            d.description,
-            listEvents,
-            d.changelog,
-            d.id,
-            d.version,
-            d.automatic,
-            d.client
-          )
+        getEvents(d.id).flatMap { listEvents =>
+          getModules(d.id).map { listModules =>
+            ResponseDeploy(
+              d.user,
+              d.timestamp,
+              d.commitBranch,
+              d.commitHash,
+              d.description,
+              listEvents,
+              d.changelog,
+              d.id,
+              d.version,
+              d.automatic,
+              d.client,
+              listModules,
+              d.configuration
+            )
+          }
         }
       }.toList)
     }.map(_.headOption)
@@ -172,7 +196,7 @@ class SlickPersistenceActor(config: Config) extends Actor with LazyLogging with 
     db.run(MTable.getTables.headOption).flatMap {
       case None => {
         logger.info("Creating DB.")
-        val ddl = projects.schema ++ deploys.schema ++ events.schema
+        val ddl = projects.schema ++ deploys.schema ++ events.schema ++ modules.schema
         db.run(DBIO.seq(ddl.create)).map(_ => db)
       }
       case Some(_) => {

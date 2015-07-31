@@ -7,7 +7,7 @@ import slick.driver.SQLiteDriver.api._
 
 case class ModuleModel(
   version: String,
-  state: ModuleStatus,
+  status: ModuleStatus,
   name: String,
   client: String,
   deployID: String,
@@ -23,7 +23,7 @@ class Modules(tag: Tag) extends Table[ModuleModel](tag, "MODULES") {
     )
 
   def version = column[String]("VERSION")
-  def state = column[ModuleStatus]("STATE")
+  def status = column[ModuleStatus]("STATUS")
   def client = column[String]("CLIENT")
   def name = column[String]("NAME")
   def deployID = column[String]("DEPLOY_ID")
@@ -32,5 +32,7 @@ class Modules(tag: Tag) extends Table[ModuleModel](tag, "MODULES") {
   def deploy = foreignKey("DEPLOY_ID", deployID, DBTables.deploys)(_.id)
   def project = foreignKey("PROJ_NAME", projName, DBTables.projects)(_.name)
 
-  def * = (version, state, name, client, deployID, projName) <> (ModuleModel.tupled, ModuleModel.unapply)
+  def pk = primaryKey("pk_a", (name, deployID))
+
+  def * = (version, status, name, client, deployID, projName) <> (ModuleModel.tupled, ModuleModel.unapply)
 }

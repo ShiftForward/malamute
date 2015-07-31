@@ -25,7 +25,7 @@ case class Event(
 
 case class Module(
   version: String,
-  state: ModuleStatus,
+  status: ModuleStatus,
   name: String,
   client: String
 )

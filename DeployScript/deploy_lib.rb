@@ -59,7 +59,6 @@ class Project
     "Code: #{res.code} : #{res.body}"
   end
 
-
   def self.open_project(name)
     uri = URI.parse(URL + "project/#{name}")
 
@@ -112,8 +111,8 @@ class Project
     end
   end
 
-  def with_module(name,version,state)
-    @modules.push({:name => "#{name}", :version =>  "#{version}", :state =>  "#{state}"})
+  def with_module(name,version,status)
+    @modules.push({:name => "#{name}", :version =>  "#{version}", :status =>  "#{status}"})
   end
 
   def add_deploy_event(status, description)

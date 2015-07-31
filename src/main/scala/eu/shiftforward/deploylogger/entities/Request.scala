@@ -22,7 +22,7 @@ case class RequestDeploy(
 
 case class RequestEvent(status: DeployStatus, description: String) extends Request
 
-case class RequestModule(name: String, version: String, state: ModuleStatus)
+case class RequestModule(name: String, version: String, status: ModuleStatus)
 
 object RequestEvent extends DefaultJsonProtocol {
   implicit val simpleEventFormat: RootJsonFormat[RequestEvent] = jsonFormat2(RequestEvent.apply)

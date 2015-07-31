@@ -9,7 +9,7 @@ sealed trait Response
 case class ResponseModule(
   name: String,
   version: String,
-  state: ModuleStatus
+  status: ModuleStatus
 )
 
 case class ResponseProject(

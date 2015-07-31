@@ -170,7 +170,7 @@ window.DeployView = Backbone.View.extend({
             events.push(ev);
         }, this);
         deploy.modules.forEach(function (m) {
-            switch (m.state) {
+            switch (m.status) {
                 case "ADD":
                     m.icon = "ok";
                     m.color = "success";

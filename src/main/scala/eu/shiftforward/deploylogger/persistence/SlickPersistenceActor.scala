@@ -44,15 +44,15 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
         )
         val deployEvent = EventModel(currentTime, DeployStatus.Started, "", newDeploy.id)
 
-        val inserts: mutable.Buffer[DBIO[Int]] = mutable.Buffer()
+        val dbOpSequence = mutable.Buffer[DBIO[Int]]()
 
         val newModules = deploy.modules.map { m =>
           val newModule = ModuleModel(m.version, m.status, m.name, deploy.client, newDeploy.id, name)
-          inserts += (modules += newModule)
+          dbOpSequence += (modules += newModule)
           newModule
         }
-        inserts += (deploys += newDeploy)
-        val sql = DBIO.sequence(inserts.toSeq)
+        dbOpSequence += (deploys += newDeploy)
+        val sql = DBIO.sequence(dbOpSequence.toSeq)
         db.run(sql).zip(
           db.run(events += deployEvent)
         ).map {

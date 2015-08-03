@@ -22,7 +22,7 @@ object DeployLoggerService {
   final val json = "application/json; charset=UTF-8"
 }
 
-@Api(value = "/", description = "Deploy Logger Service")
+@Api(value = "/api", description = "Deploy Logger Service")
 trait DeployLoggerService extends HttpService {
 
   import DeployLoggerService._
@@ -42,29 +42,29 @@ trait DeployLoggerService extends HttpService {
     }
   }
 
-  @Path("ping")
+  @Path("/ping")
   @ApiOperation(httpMethod = "GET", response = classOf[String], value = "Returns a pong", produces = "text/plain")
   @ApiResponses(Array(
     new ApiResponse(code = 200, message = "OK")
   ))
-  def pingRoute = path("ping") {
+  def pingRoute = path("api" / "ping") {
     get {
       complete("pong")
     }
   }
 
-  @Path("projects")
+  @Path("/projects")
   @ApiOperation(httpMethod = "GET", response = classOf[List[ResponseProject]], value = "Returns an array of Projects", produces = json)
   @ApiResponses(Array(
     new ApiResponse(code = 200, message = "OK")
   ))
-  def projectsGetRoute = path("projects") {
+  def projectsGetRoute = path("api" / "projects") {
     get {
       complete((actorPersistence ? GetProjects).mapTo[List[ResponseProject]])
     }
   }
 
-  @Path("project")
+  @Path("/project")
   @ApiOperation(httpMethod = "POST", response = classOf[ResponseProject], value = "Returns a Project", consumes = json, produces = "*/*")
   @ApiImplicitParams(Array(
     new ApiImplicitParam(name = "body", value = "Deploy Object", dataType = "eu.shiftforward.deploylogger.entities.RequestProject", required = true, paramType = "body")
@@ -75,7 +75,7 @@ trait DeployLoggerService extends HttpService {
     new ApiResponse(code = 400, message = "BadRequest"),
     new ApiResponse(code = 500, message = "InternalServerError")
   ))
-  def projectPostRoute = path("project") {
+  def projectPostRoute = path("api" / "project") {
     post {
       entity(as[RequestProject]) { proj =>
         complete((actorPersistence ? SaveProject(proj)).mapTo[ResponseProject])
@@ -83,7 +83,7 @@ trait DeployLoggerService extends HttpService {
     }
   }
 
-  @Path("project/{projName}/deploy")
+  @Path("/project/{projName}/deploy")
   @ApiOperation(httpMethod = "POST", response = classOf[ResponseDeploy], value = "Returns a Deploy", consumes = json, produces = "*/*")
   @ApiImplicitParams(Array(
     new ApiImplicitParam(name = "projName", required = true, dataType = "string", paramType = "path", value = "Name of project that needs to be fetched"),
@@ -95,7 +95,7 @@ trait DeployLoggerService extends HttpService {
     new ApiResponse(code = 404, message = "NotFound"),
     new ApiResponse(code = 500, message = "InternalServerError")
   ))
-  def projectDeployPostRoute = path("project" / Segment / "deploy") { name =>
+  def projectDeployPostRoute = path("api" / "project" / Segment / "deploy") { name =>
     post {
       entity(as[RequestDeploy]) { deploy =>
         complete((actorPersistence ? AddDeploy(name, deploy)).mapTo[Option[ResponseDeploy]])
@@ -103,7 +103,7 @@ trait DeployLoggerService extends HttpService {
     }
   }
 
-  @Path("project/{projName}/deploys")
+  @Path("/project/{projName}/deploys")
   @ApiOperation(httpMethod = "GET", response = classOf[List[ResponseDeploy]], value = "Returns a List of Deploy", produces = json)
   @ApiImplicitParams(Array(
     new ApiImplicitParam(name = "projName", required = true, dataType = "string", paramType = "path", value = "Name of project that needs to be fetched")
@@ -112,7 +112,7 @@ trait DeployLoggerService extends HttpService {
     new ApiResponse(code = 200, message = "OK"),
     new ApiResponse(code = 404, message = "NotFound")
   ))
-  def projectDeploysGetRoute = path("project" / Segment / "deploys") { projName =>
+  def projectDeploysGetRoute = path("api" / "project" / Segment / "deploys") { projName =>
     parameters("max".?[Int](10)) { max: Int =>
       get {
         complete((actorPersistence ? GetDeploys(projName, max)).mapTo[List[ResponseDeploy]])
@@ -129,14 +129,14 @@ trait DeployLoggerService extends HttpService {
     new ApiResponse(code = 200, message = "OK"),
     new ApiResponse(code = 404, message = "NotFound")
   ))
-  def projectGetClients = path("project" / Segment / "clients") { projName =>
+  def projectGetClients = path("api" / "project" / Segment / "clients") { projName =>
     get {
       import spray.json.DefaultJsonProtocol._
       complete((actorPersistence ? GetClients(projName)).mapTo[Option[List[String]]])
     }
   }
 
-  @Path("project/{projName}/deploy/{deployId}/event")
+  @Path("/project/{projName}/deploy/{deployId}/event")
   @ApiOperation(httpMethod = "POST", response = classOf[ResponseEvent], value = "Add a event to a deploy", produces = json)
   @ApiImplicitParams(Array(
     new ApiImplicitParam(name = "projName", required = true, dataType = "string", paramType = "path", value = "Name of project that needs to be fetched"),
@@ -147,7 +147,7 @@ trait DeployLoggerService extends HttpService {
     new ApiResponse(code = 200, message = "OK"),
     new ApiResponse(code = 404, message = "NotFound")
   ))
-  def projectDeployEventPostRoute = path("project" / Segment / "deploy" / Segment / "event") { (projName, deployId) =>
+  def projectDeployEventPostRoute = path("api" / "project" / Segment / "deploy" / Segment / "event") { (projName, deployId) =>
     post {
       entity(as[RequestEvent]) { ev =>
         complete((actorPersistence ? AddEvent(projName, deployId, ev)).mapTo[Option[ResponseEvent]])
@@ -155,7 +155,7 @@ trait DeployLoggerService extends HttpService {
     }
   }
 
-  @Path("project/{projName}/deploy/{deployId}")
+  @Path("/project/{projName}/deploy/{deployId}")
   @ApiOperation(httpMethod = "GET", response = classOf[ResponseDeploy], value = "Returns a Deploy", produces = json)
   @ApiImplicitParams(Array(
     new ApiImplicitParam(name = "projName", required = true, dataType = "string", paramType = "path", value = "Name of project that needs to be fetched"),
@@ -165,13 +165,13 @@ trait DeployLoggerService extends HttpService {
     new ApiResponse(code = 200, message = "OK"),
     new ApiResponse(code = 404, message = "NotFound")
   ))
-  def projectDeployGetRoute = path("project" / Segment / "deploy" / Rest) { (projName, deployId) =>
+  def projectDeployGetRoute = path("api" / "project" / Segment / "deploy" / Rest) { (projName, deployId) =>
     get {
       complete((actorPersistence ? GetDeploy(projName, deployId)).mapTo[Option[ResponseDeploy]])
     }
   }
 
-  @Path("project/{projName}/client/{clientName}")
+  @Path("/project/{projName}/client/{clientName}")
   @ApiOperation(httpMethod = "GET", response = classOf[List[ResponseModule]], value = "Returns a Module List", produces = json)
   @ApiImplicitParams(Array(
     new ApiImplicitParam(name = "projName", required = true, dataType = "string", paramType = "path", value = "Name of project that needs to be fetched"),
@@ -181,13 +181,13 @@ trait DeployLoggerService extends HttpService {
     new ApiResponse(code = 200, message = "OK"),
     new ApiResponse(code = 404, message = "NotFound")
   ))
-  def projectGetModules = path("project" / Segment / "client" / Rest) { (projName, clientName) =>
+  def projectGetModules = path("api" / "project" / Segment / "client" / Rest) { (projName, clientName) =>
     get {
       complete((actorPersistence ? GetModules(projName, clientName)).mapTo[Option[List[ResponseModule]]])
     }
   }
 
-  @Path("project/{projName}")
+  @Path("/project/{projName}")
   @ApiOperation(httpMethod = "GET", response = classOf[ResponseProject], value = "Returns a Project", produces = json)
   @ApiImplicitParams(Array(
     new ApiImplicitParam(name = "projName", required = true, dataType = "string", paramType = "path", value = "Name of project that needs to be fetched")
@@ -196,13 +196,13 @@ trait DeployLoggerService extends HttpService {
     new ApiResponse(code = 200, message = "OK"),
     new ApiResponse(code = 404, message = "NotFound")
   ))
-  def projectGetRoute = path("project" / Rest) { name =>
+  def projectGetRoute = path("api" / "project" / Rest) { name =>
     get {
       complete((actorPersistence ? GetProject(name)).mapTo[Option[ResponseProject]])
     }
   }
 
-  @Path("project/{projName}")
+  @Path("/project/{projName}")
   @ApiOperation(httpMethod = "DELETE", response = classOf[ResponseProject], value = "Returns a Project", produces = json)
   @ApiImplicitParams(Array(
     new ApiImplicitParam(name = "projName", required = true, dataType = "string", paramType = "path", value = "Name of project that needs to be fetched")
@@ -211,10 +211,9 @@ trait DeployLoggerService extends HttpService {
     new ApiResponse(code = 200, message = "OK"),
     new ApiResponse(code = 404, message = "NotFound")
   ))
-  def projectDeleteRoute = path("project" / Rest) { name =>
+  def projectDeleteRoute = path("api" / "project" / Rest) { name =>
     delete {
       complete((actorPersistence ? DeleteProject(name)).mapTo[Option[ResponseProject]])
     }
   }
-
 }

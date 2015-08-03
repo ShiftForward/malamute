@@ -147,7 +147,7 @@ class MemoryPersistenceActor extends PersistenceActor {
     }
   }
 
-  override def getModules(projName: String, clientName: String): Future[List[ResponseModule]] = ???
+  override def getModules(projName: String, clientName: String): Future[Option[List[ResponseModule]]] = ???
 
-  override def getClients(projName: String): Future[List[String]] = ???
+  override def getClients(projName: String): Future[Option[List[String]]] = ???
 }

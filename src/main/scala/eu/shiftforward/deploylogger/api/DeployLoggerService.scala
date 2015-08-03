@@ -132,7 +132,7 @@ trait DeployLoggerService extends HttpService {
   def projectGetClients = path("project" / Segment / "clients") { projName =>
     get {
       import spray.json.DefaultJsonProtocol._
-      complete((actorPersistence ? GetClients(projName)).mapTo[List[String]])
+      complete((actorPersistence ? GetClients(projName)).mapTo[Option[List[String]]])
     }
   }
 
@@ -183,7 +183,7 @@ trait DeployLoggerService extends HttpService {
   ))
   def projectGetModules = path("project" / Segment / "client" / Rest) { (projName, clientName) =>
     get {
-      complete((actorPersistence ? GetModules(projName, clientName)).mapTo[List[ResponseModule]])
+      complete((actorPersistence ? GetModules(projName, clientName)).mapTo[Option[List[ResponseModule]]])
     }
   }
 

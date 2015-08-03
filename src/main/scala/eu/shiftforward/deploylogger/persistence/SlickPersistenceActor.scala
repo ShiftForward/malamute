@@ -44,39 +44,35 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
         )
         val deployEvent = EventModel(currentTime, DeployStatus.Started, "", newDeploy.id)
 
-        val inserts: mutable.Buffer[DBIO[Int]] = mutable.Buffer()
+        val dbOpSequence = mutable.Buffer[DBIO[Int]]()
 
         val newModules = deploy.modules.map { m =>
           val newModule = ModuleModel(m.version, m.status, m.name, deploy.client, newDeploy.id, name)
-          inserts += modules.filter(mod => mod.name === m.name &&
-            mod.version.toString() != m.version &&
-            mod.status != ModuleStatus.Remove).map(_.status).update(ModuleStatus.Remove)
-          inserts += (modules += newModule)
+          dbOpSequence += (modules += newModule)
           newModule
         }
-
-        inserts += (deploys += newDeploy)
-        val sql = DBIO.sequence(inserts.toSeq)
+        dbOpSequence += (deploys += newDeploy)
+        val sql = DBIO.sequence(dbOpSequence.toSeq)
         db.run(sql).zip(
           db.run(events += deployEvent)
         ).map {
-            case _ =>
-              Some(ResponseDeploy(
-                newDeploy.user,
-                newDeploy.timestamp,
-                newDeploy.commitBranch,
-                newDeploy.commitHash,
-                newDeploy.description,
-                List(ResponseEvent(deployEvent.timestamp, deployEvent.status, deployEvent.description)),
-                newDeploy.changelog,
-                newDeploy.id,
-                newDeploy.version,
-                newDeploy.automatic,
-                newDeploy.client,
-                newModules.map(m => ResponseModule(m.name, m.version, m.status)),
-                newDeploy.configuration
-              ))
-          }
+          case _ =>
+            Some(ResponseDeploy(
+              newDeploy.user,
+              newDeploy.timestamp,
+              newDeploy.commitBranch,
+              newDeploy.commitHash,
+              newDeploy.description,
+              List(ResponseEvent(deployEvent.timestamp, deployEvent.status, deployEvent.description)),
+              newDeploy.changelog,
+              newDeploy.id,
+              newDeploy.version,
+              newDeploy.automatic,
+              newDeploy.client,
+              newModules.map(m => ResponseModule(m.name, m.version, m.status)),
+              newDeploy.configuration
+            ))
+        }
       }.getOrElse(Future.successful(None))
     }
   }
@@ -196,25 +192,34 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
     }.map(_.headOption)
   }
 
-  override def getModules(projName: String, clientName: String): Future[List[ResponseModule]] = {
-    db.run(modules.filter(m => m.projName === projName && m.client === clientName).result).map { f =>
-      {
-        val res = f.map { mod =>
-          ResponseModule(mod.name, mod.version, mod.status)
-        }.toList
-        val removed = res.filter(_.status == ModuleStatus.Remove).distinct
-        val added = res.filter(_.status == ModuleStatus.Add).distinct
-        added.filterNot(m => removed.exists(x => x.name == m.name && x.version == m.version))
-      }
+  override def getModules(projName: String, clientName: String): Future[Option[List[ResponseModule]]] = {
+    val project: Future[Option[ProjectModel]] = getProjectExists(projName)
+
+    val mods: Future[Future[Option[List[ResponseModule]]]] = project.map {
+      case Some(p) =>
+        db.run(modules.filter(m => m.projName === projName && m.client === clientName).result).map { f =>
+          val res = f.map { mod =>
+            ResponseModule(mod.name, mod.version, mod.status)
+          }.toList
+          val removed = res.filter(_.status == ModuleStatus.Remove).distinct
+          val added = res.filter(_.status == ModuleStatus.Add).distinct
+          added.filterNot(m => removed.exists(x => x.name == m.name && x.version == m.version))
+        }.map(Option(_))
+      case None => Future.successful(None)
     }
+    mods.flatMap(identity)
   }
 
-  override def getClients(projName: String): Future[List[String]] = {
-    db.run(deploys.filter(_.projName === projName).sortBy(_.timestamp.desc).result).map { f =>
-      f.map {
-        d => d.client
-      }.toList.distinct
+  override def getClients(projName: String): Future[Option[List[String]]] = {
+    val project: Future[Option[ProjectModel]] = getProjectExists(projName)
+
+    val clients: Future[Future[Option[List[String]]]] = project.map {
+      case Some(p) =>
+        db.run(deploys.filter(_.projName === projName).sortBy(_.timestamp.desc).result)
+          .map(_.map(_.client).toList.distinct).map(Option(_))
+      case None => Future.successful(None)
     }
+    clients.flatMap(identity)
   }
 }
 

@@ -36,29 +36,29 @@ class DeployLoggerActor(config: Config) extends Actor with HttpService with Depl
 
   def receive = runRoute(
     pingRoute ~
-    projectGetModules ~
-    projectGetClients ~
-    projectPostRoute ~
-    projectsGetRoute ~
-    projectDeployPostRoute ~
-    projectDeploysGetRoute ~
-    projectDeployEventPostRoute ~
-    projectDeployGetRoute ~
-    projectGetRoute ~
-    projectDeleteRoute ~
-    swaggerService.routes ~
-    get {
-      path("swagger") {
-        getFromResource("swagger-ui/index.html")
+      projectGetModules ~
+      projectGetClients ~
+      projectPostRoute ~
+      projectsGetRoute ~
+      projectDeployPostRoute ~
+      projectDeploysGetRoute ~
+      projectDeployEventPostRoute ~
+      projectDeployGetRoute ~
+      projectGetRoute ~
+      projectDeleteRoute ~
+      swaggerService.routes ~
+      get {
+        path("swagger") {
+          getFromResource("swagger-ui/index.html")
+        } ~
+          getFromResourceDirectory("swagger-ui")
       } ~
-        getFromResourceDirectory("swagger-ui")
-    } ~
-    get {
-      pathEndOrSingleSlash {
-        getFromResource("webapp/index.html")
-      } ~
-        getFromResourceDirectory("webapp")
-    }
+      get {
+        pathEndOrSingleSlash {
+          getFromResource("webapp/index.html")
+        } ~
+          getFromResourceDirectory("webapp")
+      }
   )
 }
 

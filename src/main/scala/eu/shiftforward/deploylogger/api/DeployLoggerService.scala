@@ -11,7 +11,7 @@ import eu.shiftforward.deploylogger.entities._
 import eu.shiftforward.deploylogger.persistence._
 import spray.http.StatusCodes._
 import spray.httpx.SprayJsonSupport._
-import spray.routing.{Route, ExceptionHandler, HttpService}
+import spray.routing.{ Route, ExceptionHandler, HttpService }
 import spray.util.LoggingContext
 
 import scala.concurrent.ExecutionContext

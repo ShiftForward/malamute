@@ -51,8 +51,8 @@ trait PersistenceActor extends Actor with API {
       getDeploys(projName, max).pipeTo(sender())
     case GetDeploy(projName, deployId) =>
       getDeploy(projName, deployId).pipeTo(sender())
-    case GetModules(projName,clientName) =>
-      getModules(projName,clientName).pipeTo(sender())
+    case GetModules(projName, clientName) =>
+      getModules(projName, clientName).pipeTo(sender())
     case GetClients(projName) =>
       getClients(projName).pipeTo(sender())
   }

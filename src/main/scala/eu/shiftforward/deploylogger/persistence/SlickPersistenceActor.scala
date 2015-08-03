@@ -19,6 +19,7 @@ import scala.concurrent.{ ExecutionContext, Future }
 class SlickQueryingActor(db: Database) extends PersistenceActor {
 
   import DBTables._
+
   override implicit def ec: ExecutionContext = context.dispatcher
 
   private def getProjectExists(name: String) = {
@@ -56,23 +57,23 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
         db.run(sql).zip(
           db.run(events += deployEvent)
         ).map {
-            case _ =>
-              Some(ResponseDeploy(
-                newDeploy.user,
-                newDeploy.timestamp,
-                newDeploy.commitBranch,
-                newDeploy.commitHash,
-                newDeploy.description,
-                List(ResponseEvent(deployEvent.timestamp, deployEvent.status, deployEvent.description)),
-                newDeploy.changelog,
-                newDeploy.id,
-                newDeploy.version,
-                newDeploy.automatic,
-                newDeploy.client,
-                newModules.map(m => ResponseModule(m.name, m.version, m.status)),
-                newDeploy.configuration
-              ))
-          }
+          case _ =>
+            Some(ResponseDeploy(
+              newDeploy.user,
+              newDeploy.timestamp,
+              newDeploy.commitBranch,
+              newDeploy.commitHash,
+              newDeploy.description,
+              List(ResponseEvent(deployEvent.timestamp, deployEvent.status, deployEvent.description)),
+              newDeploy.changelog,
+              newDeploy.id,
+              newDeploy.version,
+              newDeploy.automatic,
+              newDeploy.client,
+              newModules.map(m => ResponseModule(m.name, m.version, m.status)),
+              newDeploy.configuration
+            ))
+        }
       }.getOrElse(Future.successful(None))
     }
   }
@@ -192,34 +193,34 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
     }.map(_.headOption)
   }
 
-  override def getModules(projName: String, clientName: String): Future[Option[List[ResponseModule]]] =  {
-    db.run(modules.filter(m => m.projName === projName && m.client === clientName).result).map{ f => {
-        val res = f.map{ mod =>
-          ResponseModule(mod.name,mod.version,mod.status)
-        }.toList
-        if(res.nonEmpty) {
+  override def getModules(projName: String, clientName: String): Future[Option[List[ResponseModule]]] = {
+    val project: Future[Option[ProjectModel]] = getProjectExists(projName)
+
+    val mods: Future[Future[Option[List[ResponseModule]]]] = project.map {
+      case Some(p) =>
+        db.run(modules.filter(m => m.projName === projName && m.client === clientName).result).map { f =>
+          val res = f.map { mod =>
+            ResponseModule(mod.name, mod.version, mod.status)
+          }.toList
           val removed = res.filter(_.status == ModuleStatus.Remove).distinct
           val added = res.filter(_.status == ModuleStatus.Add).distinct
-          Some(added.filterNot(m => removed.exists(x => x.name == m.name && x.version == m.version)))
-        }
-        else
-          None
-      }
+          added.filterNot(m => removed.exists(x => x.name == m.name && x.version == m.version))
+        }.map(Option(_))
+      case None => Future.successful(None)
     }
+    mods.flatMap(identity)
   }
 
   override def getClients(projName: String): Future[Option[List[String]]] = {
-    db.run(deploys.filter(_.projName === projName).sortBy(_.timestamp.desc).result).map { f =>
-      val res = f.map {
-        d => {
-          d.client
-        }
-      }.toList.distinct
-      if(res.nonEmpty)
-        Some(res)
-      else
-        None
+    val project: Future[Option[ProjectModel]] = getProjectExists(projName)
+
+    val clients: Future[Future[Option[List[String]]]] = project.map {
+      case Some(p) =>
+        db.run(deploys.filter(_.projName === projName).sortBy(_.timestamp.desc).result)
+          .map(_.map(_.client).toList.distinct).map(Option(_))
+      case None => Future.successful(None)
     }
+    clients.flatMap(identity)
   }
 }
 

@@ -370,7 +370,7 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
           }
         }
         eventually {
-          Get("/project/TestProj/client/ClienteXPTO") ~> projectGetModules ~> check {
+          Get("/project/ProjNonExistent/client/Cliente") ~> projectGetModules ~> check {
             status === NotFound
           }
         }

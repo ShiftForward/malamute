@@ -58,6 +58,36 @@
     </div>
 </script>
 
+<script id="modulesTpl" type="text/template">
+    <div class="col-md-12">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h2 class="panel-title">Client: <%= client %></h2>
+            </div>
+            <div class="panel-body">
+                <% _.each(modules, function(m){ %>
+                <div class="col-md-4">
+                    <div class="list-group-item" style="padding: 7px;margin-bottom:5px">
+                        <h6>
+                            <span style="float:right; margin-left: 2px" class="label label-primary">
+                                <%= m.version %>
+                            </span>
+                        </h6>
+                        <h6>
+                            <span style="float:left; margin-right: 5px;" class="label label-success">
+                                <span class="glyphicon glyphicon-ok" aria-hidden="true">
+                                </span>
+                            </span>
+                        </h6>
+                        <h6> <%= m.name %></h6>
+                    </div>
+                </div>
+                <% }); %>
+            </div>
+        </div>
+    </div>
+</script>
+
 <script id="projectTpl" type="text/template">
     <div class="panel panel-primary">
         <div class="panel-heading">
@@ -88,23 +118,6 @@
             </div>
             <div class="panel-body">
                 <p>Version: <%= version %></p>
-            </div>
-        </div>
-    </div>
-</script>
-
-<script id="clientsTpl" type="text/template">
-    <div class="col-lg-12">
-        <div>
-            <div class="btn-group">
-                <a id="current" class="btn btn-default">Select Client</a>
-                <a aria-expanded="false" href="#" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></a>
-                <ul class="dropdown-menu">
-                    <% _.each(clients, function(c){ %>
-                        <li><a><%= c %></a></li>
-                    <% }); %>
-                </ul>
-                <hr>
             </div>
         </div>
     </div>
@@ -157,7 +170,7 @@
                                 </span>
                             </h6>
                             <h6>
-                                <span style="float:left" class="label label-<%= m.color %>">
+                                <span style="float:left;margin-right: 5px;" class="label label-<%= m.color %>">
                                     <span class="glyphicon glyphicon-<%= m.icon %>" aria-hidden="true">
                                     </span>
                                 </span>

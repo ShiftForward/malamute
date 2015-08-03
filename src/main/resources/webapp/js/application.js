@@ -23,8 +23,8 @@ window.ProjectModel = Backbone.Collection.extend({
 
 window.ClientModulesModel = Backbone.Collection.extend({
     model: Modules,
-    initialize: function (id,clientName) {
-        this.url = "/api/project/"+id+"/client/"+clientName
+    initialize: function (id, clientName) {
+        this.url = "/api/project/" + id + "/client/" + clientName
     }
 });
 
@@ -44,10 +44,10 @@ window.DeployCollection = Backbone.Collection.extend({
 
 // Views
 
-var tabs = '<div>'+
-    '<ul class="nav nav-tabs" style="border-bottom: 1px solid #DDD">'+
-    '<li class="active"><a aria-expanded="true" href="#deploys" data-toggle="tab">Deploys</a></li>'+
-    '<li class=""><a aria-expanded="false" href="#clients" data-toggle="tab">Clients</a></li>'+
+var tabs = '<div>' +
+    '<ul class="nav nav-tabs" style="border-bottom: 1px solid #DDD">' +
+    '<li class="active"><a aria-expanded="true" href="#deploys" data-toggle="tab">Deploys</a></li>' +
+    '<li class=""><a aria-expanded="false" href="#clients" data-toggle="tab">Modules</a></li>' +
     '</ul><br></div>';
 
 window.ProjectListView = Backbone.View.extend({
@@ -79,17 +79,8 @@ window.ModulesListView = Backbone.View.extend({
     },
 
     render: function (eventName) {
-        if (this.model.models.length == 0) {
-            var nocontent = {xhr: {status: "204", statusText: "No modules found"}}
-            simpleErrorModules(nocontent);
-        }
-        else {
-            this.model.models.reverse().forEach(function (mod) {
-                $(this.el).append(new ModulesListItemView({model: mod.attributes}).render().el);
-            }, this);
-            return this;
-        }
-
+        $(this.el).append(new ModulesListItemView({model: mod.attributes}).render().el);
+        return this;
     }
 
 });
@@ -108,7 +99,7 @@ window.ProjectListItemView = Backbone.View.extend({
 
 window.ModulesListItemView = Backbone.View.extend({
 
-    template: _.template($('#modulesListTpl').html()),
+    template: _.template($('#modulesTpl').html()),
 
     render: function (eventName) {
         $(this.el).html(this.template(this.model));
@@ -307,7 +298,7 @@ var AppRouter = Backbone.Router.extend({
                 this.projView = new ProjectView({model: proj});
                 $('.project-section').html(this.projView.render().el);
                 $('.project-section').append(tabs);
-                $('.nav').on('click',function(){
+                $('.nav').on('click', function () {
                     $('.modulesError').remove();
                     $('.simpleError').remove();
                 });
@@ -316,24 +307,24 @@ var AppRouter = Backbone.Router.extend({
                     reset: "true",
                     success: (function () {
                         deployListView = new DeployListView({model: this.deployList, proj: projname});
-                        $.get("/api/project/" + projname + "/clients", function(result){
-                            var tpl =  _.template($("#clientsTpl").html());
+                        $.get("/api/project/" + projname + "/clients", function (result) {
+                            var tpl = _.template($("#modulesTpl").html());
                             $('.content-section').html(deployListView.render().el);
                             $('.content-section').html(
                                 '<div class="tab-pane fade active in" id="deploys">' +
                                 $('.content-section').html()
                                 + '</div>'
-                            )
-                            $('.content-section').append(
-                                '<div class="tab-pane fade" id="clients">' +
-                                tpl({clients: result,projName:projname}) +
-                                '</div>'
                             );
-                            $(".dropdown-menu li a").click(function(){
-                                showModules(projname,$(this).text())
-                                $("#current").text($(this).text());
-                                $("#current").val($(this).text());
-                            })
+
+                            var resultHtml = '<div class="tab-pane fade" id="clients"></div>';
+                            $('.content-section').append(resultHtml)
+                            result.forEach(function (client) {
+                                $.get("/api/project/" + projname + "/client/" + client, function (data) {
+                                    $('#clients').append(tpl({client: client, modules: data}));
+                                })
+                            }, this)
+
+
                         });
 
                     }),
@@ -388,41 +379,12 @@ function errorWindow(err) {
     $('.project-section').html(error);
 }
 
-function simpleError(err){
+function simpleError(err) {
     $('.simpleError').remove();
-    var error = '<div class="alert alert-dismissible alert-danger simpleError">'+
-    '<button type="button" class="close" data-dismiss="alert">×</button>'+
-    '<h4>Error!</h4>'+
-    '<p>'+err+'</p>'+
-    '</div>"';
+    var error = '<div class="alert alert-dismissible alert-danger simpleError">' +
+        '<button type="button" class="close" data-dismiss="alert">ï¿½</button>' +
+        '<h4>Error!</h4>' +
+        '<p>' + err + '</p>' +
+        '</div>"';
     $('.content-section').append(error);
-}
-
-function simpleErrorModules(err){
-    $('.modulesError').remove();
-    var error = '<br><div class="alert alert-dismissible alert-danger modulesError" style="margin-top: 10px;">'+
-        '<button type="button" class="close" data-dismiss="alert">' +
-        '&times;' +
-        '</button>'+
-        '<h4>Error!</h4>'+
-        '<p>' + err.xhr.status + ": " + err.xhr.statusText+'</p>'+
-        '</div>';
-    $('.content-section').append(error);
-}
-
-
-
-function showModules (projname, client) {
-    modulesList = new ClientModulesModel(projname, client);
-    modulesList.fetch({
-        // reset:"true",
-        success: (function () {
-            this.modulesListView = new ModulesListView({model: modulesList});
-            $('.currentModules').remove();
-            $('#clients').append(this.modulesListView.render().el);
-        }),
-        error: (function (xhr, status, error) {
-            errorWindow(error)
-        })
-    })
 }

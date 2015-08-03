@@ -319,6 +319,133 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
         }
       }
     }
+    "handle /project/:name/client/:clientName" in {
+      "return a 'JSON list obj Module' response for GET requests" in new MockDeployLoggerService {
+        Post("/project",
+          RequestProject("TestProj", "Proj Description Test", "http://bitbucket.com/abc")
+        ) ~> projectPostRoute ~> check {
+          status === OK
+          responseAs[ResponseProject].name must beEqualTo("TestProj")
+          responseAs[ResponseProject].description must beEqualTo("Proj Description Test")
+        }
+        eventually {
+          Post("/project/TestProj/deploy",
+            RequestDeploy("testUser",
+              Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente",
+              List(
+                RequestModule("ModuleX", "v0.1", ModuleStatus.Add),
+                RequestModule("ModuleX", "v0.1", ModuleStatus.Remove),
+                RequestModule("ModuleX", "v0.2", ModuleStatus.Add)
+              ), "This config")
+          ) ~> projectDeployPostRoute ~> check {
+            status === OK
+            responseAs[ResponseDeploy].user must beEqualTo("testUser")
+          }
+        }
+        eventually {
+          Get("/project/TestProj/client/Cliente") ~> projectGetModules ~> check {
+            status === OK
+            responseAs[List[ResponseModule]] === List(ResponseModule("ModuleX","v0.2",ModuleStatus.Add))
+          }
+        }
+      }
+      "return a 404-NotFound response for GET requests on a nonExistent Client" in new MockDeployLoggerService {
+        Post("/project",
+          RequestProject("TestProj", "Proj Description Test", "http://bitbucket.com/abc")
+        ) ~> projectPostRoute ~> check {
+          status === OK
+          responseAs[ResponseProject].name must beEqualTo("TestProj")
+          responseAs[ResponseProject].description must beEqualTo("Proj Description Test")
+        }
+        eventually {
+          Post("/project/TestProj/deploy",
+            RequestDeploy("testUser",
+              Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente",
+              List(
+                RequestModule("ModuleX", "v0.1", ModuleStatus.Add)
+              ), "This config")
+          ) ~> projectDeployPostRoute ~> check {
+            status === OK
+            responseAs[ResponseDeploy].user must beEqualTo("testUser")
+          }
+        }
+        eventually {
+          Get("/project/ProjNonExistent/client/Cliente") ~> projectGetModules ~> check {
+            status === NotFound
+          }
+        }
+      }
+    }
+    "handle /project/:name/clients" in {
+      "return a 'JSON list string' response for GET requests" in new MockDeployLoggerService {
+        Post("/project",
+          RequestProject("TestProj", "Proj Description Test", "http://bitbucket.com/abc")
+        ) ~> projectPostRoute ~> check {
+          status === OK
+          responseAs[ResponseProject].name must beEqualTo("TestProj")
+          responseAs[ResponseProject].description must beEqualTo("Proj Description Test")
+        }
+        eventually {
+          Post("/project/TestProj/deploy",
+            RequestDeploy("testUser",
+              Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente",
+              List(
+                RequestModule("ModuleX","v0.1",ModuleStatus.Add),
+                RequestModule("ModuleX","v0.1",ModuleStatus.Remove),
+                RequestModule("ModuleX","v0.2",ModuleStatus.Add)
+              ), "This config")
+          ) ~> projectDeployPostRoute ~> check {
+            status === OK
+            responseAs[ResponseDeploy].user must beEqualTo("testUser")
+          }
+          Post("/project/TestProj/deploy",
+            RequestDeploy("testUser",
+              Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente1",
+              List(
+                RequestModule("ModuleX","v0.1",ModuleStatus.Add),
+                RequestModule("ModuleX","v0.1",ModuleStatus.Remove),
+                RequestModule("ModuleX","v0.2",ModuleStatus.Add)
+              ), "This config")
+          ) ~> projectDeployPostRoute ~> check {
+            status === OK
+            responseAs[ResponseDeploy].user must beEqualTo("testUser")
+          }
+          Get("/project/TestProj/clients") ~> projectGetClients ~> check {
+            status === OK
+            import spray.json.DefaultJsonProtocol._
+            responseAs[List[String]].length === 2
+            responseAs[List[String]] == List("Cliente","Cliente1")
+          }
+        }
+      }
+      "return a 404 response for GET requests on a non-existing Project" in new MockDeployLoggerService {
+        Post("/project",
+          RequestProject("TestProj", "Proj Description Test", "http://bitbucket.com/abc")
+        ) ~> projectPostRoute ~> check {
+          status === OK
+          responseAs[ResponseProject].name must beEqualTo("TestProj")
+          responseAs[ResponseProject].description must beEqualTo("Proj Description Test")
+        }
+        eventually {
+          Post("/project/TestProj/deploy",
+            RequestDeploy("testUser",
+              Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente",
+              List(
+                RequestModule("ModuleX","v0.1",ModuleStatus.Add),
+                RequestModule("ModuleX","v0.1",ModuleStatus.Remove),
+                RequestModule("ModuleX","v0.2",ModuleStatus.Add)
+              ), "This config")
+          ) ~> projectDeployPostRoute ~> check {
+            status === OK
+            responseAs[ResponseDeploy].user must beEqualTo("testUser")
+          }
+
+          Get("/project/NonExistentProj/clients") ~> projectGetClients ~> check {
+            status === NotFound
+          }
+        }
+      }
+    }
   }
   step {
     import java.io._

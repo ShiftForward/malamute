@@ -12,12 +12,14 @@ import SlickPersistenceActor.DBConnected
 import slick.dbio.DBIO
 import slick.driver.SQLiteDriver.api._
 import slick.jdbc.meta.MTable
+import scala.collection.mutable
 import scala.compat.Platform._
 import scala.concurrent.{ ExecutionContext, Future }
 
 class SlickQueryingActor(db: Database) extends PersistenceActor {
 
   import DBTables._
+
   override implicit def ec: ExecutionContext = context.dispatcher
 
   private def getProjectExists(name: String) = {
@@ -42,11 +44,17 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
           deploy.configuration
         )
         val deployEvent = EventModel(currentTime, DeployStatus.Started, "", newDeploy.id)
+
+        val dbOpSequence = mutable.Buffer[DBIO[Int]]()
+
         val newModules = deploy.modules.map { m =>
-          ModuleModel(m.version, m.status, m.name, deploy.client, newDeploy.id)
+          val newModule = ModuleModel(m.version, m.status, m.name, deploy.client, newDeploy.id, name)
+          dbOpSequence += (modules += newModule)
+          newModule
         }
-        newModules.map(m => db.run(modules += m))
-        db.run(deploys += newDeploy).zip(
+        dbOpSequence += (deploys += newDeploy)
+        val sql = DBIO.sequence(dbOpSequence.toSeq)
+        db.run(sql).zip(
           db.run(events += deployEvent)
         ).map {
             case _ =>
@@ -183,6 +191,36 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
         }
       }.toList)
     }.map(_.headOption)
+  }
+
+  override def getModules(projName: String, clientName: String): Future[Option[List[ResponseModule]]] = {
+    val project: Future[Option[ProjectModel]] = getProjectExists(projName)
+
+    val mods: Future[Future[Option[List[ResponseModule]]]] = project.map {
+      case Some(p) =>
+        db.run(modules.filter(m => m.projName === projName && m.client === clientName).result).map { f =>
+          val res = f.map { mod =>
+            ResponseModule(mod.name, mod.version, mod.status)
+          }.toList
+          val removed = res.filter(_.status == ModuleStatus.Remove).distinct
+          val added = res.filter(_.status == ModuleStatus.Add).distinct
+          added.filterNot(m => removed.exists(x => x.name == m.name && x.version == m.version))
+        }.map(Option(_))
+      case None => Future.successful(None)
+    }
+    mods.flatMap(identity)
+  }
+
+  override def getClients(projName: String): Future[Option[List[String]]] = {
+    val project: Future[Option[ProjectModel]] = getProjectExists(projName)
+
+    val clients: Future[Future[Option[List[String]]]] = project.map {
+      case Some(p) =>
+        db.run(deploys.filter(_.projName === projName).sortBy(_.timestamp.desc).result)
+          .map(_.map(_.client).toList.distinct).map(Option(_))
+      case None => Future.successful(None)
+    }
+    clients.flatMap(identity)
   }
 }
 

@@ -36,6 +36,8 @@ class DeployLoggerActor(config: Config) extends Actor with HttpService with Depl
 
   def receive = runRoute(
     pingRoute ~
+      projectGetModules ~
+      projectGetClients ~
       projectPostRoute ~
       projectsGetRoute ~
       projectDeployPostRoute ~

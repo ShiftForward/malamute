@@ -340,12 +340,38 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
           ) ~> projectDeployPostRoute ~> check {
             status === OK
             responseAs[ResponseDeploy].user must beEqualTo("testUser")
-            eventually {
-              Get("/api/project/TestProj/client/Cliente") ~> projectGetModules ~> check {
-                status === OK
-                responseAs[List[ResponseModule]].head === ResponseModule("ModuleX", "v0.2", ModuleStatus.Add)
-              }
-            }
+          }
+        }
+        eventually {
+          Get("/api/project/TestProj/client/Cliente") ~> projectGetModules ~> check {
+            status === OK
+            responseAs[List[ResponseModule]] === List(ResponseModule("ModuleX","v0.2",ModuleStatus.Add))
+          }
+        }
+      }
+      "return a 404-NotFound response for GET requests on a nonExistent Client" in new MockDeployLoggerService {
+        Post("/api/project",
+          RequestProject("TestProj", "Proj Description Test", "http://bitbucket.com/abc")
+        ) ~> projectPostRoute ~> check {
+          status === OK
+          responseAs[ResponseProject].name must beEqualTo("TestProj")
+          responseAs[ResponseProject].description must beEqualTo("Proj Description Test")
+        }
+        eventually {
+          Post("/api/project/TestProj/deploy",
+            RequestDeploy("testUser",
+              Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente",
+              List(
+                RequestModule("ModuleX", "v0.1", ModuleStatus.Add)
+              ), "This config")
+          ) ~> projectDeployPostRoute ~> check {
+            status === OK
+            responseAs[ResponseDeploy].user must beEqualTo("testUser")
+          }
+        }
+        eventually {
+          Get("/api/project/ProjNonExistent/client/Cliente") ~> projectGetModules ~> check {
+            status === NotFound
           }
         }
       }
@@ -388,7 +414,34 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
             status === OK
             import spray.json.DefaultJsonProtocol._
             responseAs[List[String]].length === 2
-            responseAs[List[String]] must contain("Cliente","Cliente1")
+            responseAs[List[String]] == List("Cliente","Cliente1")
+          }
+        }
+      }
+      "return a 404 response for GET requests on a non-existing Project" in new MockDeployLoggerService {
+        Post("/api/project",
+          RequestProject("TestProj", "Proj Description Test", "http://bitbucket.com/abc")
+        ) ~> projectPostRoute ~> check {
+          status === OK
+          responseAs[ResponseProject].name must beEqualTo("TestProj")
+          responseAs[ResponseProject].description must beEqualTo("Proj Description Test")
+        }
+        eventually {
+          Post("/api/project/TestProj/deploy",
+            RequestDeploy("testUser",
+              Commit("abc124ada", "master"), "testestess", "http://google.com/", "1.1.1", false, "Cliente",
+              List(
+                RequestModule("ModuleX","v0.1",ModuleStatus.Add),
+                RequestModule("ModuleX","v0.1",ModuleStatus.Remove),
+                RequestModule("ModuleX","v0.2",ModuleStatus.Add)
+              ), "This config")
+          ) ~> projectDeployPostRoute ~> check {
+            status === OK
+            responseAs[ResponseDeploy].user must beEqualTo("testUser")
+          }
+
+          Get("/api/project/NonExistentProj/clients") ~> projectGetClients ~> check {
+            status === NotFound
           }
         }
       }

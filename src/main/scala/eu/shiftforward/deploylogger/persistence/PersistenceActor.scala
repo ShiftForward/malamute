@@ -25,9 +25,9 @@ trait API {
 
   def getDeploy(projName: String, deployId: String): Future[Option[ResponseDeploy]]
 
-  def getModules(projName: String, clientName: String): Future[List[ResponseModule]]
+  def getModules(projName: String, clientName: String): Future[Option[List[ResponseModule]]]
 
-  def getClients(projName: String): Future[List[String]]
+  def getClients(projName: String): Future[Option[List[String]]]
 }
 
 trait PersistenceActor extends Actor with API {
@@ -51,8 +51,8 @@ trait PersistenceActor extends Actor with API {
       getDeploys(projName, max).pipeTo(sender())
     case GetDeploy(projName, deployId) =>
       getDeploy(projName, deployId).pipeTo(sender())
-    case GetModules(projName,clientName) =>
-      getModules(projName,clientName).pipeTo(sender())
+    case GetModules(projName, clientName) =>
+      getModules(projName, clientName).pipeTo(sender())
     case GetClients(projName) =>
       getClients(projName).pipeTo(sender())
   }

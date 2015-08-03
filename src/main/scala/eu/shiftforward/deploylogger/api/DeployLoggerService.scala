@@ -11,12 +11,12 @@ import eu.shiftforward.deploylogger.entities._
 import eu.shiftforward.deploylogger.persistence._
 import spray.http.StatusCodes._
 import spray.httpx.SprayJsonSupport._
-import spray.routing.{Route, ExceptionHandler, HttpService}
+import spray.routing.{ Route, ExceptionHandler, HttpService }
 import spray.util.LoggingContext
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
-import scala.util.{Failure, Success}
+import scala.util.{ Failure, Success }
 
 object DeployLoggerService {
   final val json = "application/json; charset=UTF-8"
@@ -120,8 +120,8 @@ trait DeployLoggerService extends HttpService {
     }
   }
 
-  @Path("/project/{projName}/clients")
-  @ApiOperation(httpMethod = "GET", response = classOf[List[String]], value = "Returns a List of Deploy", produces = json)
+  @Path("project/{projName}/clients")
+  @ApiOperation(httpMethod = "GET", response = classOf[List[String]], value = "Returns a List of Clients", produces = json)
   @ApiImplicitParams(Array(
     new ApiImplicitParam(name = "projName", required = true, dataType = "string", paramType = "path", value = "Name of project that needs to be fetched")
   ))
@@ -132,7 +132,7 @@ trait DeployLoggerService extends HttpService {
   def projectGetClients = path("api" / "project" / Segment / "clients") { projName =>
     get {
       import spray.json.DefaultJsonProtocol._
-      complete((actorPersistence ? GetClients(projName)).mapTo[List[String]])
+      complete((actorPersistence ? GetClients(projName)).mapTo[Option[List[String]]])
     }
   }
 
@@ -175,7 +175,7 @@ trait DeployLoggerService extends HttpService {
   @ApiOperation(httpMethod = "GET", response = classOf[List[ResponseModule]], value = "Returns a Module List", produces = json)
   @ApiImplicitParams(Array(
     new ApiImplicitParam(name = "projName", required = true, dataType = "string", paramType = "path", value = "Name of project that needs to be fetched"),
-    new ApiImplicitParam(name = "clientName", required = true, dataType = "string", paramType = "path", value = "Client of modules that needs to be fetched")
+    new ApiImplicitParam(name = "clientName", required = true, dataType = "string", paramType = "path", value = "Client that needs to be fetched")
   ))
   @ApiResponses(Array(
     new ApiResponse(code = 200, message = "OK"),
@@ -183,7 +183,7 @@ trait DeployLoggerService extends HttpService {
   ))
   def projectGetModules = path("api" / "project" / Segment / "client" / Rest) { (projName, clientName) =>
     get {
-      complete((actorPersistence ? GetModules(projName, clientName)).mapTo[List[ResponseModule]])
+      complete((actorPersistence ? GetModules(projName, clientName)).mapTo[Option[List[ResponseModule]]])
     }
   }
 

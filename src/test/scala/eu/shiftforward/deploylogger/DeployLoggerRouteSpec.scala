@@ -418,7 +418,7 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
           }
         }
       }
-      "return a 404 response for GET requests on a no existent Project" in new MockDeployLoggerService {
+      "return a 404 response for GET requests on a non-existing Project" in new MockDeployLoggerService {
         Post("/api/project",
           RequestProject("TestProj", "Proj Description Test", "http://bitbucket.com/abc")
         ) ~> projectPostRoute ~> check {

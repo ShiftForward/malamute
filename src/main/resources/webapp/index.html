@@ -155,11 +155,30 @@
              <span class="col-md-4">
                 <span class="glyphicon glyphicon-user" aria-hidden="true"></span> Client: <%= client %>
              </span>
-                    <span class="col-md-4">
-                <span class="glyphicon glyphicon-cog" aria-hidden="true"></span> Configuration: <%= configuration %>
+             <span class="col-md-4">
+                 <a style="cursor: pointer; cursor: hand;" data-toggle="modal" data-target="#configModal">
+                     <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+                     Configuration
+                 </a>
              </span>
-                </h6>
-
+            </h6>
+                    <!-- Modal -->
+            <div class="modal fade" id="configModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" >Configuration</h4>
+                        </div>
+                        <div class="modal-body" style="max-height: 300px;overflow-y: scroll;">
+                            <%= configuration %>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
                 <div class="col-md-12">
                     <h5>Modules</h5>
                     <% _.each(modules, function(m){ %>

@@ -52,10 +52,9 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
           newModule
         }
         dbOpSequence += (deploys += newDeploy)
+        dbOpSequence += (events += deployEvent)
         val sql = DBIO.sequence(dbOpSequence.toSeq)
-        db.run(sql).zip(
-          db.run(events += deployEvent)
-        ).map {
+        db.run(sql).map {
             case _ =>
               Some(ResponseDeploy(
                 newDeploy.user,

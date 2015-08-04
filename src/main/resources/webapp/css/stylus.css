@@ -1,0 +1,3 @@
+.progress .progress-bar.reversed{
+    animation-direction: reverse;
+}

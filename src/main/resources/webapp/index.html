@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <link rel="stylesheet" href="css/bootstrap.css" media="screen">
+    <link rel="stylesheet" href="css/stylus.css">
 </head>
 <body>
 <div class="navbar navbar-default navbar-fixed-top">
@@ -132,7 +133,7 @@
             </div>
             <% if (deploy.running) { %>
             <div class="progress progress-striped active" style="margin-bottom:0px">
-                <div class="progress-bar" style="width: 100%; animation-direction: reverse"></div>
+                <div class="progress-bar reversed" style="width: 100%" ></div>
             </div>
             <% } %>
             <div class="panel-body">

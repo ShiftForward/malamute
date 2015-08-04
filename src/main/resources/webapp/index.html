@@ -104,7 +104,7 @@
 <script id="deployTpl" type="text/template">
     <th><span class='glyphicon glyphicon-<%= status %>' aria-hidden="true"></span></th>
     <th><%= timestamp %></th>
-    <th><%= description %></th>
+    <th style="text-overflow:ellipsis;"><%= description %></th>
     <th><%= version %></th>
     <th><%= user %></th>
     <th><%= client %></th>
@@ -131,7 +131,7 @@
                 <h3 class="panel-title">Deploy at <%= timestamp %></h3>
             </div>
             <% if (deploy.running) { %>
-            <div class="progress progress-striped active" style="margin-bottom:0px">
+            <div class="progress progress-striped active" style="margin-bottom:0px; animation-direction: reverse">
                 <div class="progress-bar" style="width: 100%"></div>
             </div>
             <% } %>

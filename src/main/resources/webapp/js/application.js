@@ -151,6 +151,8 @@ window.DeployListItemView = Backbone.View.extend({
     render: function (eventName) {
         var deploy = this.model;
         deploy.timestamp = $.format.date(deploy.timestamp, DateFormat);
+        if(deploy.description.length>=80)
+            deploy.description = deploy.description.substring(0, 76)+"...";
         if (deploy.events[deploy.events.length - 1]) {
             switch (deploy.events[deploy.events.length - 1].status) {
                 case "SUCCESS":

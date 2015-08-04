@@ -27,7 +27,7 @@ $.fn.pageMe = function(opts){
 
     if (settings.showPrevNext){
         $('<li><a href="#" class="prev_link" style="border-radius: 0px;">' +
-            '<span class="glyphicon glyphicon-backward" aria-hidden="true"></span>' +
+            '<span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>' +
             '</a></li>').appendTo(pager);
     }
 
@@ -39,7 +39,7 @@ $.fn.pageMe = function(opts){
 
     if (settings.showPrevNext){
         $('<li><a href="#" class="next_link" style="border-radius: 0px;">' +
-            '<span class="glyphicon glyphicon-forward" aria-hidden="true"></span></a>' +
+            '<span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span></a>' +
             '</li>').appendTo(pager);
     }
 

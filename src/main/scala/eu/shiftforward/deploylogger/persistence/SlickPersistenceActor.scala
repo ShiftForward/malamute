@@ -6,6 +6,7 @@ import akka.pattern.pipe
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.LazyLogging
 import eu.shiftforward.deploylogger.DBTables
+import eu.shiftforward.deploylogger.DBTables._
 import eu.shiftforward.deploylogger.entities._
 import eu.shiftforward.deploylogger.models.{ ModuleModel, EventModel, DeployModel, ProjectModel }
 import SlickPersistenceActor.DBConnected
@@ -52,10 +53,9 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
           newModule
         }
         dbOpSequence += (deploys += newDeploy)
+        dbOpSequence += (events += deployEvent)
         val sql = DBIO.sequence(dbOpSequence.toSeq)
-        db.run(sql).zip(
-          db.run(events += deployEvent)
-        ).map {
+        db.run(sql).map {
             case _ =>
               Some(ResponseDeploy(
                 newDeploy.user,

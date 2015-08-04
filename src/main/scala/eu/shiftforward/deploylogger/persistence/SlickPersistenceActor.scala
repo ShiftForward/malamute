@@ -55,23 +55,23 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
         dbOpSequence += (events += deployEvent)
         val sql = DBIO.sequence(dbOpSequence.toSeq)
         db.run(sql).map {
-            case _ =>
-              Some(ResponseDeploy(
-                newDeploy.user,
-                newDeploy.timestamp,
-                newDeploy.commitBranch,
-                newDeploy.commitHash,
-                newDeploy.description,
-                List(ResponseEvent(deployEvent.timestamp, deployEvent.status, deployEvent.description)),
-                newDeploy.changelog,
-                newDeploy.id,
-                newDeploy.version,
-                newDeploy.automatic,
-                newDeploy.client,
-                newModules.map(m => ResponseModule(m.name, m.version, m.status)),
-                newDeploy.configuration
-              ))
-          }
+          case _ =>
+            Some(ResponseDeploy(
+              newDeploy.user,
+              newDeploy.timestamp,
+              newDeploy.commitBranch,
+              newDeploy.commitHash,
+              newDeploy.description,
+              List(ResponseEvent(deployEvent.timestamp, deployEvent.status, deployEvent.description)),
+              newDeploy.changelog,
+              newDeploy.id,
+              newDeploy.version,
+              newDeploy.automatic,
+              newDeploy.client,
+              newModules.map(m => ResponseModule(m.name, m.version, m.status)),
+              newDeploy.configuration
+            ))
+        }
       }.getOrElse(Future.successful(None))
     }
   }

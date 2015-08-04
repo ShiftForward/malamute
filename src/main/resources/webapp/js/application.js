@@ -38,7 +38,7 @@ window.DeployModel = Backbone.Collection.extend({
 window.DeployCollection = Backbone.Collection.extend({
     model: Deploy,
     initialize: function (id) {
-        this.url = "/api/project/" + id + "/deploys";
+        this.url = "/api/project/" + id + "/deploys?max=20";
     }
 });
 
@@ -151,21 +151,26 @@ window.DeployListItemView = Backbone.View.extend({
     render: function (eventName) {
         var deploy = this.model;
         deploy.timestamp = $.format.date(deploy.timestamp, DateFormat);
-        switch (deploy.events[deploy.events.length - 1].status) {
-            case "SUCCESS":
-                deploy.status = "ok";
-                break;
-            case "FAILED":
-                deploy.status = "remove";
-                break;
-            case "SKIPPED":
-                deploy.status = "question";
-                break;
-            case "LOG":
-                deploy.status = "info";
-                break;
-            default:
-                deploy.status = "exclamation";
+        if (deploy.events[deploy.events.length - 1]) {
+            switch (deploy.events[deploy.events.length - 1].status) {
+                case "SUCCESS":
+                    deploy.status = "ok-sign";
+                    break;
+                case "FAILED":
+                    deploy.status = "remove-sign";
+                    break;
+                case "SKIPPED":
+                    deploy.status = "question-sign";
+                    break;
+                case "LOG":
+                    deploy.status = "info-sign";
+                    break;
+                default:
+                    deploy.status = "cloud-upload";
+            }
+        }
+        else {
+            deploy.status = "info-sign";
         }
         $(this.el).html(this.template(deploy));
         return this;

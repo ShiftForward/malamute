@@ -153,19 +153,19 @@ window.DeployListItemView = Backbone.View.extend({
         deploy.timestamp = $.format.date(deploy.timestamp, DateFormat);
         switch (deploy.events[deploy.events.length - 1].status) {
             case "SUCCESS":
-                deploy.status = "ok";
+                deploy.status = "ok-sign";
                 break;
             case "FAILED":
-                deploy.status = "remove";
+                deploy.status = "remove-sign";
                 break;
             case "SKIPPED":
-                deploy.status = "question";
+                deploy.status = "question-sign";
                 break;
             case "LOG":
-                deploy.status = "info";
+                deploy.status = "info-sign";
                 break;
             default:
-                deploy.status = "exclamation";
+                deploy.status = "cloud-upload";
         }
         $(this.el).html(this.template(deploy));
         return this;

@@ -151,7 +151,7 @@ window.DeployListItemView = Backbone.View.extend({
     render: function (eventName) {
         var deploy = this.model;
         deploy.timestamp = $.format.date(deploy.timestamp, DateFormat);
-        if(deploy.events[deploy.events.length - 1]){
+        if (deploy.events[deploy.events.length - 1]) {
             switch (deploy.events[deploy.events.length - 1].status) {
                 case "SUCCESS":
                     deploy.status = "ok-sign";
@@ -169,7 +169,7 @@ window.DeployListItemView = Backbone.View.extend({
                     deploy.status = "cloud-upload";
             }
         }
-        else{
+        else {
             deploy.status = "info-sign";
         }
         $(this.el).html(this.template(deploy));

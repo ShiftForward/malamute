@@ -95,6 +95,7 @@
         </div>
         <div class="panel-body">
             <p>Description: <%= description %></p>
+
             <p><a href="<%= git %>"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> <%= git %></a></p>
         </div>
     </div>
@@ -204,7 +205,8 @@
                                         <input type="text" class="form-control" id="msg" placeholder="Example">
                                     </div>
                                     <button class="btn btn-primary"
-                                            data-url="/api/project/<%= projname %>/deploy/<%= id %>/event" id="addEvent">
+                                            data-url="/api/project/<%= projname %>/deploy/<%= id %>/event"
+                                            id="addEvent">
                                         Add Event
                                     </button>
                                 </form>

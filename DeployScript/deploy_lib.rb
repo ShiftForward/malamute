@@ -117,27 +117,6 @@ class Deploy
       raise "Code: #{res.code} : #{res.body}"
     end
   end
-  
-  def add_deploy_event(status, description)
-    uri = URI.parse(URL + "project/#{@project_name}/deploy/#{@last_deploy_id}/event")
-
-    req = Net::HTTP::Post.new(uri.request_uri)
-    req['Content-Type'] = 'application/json'
-
-    req.body = {
-        status: status,
-        description: description
-    }.to_json
-
-    res = Net::HTTP.start(uri.hostname, uri.port) do |http|
-      http.request(req)
-    end
-    if res.kind_of?(Net::HTTPSuccess)
-      res.body
-    else
-      raise "Code: #{res.code} : #{res.body}"
-    end
-  end
     
   def with_module(name,version,status)
     @modules.push({:name => "#{name}", :version =>  "#{version}", :status =>  "#{status}"})

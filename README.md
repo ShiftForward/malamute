@@ -2,7 +2,7 @@
 
 ### Deploy Logger Service
 
-The Deploy Logger Service is built for controlling and record the release of new versions of projects (deploys) and it's modules.
+The Deploy Logger Service is built for documenting and record the release of new versions of projects (deploys) and it's modules.
 
 The core of the project was developed using Scala and [Spray](http://spray.io/) providing a RESTful API documented trough [Swagger](http://swagger.io/). 
 A webapp for viewing information built in [Backbone](http://backbonejs.org/) and [Bootstrap Paper Template](https://bootswatch.com/paper/).
@@ -46,13 +46,12 @@ A configuration file is available in `/src/main/resources/reference.conf`.
     get /api/ping
         Returns a pong
 
-More information is available trough Swagger on `http://localhost:8000/swagger`
+More information is available at Swagger on `http://localhost:8000/swagger`
 
 ## Build & Run
 
 ### Building
 
-    sbt update
     sbt compile
     
 ### Run
@@ -82,6 +81,6 @@ We encourage you to contribute to Malamute! Submit bug reports and suggestions f
 
 ## Licenses
 
-Copyright (c) 2015 ShiftForward, Lda. See LICENSE for details.
+Copyright (c) 2015 ShiftForward S.A.. See LICENSE for details.
 
 [![ShiftForward](http://cdn.shiftforward.eu/wp-content/uploads/2015/01/ShiftForward_logo_new-01.png)](http://www.shiftforward.eu/)

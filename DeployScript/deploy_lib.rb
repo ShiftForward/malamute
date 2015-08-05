@@ -80,7 +80,6 @@ class Deploy
     @client = client
     @last_deploy_id = "" 
     @project_name = project_name
-    self
   end
   
   def start()

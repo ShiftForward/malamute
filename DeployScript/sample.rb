@@ -1,3 +1,5 @@
+#!/usr/bin/env ruby
+
 require_relative 'deploy_lib'
 
 if __FILE__ == $0

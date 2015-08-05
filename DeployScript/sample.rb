@@ -3,8 +3,11 @@
 require_relative 'deploy_lib'
 
 if __FILE__ == $0
-  p1 = Project.open_project('malamute')
-  p1 = Project.open_project('malamute')
+
+  URL = "http://localhost:8000/api/"
+
+  sdk = DeployLoggerSDK.new(URL)
+  p1 = sdk.open_project('malamute')
   d1 = p1.new_deploy('TESTESTE version', 'https://bitbucket.org/shiftforward/malamute',
                 'v0.2132', false, 'KuantoKusta', "This config")
     .with_module("ABCD!","SNAPSHOT 2.0",ModuleStatus::ADD)

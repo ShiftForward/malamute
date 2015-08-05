@@ -2,7 +2,6 @@ require 'net/http'
 require 'uri'
 require 'json'
 
-URL = 'http://localhost:8000/api/'
 
 module DeployStatus
   STARTED = "STARTED"
@@ -17,14 +16,16 @@ module ModuleStatus
   ADD = "ADD"
 end
 
-class Project
+$URL = ""
 
-  def initialize(project_name)
-    @project_name = project_name
+class DeployLoggerSDK
+
+  def initialize(url)
+    $URL = url
   end
 
-  def self.new_project(name, description, git)
-    uri = URI.parse(URL + "project")
+  def new_project(name, description, git)
+    uri = URI.parse($URL + "project")
 
     req = Net::HTTP::Post.new(uri.request_uri)
     req['Content-Type'] = 'application/json'
@@ -45,9 +46,9 @@ class Project
       raise "Code: #{res.code} : #{res.body}"
     end
   end
-  
-  def self.open_project(name)
-    uri = URI.parse(URL + "project/#{name}")
+
+  def open_project(name)
+    uri = URI.parse($URL + "project/#{name}")
 
     req = Net::HTTP::Get.new(uri.request_uri)
     req['Content-Type'] = 'application/json'
@@ -60,6 +61,13 @@ class Project
     else
       raise "Code: #{res.code} : #{res.body}"
     end
+  end
+end
+
+class Project
+
+  def initialize(project_name)
+    @project_name = project_name
   end
   
   def new_deploy(description,changelog,version,automatic,client,configuration)
@@ -88,7 +96,7 @@ class Deploy
     commit_branch = `git rev-parse --abbrev-ref HEAD`.chomp!
     commit_hash = `git rev-parse HEAD`.chomp!
 
-    uri = URI.parse(URL + "project/#{@project_name}/deploy")
+    uri = URI.parse($URL + "project/#{@project_name}/deploy")
 
     req = Net::HTTP::Post.new(uri.request_uri)
     req['Content-Type'] = 'application/json'
@@ -125,7 +133,7 @@ class Deploy
   end
   
   def add_event(status, description)
-    uri = URI.parse(URL + "project/#{@project_name}/deploy/#{@last_deploy_id}/event")
+    uri = URI.parse($URL + "project/#{@project_name}/deploy/#{@last_deploy_id}/event")
 
     req = Net::HTTP::Post.new(uri.request_uri)
     req['Content-Type'] = 'application/json'

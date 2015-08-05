@@ -128,7 +128,7 @@ window.DeployListView = Backbone.View.extend({
             "<th>Version</th>" +
             "<th>User</th>" +
             "<th>Client</th>" +
-            "<th>Details</th>" +
+            "<th style='width: 90px;'>Details</th>" +
             "</tr>" +
             "</thead>";
         $(this.el).append(deploysTableHeader);

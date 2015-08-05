@@ -51,6 +51,7 @@
             </div>
             <div class="panel-body">
                 <p>Description: <%= description %></p>
+
                 <p>
                     <a target="_blank" href="<%= git %>">
                         <span class="glyphicon glyphicon-link" aria-hidden="true"></span>
@@ -195,7 +196,7 @@
                     <h5>Modules</h5>
                     <% _.each(modules, function(m){ %>
                     <div class="col-md-4">
-                        <div class="list-group-item unique" >
+                        <div class="list-group-item unique">
                             <h6>
                                 <span class="label shift-version label-primary">
                                     <%= m.version %>

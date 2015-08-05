@@ -240,7 +240,7 @@ window.DeployView = Backbone.View.extend({
         'click #addEvent': 'addEvent',
         'click #downloadButton': 'downloadEvent'
     },
-    downloadEvent: function(e){
+    downloadEvent: function (e) {
         e.preventDefault();
         downloadDiv('config.txt', 'configText', 'text/plain');
     },

@@ -80,6 +80,7 @@ class Deploy
     @client = client
     @last_deploy_id = "" 
     @project_name = project_name
+    self
   end
   
   def start()
@@ -116,10 +117,12 @@ class Deploy
     else
       raise "Code: #{res.code} : #{res.body}"
     end
+    self
   end
     
   def with_module(name,version,status)
     @modules.push({:name => "#{name}", :version =>  "#{version}", :status =>  "#{status}"})
+    self
   end
   
   def with_modules(modules)
@@ -131,6 +134,7 @@ class Deploy
   def with_client(client_name)
     @client = client_name
     @modules = Array.new
+    self
   end
   
   def add_deploy_event(status, description)
@@ -152,6 +156,7 @@ class Deploy
     else
       raise "Code: #{res.code} : #{res.body}"
     end
+    self
   end
   
 end

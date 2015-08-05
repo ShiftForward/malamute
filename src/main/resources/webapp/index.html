@@ -52,7 +52,8 @@
             <div class="panel-body">
                 <p>Description: <%= description %></p>
 
-                <p><a target="_blank" href="<%= git %>"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> <%= git %></a>
+                <p><a target="_blank" href="<%= git %>"><span class="glyphicon glyphicon-link"
+                                                              aria-hidden="true"></span> <%= git %></a>
                 </p>
             </div>
         </div>
@@ -97,7 +98,8 @@
         <div class="panel-body">
             <p>Description: <%= description %></p>
 
-            <p><a target="_blank" href="<%= git %>"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> <%= git %></a></p>
+            <p><a target="_blank" href="<%= git %>"><span class="glyphicon glyphicon-link" aria-hidden="true"></span>
+                <%= git %></a></p>
         </div>
     </div>
 </script>
@@ -105,7 +107,7 @@
 <script id="deployTpl" type="text/template">
     <th><span class='glyphicon glyphicon-<%= status %>' aria-hidden="true"></span></th>
     <th><%= timestamp %></th>
-    <th style="text-overflow:ellipsis;"><%= description %></th>
+    <th><%= description %></th>
     <th><%= version %></th>
     <th><%= user %></th>
     <th><%= client %></th>
@@ -133,7 +135,7 @@
             </div>
             <% if (deploy.running) { %>
             <div class="progress progress-striped active" style="margin-bottom:0px">
-                <div class="progress-bar reversed" style="width: 100%" ></div>
+                <div class="progress-bar reversed" style="width: 100%"></div>
             </div>
             <% } %>
             <div class="panel-body">
@@ -151,7 +153,8 @@
                 </br>
                 <h6>
              <span class="col-md-4">
-                <a target="_blank" href="<%= changelog %>"> <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Changelog</a>
+                <a target="_blank" href="<%= changelog %>"> <span class="glyphicon glyphicon-file"
+                                                                  aria-hidden="true"></span> Changelog</a>
              </span>
              <span class="col-md-4">
                 <span class="glyphicon glyphicon-user" aria-hidden="true"></span> Client: <%= client %>
@@ -162,24 +165,25 @@
                      Configuration
                  </a>
              </span>
-            </h6>
-                    <!-- Modal -->
-            <div class="modal fade" id="configModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                            <h4 class="modal-title" >Configuration</h4>
-                        </div>
-                        <div class="modal-body" style="max-height: 300px;overflow-y: scroll;">
-                            <%= configuration %>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </h6>
+                <!-- Modal -->
+                <div class="modal fade" id="configModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                        aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Configuration</h4>
+                            </div>
+                            <div class="modal-body" style="max-height: 300px;overflow-y: scroll;">
+                                <%= configuration %>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
                 <div class="col-md-12">
                     <h5>Modules</h5>
                     <% _.each(modules, function(m){ %>

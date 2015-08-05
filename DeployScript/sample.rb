@@ -10,15 +10,15 @@ if __FILE__ == $0
     .with_module("ABCD!","SNAPSHOT 2.0",ModuleStatus::ADD)
     .with_module("ABCD!","SNAPSHOT 2.0",ModuleStatus::ADD)
     .with_module("ABCD!","SNAPSHOT 2.0",ModuleStatus::ADD)
-    .start().add_deploy_event(DeployStatus::LOG, "Information.")
+    .start().add_event(DeployStatus::LOG, "Information.")
 
   n = rand(0..2)
   if n == 0
-    d1.add_deploy_event(DeployStatus::FAILED, "Failed.")
+    d1.add_event(DeployStatus::FAILED, "Failed.")
   elsif n == 1
-    d1.add_deploy_event(DeployStatus::SUCCESS, "Success.")
+    d1.add_event(DeployStatus::SUCCESS, "Success.")
   else
-    d1.add_deploy_event(DeployStatus::SKIPPED, "Skipped.")
+    d1.add_event(DeployStatus::SKIPPED, "Skipped.")
   end
     
   d1.with_client("BlaBlaXPTO")
@@ -30,13 +30,13 @@ if __FILE__ == $0
   d1.start()
 
   
-  d1.add_deploy_event(DeployStatus::LOG, "Information.")
+  d1.add_event(DeployStatus::LOG, "Information.")
   n = rand(0..2)
   if n == 0
-    d1.add_deploy_event(DeployStatus::FAILED, "Failed.")
+    d1.add_event(DeployStatus::FAILED, "Failed.")
   elsif n == 1
-    d1.add_deploy_event(DeployStatus::SUCCESS, "Success.")
+    d1.add_event(DeployStatus::SUCCESS, "Success.")
   else
-    d1.add_deploy_event(DeployStatus::SKIPPED, "Skipped.")
+    d1.add_event(DeployStatus::SKIPPED, "Skipped.")
   end
 end

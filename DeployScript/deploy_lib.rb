@@ -137,7 +137,7 @@ class Deploy
     self
   end
   
-  def add_deploy_event(status, description)
+  def add_event(status, description)
     uri = URI.parse(URL + "project/#{@project_name}/deploy/#{@last_deploy_id}/event")
 
     req = Net::HTTP::Post.new(uri.request_uri)

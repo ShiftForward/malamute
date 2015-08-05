@@ -49,8 +49,8 @@ var tabs = '<div>' +
     '<li class="active"><a aria-expanded="true" href="#deploys" data-toggle="tab">Deploys</a></li>' +
     '<li class=""><a aria-expanded="false" href="#clients" data-toggle="tab">Modules</a></li>' +
     '</ul><br></div>';
-var pager = '<div class="col-md-12 text-center">'+
-    '<ul class="pagination pagination-lg pager" id="myPager"></ul>'+
+var pager = '<div class="col-md-12 text-center">' +
+    '<ul class="pagination pagination-lg pager" id="myPager"></ul>' +
     '</div>';
 
 window.ProjectListView = Backbone.View.extend({
@@ -113,7 +113,7 @@ window.ModulesListItemView = Backbone.View.extend({
 
 window.DeployListView = Backbone.View.extend({
     tagName: 'table',
-    className: 'table table-striped table-hover col-md-12',
+    className: 'table table-striped table-hover col-md-12 table-fixed',
     initialize: function (options) {
         this.model.bind("reset", this.render, this);
         this.projname = options.proj
@@ -122,13 +122,13 @@ window.DeployListView = Backbone.View.extend({
     render: function (eventName) {
         var deploysTableHeader = "<thead>" +
             "<tr>" +
-            "<th>Status</th>" +
+            "<th style='width: 70px;'>Status</th>" +
             "<th>Timestamp</th>" +
-            "<th>Description</th>" +
+            "<th class='col-md-3'>Description</th>" +
             "<th>Version</th>" +
             "<th>User</th>" +
             "<th>Client</th>" +
-            "<th>Details</th>" +
+            "<th style='width: 90px;'>Details</th>" +
             "</tr>" +
             "</thead>";
         $(this.el).append(deploysTableHeader);
@@ -141,7 +141,7 @@ window.DeployListView = Backbone.View.extend({
         }, this);
 
         $(this.el).append("</tbody>");
-         return this;
+        return this;
     }
 
 });
@@ -153,9 +153,7 @@ window.DeployListItemView = Backbone.View.extend({
 
     render: function (eventName) {
         var deploy = this.model;
-        deploy.timestamp = $.format.date(deploy.timestamp, DateFormat);
-        if(deploy.description.length>=60)
-            deploy.description = deploy.description.substring(0, 56)+"...";
+        deploy.timestamp = $.format.prettyDate(deploy.timestamp, DateFormat);
         if (deploy.events[deploy.events.length - 1]) {
             switch (deploy.events[deploy.events.length - 1].status) {
                 case "SUCCESS":
@@ -239,7 +237,12 @@ window.DeployView = Backbone.View.extend({
         return this;
     },
     events: {
-        'click #addEvent': 'addEvent'
+        'click #addEvent': 'addEvent',
+        'click #downloadButton': 'downloadEvent'
+    },
+    downloadEvent: function (e) {
+        e.preventDefault();
+        downloadDiv('config.txt', 'configText', 'text/plain');
     },
     addEvent: function (e) {
         $.ajax({
@@ -322,11 +325,16 @@ var AppRouter = Backbone.Router.extend({
                             $('.content-section').html(deployListView.render().el);
                             $('.content-section').html(
                                 '<div class="tab-pane fade active in" id="deploys">' +
-                                $('.content-section').html()+pager+
-                               '</div>'
+                                $('.content-section').html() + pager +
+                                '</div>'
                             );
 
-                            $("#deployTable").pageMe({pagerSelector:'#myPager',showPrevNext:true,hidePageNumbers:false,perPage:10});
+                            $("#deployTable").pageMe({
+                                pagerSelector: '#myPager',
+                                showPrevNext: true,
+                                hidePageNumbers: false,
+                                perPage: 10
+                            });
 
 
                             var resultHtml = '<div class="tab-pane fade" id="clients"></div>';
@@ -365,6 +373,7 @@ var AppRouter = Backbone.Router.extend({
                     success: (function () {
                         this.deployDetailsView = new DeployView({model: this.deployDetails, proj: projname});
                         $('.content-section').html(this.deployDetailsView.render().el);
+
                     }),
                     error: (function (xhr, status, error) {
                         errorWindow(error)

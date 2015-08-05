@@ -1,3 +1,31 @@
-.progress .progress-bar.reversed{
+.progress .progress-bar.reversed {
     animation-direction: reverse;
 }
+
+.label.shift-version {
+    float: right;
+    margin-left: 2px;
+}
+
+.label.shift-status {
+    float: left;
+    margin-right: 5px;
+}
+
+.text-ellipsis {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 100%;
+    padding-right: 5px;
+}
+
+.list-group-item.unique {
+    padding: 7px;
+    margin-bottom: 5px;
+}
+
+.table-fixed {
+    table-layout: fixed;
+}
+

@@ -52,8 +52,11 @@
             <div class="panel-body">
                 <p>Description: <%= description %></p>
 
-                <p><a target="_blank" href="<%= git %>"><span class="glyphicon glyphicon-link"
-                                                              aria-hidden="true"></span> <%= git %></a>
+                <p>
+                    <a target="_blank" href="<%= git %>">
+                        <span class="glyphicon glyphicon-link" aria-hidden="true"></span>
+                        <%= git %>
+                    </a>
                 </p>
             </div>
         </div>
@@ -69,14 +72,14 @@
             <div class="panel-body">
                 <% _.each(modules, function(m){ %>
                 <div class="col-md-4">
-                    <div class="list-group-item" style="padding: 7px;margin-bottom:5px">
+                    <div class="list-group-item unique">
                         <h6>
-                            <span style="float:right; margin-left: 2px" class="label label-primary">
+                            <span class="label shift-version label-primary">
                                 <%= m.version %>
                             </span>
                         </h6>
                         <h6>
-                            <span style="float:left; margin-right: 5px;" class="label label-success">
+                            <span class="label shift-status label-success">
                                 <span class="glyphicon glyphicon-ok" aria-hidden="true">
                                 </span>
                             </span>
@@ -107,7 +110,11 @@
 <script id="deployTpl" type="text/template">
     <th><span class='glyphicon glyphicon-<%= status %>' aria-hidden="true"></span></th>
     <th><%= timestamp %></th>
-    <th><%= description %></th>
+    <th>
+        <div class="text-ellipsis">
+            <%= description %>
+        </div>
+    </th>
     <th><%= version %></th>
     <th><%= user %></th>
     <th><%= client %></th>
@@ -175,10 +182,11 @@
                                         aria-hidden="true">&times;</span></button>
                                 <h4 class="modal-title">Configuration</h4>
                             </div>
-                            <div class="modal-body" style="max-height: 300px;overflow-y: scroll;">
+                            <div class="modal-body" id="configText" style="max-height: 300px;overflow-y: scroll;">
                                 <%= configuration %>
                             </div>
                             <div class="modal-footer">
+                                <button id="downloadButton" type="button" class="btn btn-primary">Download</button>
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                             </div>
                         </div>
@@ -188,14 +196,14 @@
                     <h5>Modules</h5>
                     <% _.each(modules, function(m){ %>
                     <div class="col-md-4">
-                        <div class="list-group-item" style="padding: 7px;margin-bottom:5px">
+                        <div class="list-group-item unique">
                             <h6>
-                                <span style="float:right; margin-left: 2px" class="label label-primary">
+                                <span class="label shift-version label-primary">
                                     <%= m.version %>
                                 </span>
                             </h6>
                             <h6>
-                                <span style="float:left;margin-right: 5px;" class="label label-<%= m.color %>">
+                                <span class="label shift-status label-<%= m.color %>">
                                     <span class="glyphicon glyphicon-<%= m.icon %>" aria-hidden="true">
                                     </span>
                                 </span>

@@ -82,7 +82,7 @@ class Deploy
     @project_name = project_name
   end
   
-  def start_deploy()
+  def start()
     #git configurations for current folder
     user =  `git config --get user.name`.chomp!
     commit_branch = `git rev-parse --abbrev-ref HEAD`.chomp!
@@ -116,45 +116,25 @@ class Deploy
     else
       raise "Code: #{res.code} : #{res.body}"
     end
-  end
-  
-  def add_deploy_event(status, description)
-    uri = URI.parse(URL + "project/#{@project_name}/deploy/#{@last_deploy_id}/event")
-
-    req = Net::HTTP::Post.new(uri.request_uri)
-    req['Content-Type'] = 'application/json'
-
-    req.body = {
-        status: status,
-        description: description
-    }.to_json
-
-    res = Net::HTTP.start(uri.hostname, uri.port) do |http|
-      http.request(req)
-    end
-    if res.kind_of?(Net::HTTPSuccess)
-      res.body
-    else
-      raise "Code: #{res.code} : #{res.body}"
-    end
+    self
   end
     
   def with_module(name,version,status)
     @modules.push({:name => "#{name}", :version =>  "#{version}", :status =>  "#{status}"})
+    self
   end
-  
-  def with_modules(modules)
-    modules.each do |mod|
-      @modules.push({:name => "#{mod[0]}", :version =>  "#{mod[1]}", :status =>  "#{mod[2]}"})
-    end
+
+  def clear_modules()
+    @modules = Array.new
+    self
   end
-  
+
   def with_client(client_name)
     @client = client_name
-    @modules = Array.new
+    self
   end
   
-  def add_deploy_event(status, description)
+  def add_event(status, description)
     uri = URI.parse(URL + "project/#{@project_name}/deploy/#{@last_deploy_id}/event")
 
     req = Net::HTTP::Post.new(uri.request_uri)
@@ -173,6 +153,7 @@ class Deploy
     else
       raise "Code: #{res.code} : #{res.body}"
     end
+    self
   end
   
 end

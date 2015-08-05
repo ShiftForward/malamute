@@ -237,7 +237,12 @@ window.DeployView = Backbone.View.extend({
         return this;
     },
     events: {
-        'click #addEvent': 'addEvent'
+        'click #addEvent': 'addEvent',
+        'click #downloadButton': 'downloadEvent'
+    },
+    downloadEvent: function(e){
+        e.preventDefault();
+        downloadDiv('config.txt', 'configText', 'text/plain');
     },
     addEvent: function (e) {
         $.ajax({
@@ -368,6 +373,7 @@ var AppRouter = Backbone.Router.extend({
                     success: (function () {
                         this.deployDetailsView = new DeployView({model: this.deployDetails, proj: projname});
                         $('.content-section').html(this.deployDetailsView.render().el);
+
                     }),
                     error: (function (xhr, status, error) {
                         errorWindow(error)

@@ -319,7 +319,7 @@ class DeployLoggerRouteSpec extends Specification with Specs2RouteTest {
         }
       }
     }
-    "handle /project/:name/client/:clientName" in {
+    "handle /api/project/:name/client/:clientName" in {
       "return a 'JSON list obj Module' response for GET requests" in new MockDeployLoggerService {
         Post("/api/project",
           RequestProject("TestProj", "Proj Description Test", "http://bitbucket.com/abc")

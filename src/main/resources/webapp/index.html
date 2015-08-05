@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <link rel="stylesheet" href="css/bootstrap.css" media="screen">
+    <link rel="stylesheet" href="css/stylus.css">
 </head>
 <body>
 <div class="navbar navbar-default navbar-fixed-top">
@@ -27,11 +28,11 @@
 <div style="padding-top: 100px;" class="container">
 
     <!-- Projects Section -->
-    <div class="project-section">
+    <div class="project-section col-md-12">
     </div>
 
     <!-- Deploy Details -->
-    <div class="content-section">
+    <div class="content-section tab-content col-md-12">
     </div>
 
 </div>
@@ -51,8 +52,42 @@
             <div class="panel-body">
                 <p>Description: <%= description %></p>
 
-                <p><a href="<%= git %>"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> <%= git %></a>
+                <p>
+                    <a target="_blank" href="<%= git %>">
+                        <span class="glyphicon glyphicon-link" aria-hidden="true"></span>
+                        <%= git %>
+                    </a>
                 </p>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script id="modulesTpl" type="text/template">
+    <div class="col-md-12">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h2 class="panel-title">Client: <%= client %></h2>
+            </div>
+            <div class="panel-body">
+                <% _.each(modules, function(m){ %>
+                <div class="col-md-4">
+                    <div class="list-group-item unique">
+                        <h6>
+                            <span class="label shift-version label-primary">
+                                <%= m.version %>
+                            </span>
+                        </h6>
+                        <h6>
+                            <span class="label shift-status label-success">
+                                <span class="glyphicon glyphicon-ok" aria-hidden="true">
+                                </span>
+                            </span>
+                        </h6>
+                        <h6> <%= m.name %></h6>
+                    </div>
+                </div>
+                <% }); %>
             </div>
         </div>
     </div>
@@ -61,24 +96,42 @@
 <script id="projectTpl" type="text/template">
     <div class="panel panel-primary">
         <div class="panel-heading">
-            <a href='#<%= name %>' style="color:white"><h2 class="panel-title">Project: <%= name %></h2></a>
+            <a href="#<%= name %>" style="color:white"><h2 class="panel-title">Project: <%= name %></h2></a>
         </div>
         <div class="panel-body">
             <p>Description: <%= description %></p>
 
-            <p><a href="<%= git %>"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> <%= git %></a></p>
+            <p><a target="_blank" href="<%= git %>"><span class="glyphicon glyphicon-link" aria-hidden="true"></span>
+                <%= git %></a></p>
         </div>
     </div>
 </script>
 
 <script id="deployTpl" type="text/template">
-    <th><span class='glyphicon glyphicon-<%= status %>-sign' aria-hidden="true"></span></th>
+    <th><span class='glyphicon glyphicon-<%= status %>' aria-hidden="true"></span></th>
     <th><%= timestamp %></th>
-    <th><%= description %></th>
+    <th>
+        <div class="text-ellipsis">
+            <%= description %>
+        </div>
+    </th>
     <th><%= version %></th>
     <th><%= user %></th>
     <th><%= client %></th>
     <th><a href="#<%= projname %>/<%=id%>">Details</a></th>
+</script>
+
+<script id="modulesListTpl" type="text/template">
+    <div class="col-md-4 currentModules">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h2 class="panel-title">Module: <%= name %></h2>
+            </div>
+            <div class="panel-body">
+                <p>Version: <%= version %></p>
+            </div>
+        </div>
+    </div>
 </script>
 
 <script id="deployDetailTpl" type="text/template">
@@ -89,7 +142,7 @@
             </div>
             <% if (deploy.running) { %>
             <div class="progress progress-striped active" style="margin-bottom:0px">
-                <div class="progress-bar" style="width: 100%"></div>
+                <div class="progress-bar reversed" style="width: 100%"></div>
             </div>
             <% } %>
             <div class="panel-body">
@@ -100,35 +153,57 @@
                     <span class="col-md-4"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span> Version: <%= version %></span>
                     <span class="col-md-4"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> User: <%= user %></span>
               <span class="col-md-4">
-                 <a href="https://bitbucket.org/shiftforward/<%= projname %>/commits/<%=commitHash%>">
+                 <a target="_blank" href="https://bitbucket.org/shiftforward/<%= projname %>/commits/<%=commitHash%>">
                      <span class="glyphicon glyphicon-random" aria-hidden="true"></span> <%= commitBranch %></a>
               </span>
                 </h6>
                 </br>
                 <h6>
              <span class="col-md-4">
-                <a href="<%= changelog %>"> <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Changelog</a>
+                <a target="_blank" href="<%= changelog %>"> <span class="glyphicon glyphicon-file"
+                                                                  aria-hidden="true"></span> Changelog</a>
              </span>
              <span class="col-md-4">
                 <span class="glyphicon glyphicon-user" aria-hidden="true"></span> Client: <%= client %>
              </span>
-                    <span class="col-md-4">
-                <span class="glyphicon glyphicon-cog" aria-hidden="true"></span> Configuration: <%= configuration %>
+             <span class="col-md-4">
+                 <a style="cursor: pointer; cursor: hand;" data-toggle="modal" data-target="#configModal">
+                     <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+                     Configuration
+                 </a>
              </span>
                 </h6>
-
+                <!-- Modal -->
+                <div class="modal fade" id="configModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                        aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Configuration</h4>
+                            </div>
+                            <div class="modal-body" id="configText" style="max-height: 300px;overflow-y: scroll;">
+                                <%= configuration %>
+                            </div>
+                            <div class="modal-footer">
+                                <button id="downloadButton" type="button" class="btn btn-primary">Download</button>
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="col-md-12">
                     <h5>Modules</h5>
                     <% _.each(modules, function(m){ %>
                     <div class="col-md-4">
-                        <div class="list-group-item" style="padding: 7px;margin-bottom:5px">
+                        <div class="list-group-item unique">
                             <h6>
-                                <span style="float:right; margin-left: 2px" class="label label-primary">
+                                <span class="label shift-version label-primary">
                                     <%= m.version %>
                                 </span>
                             </h6>
                             <h6>
-                                <span style="float:left" class="label label-<%= m.color %>">
+                                <span class="label shift-status label-<%= m.color %>">
                                     <span class="glyphicon glyphicon-<%= m.icon %>" aria-hidden="true">
                                     </span>
                                 </span>
@@ -162,7 +237,8 @@
                                         <input type="text" class="form-control" id="msg" placeholder="Example">
                                     </div>
                                     <button class="btn btn-primary"
-                                            data-url="/api/project/<%= projname %>/deploy/<%= id %>/event" id="addEvent">
+                                            data-url="/api/project/<%= projname %>/deploy/<%= id %>/event"
+                                            id="addEvent">
                                         Add Event
                                     </button>
                                 </form>
@@ -195,6 +271,7 @@
         </div>
     </div>
 </script>
+<script src="js/util.js"></script>
 <script src="js/application.js"></script>
 </body>
 </html>

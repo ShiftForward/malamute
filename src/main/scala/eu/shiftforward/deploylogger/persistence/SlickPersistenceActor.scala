@@ -19,7 +19,6 @@ import scala.concurrent.{ ExecutionContext, Future }
 class SlickQueryingActor(db: Database) extends PersistenceActor {
 
   import DBTables._
-
   override implicit def ec: ExecutionContext = context.dispatcher
 
   private def getProjectExists(name: String) = {
@@ -53,27 +52,26 @@ class SlickQueryingActor(db: Database) extends PersistenceActor {
           newModule
         }
         dbOpSequence += (deploys += newDeploy)
+        dbOpSequence += (events += deployEvent)
         val sql = DBIO.sequence(dbOpSequence.toSeq)
-        db.run(sql).zip(
-          db.run(events += deployEvent)
-        ).map {
-            case _ =>
-              Some(ResponseDeploy(
-                newDeploy.user,
-                newDeploy.timestamp,
-                newDeploy.commitBranch,
-                newDeploy.commitHash,
-                newDeploy.description,
-                List(ResponseEvent(deployEvent.timestamp, deployEvent.status, deployEvent.description)),
-                newDeploy.changelog,
-                newDeploy.id,
-                newDeploy.version,
-                newDeploy.automatic,
-                newDeploy.client,
-                newModules.map(m => ResponseModule(m.name, m.version, m.status)),
-                newDeploy.configuration
-              ))
-          }
+        db.run(sql).map {
+          case _ =>
+            Some(ResponseDeploy(
+              newDeploy.user,
+              newDeploy.timestamp,
+              newDeploy.commitBranch,
+              newDeploy.commitHash,
+              newDeploy.description,
+              List(ResponseEvent(deployEvent.timestamp, deployEvent.status, deployEvent.description)),
+              newDeploy.changelog,
+              newDeploy.id,
+              newDeploy.version,
+              newDeploy.automatic,
+              newDeploy.client,
+              newModules.map(m => ResponseModule(m.name, m.version, m.status)),
+              newDeploy.configuration
+            ))
+        }
       }.getOrElse(Future.successful(None))
     }
   }

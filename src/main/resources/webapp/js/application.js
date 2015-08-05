@@ -49,8 +49,8 @@ var tabs = '<div>' +
     '<li class="active"><a aria-expanded="true" href="#deploys" data-toggle="tab">Deploys</a></li>' +
     '<li class=""><a aria-expanded="false" href="#clients" data-toggle="tab">Modules</a></li>' +
     '</ul><br></div>';
-var pager = '<div class="col-md-12 text-center">'+
-    '<ul class="pagination pagination-lg pager" id="myPager"></ul>'+
+var pager = '<div class="col-md-12 text-center">' +
+    '<ul class="pagination pagination-lg pager" id="myPager"></ul>' +
     '</div>';
 
 window.ProjectListView = Backbone.View.extend({
@@ -141,7 +141,7 @@ window.DeployListView = Backbone.View.extend({
         }, this);
 
         $(this.el).append("</tbody>");
-         return this;
+        return this;
     }
 
 });
@@ -153,9 +153,7 @@ window.DeployListItemView = Backbone.View.extend({
 
     render: function (eventName) {
         var deploy = this.model;
-        deploy.timestamp = $.format.date(deploy.timestamp, DateFormat);
-        if(deploy.description.length>=60)
-            deploy.description = deploy.description.substring(0, 56)+"...";
+        deploy.timestamp = $.format.prettyDate(deploy.timestamp, DateFormat);
         if (deploy.events[deploy.events.length - 1]) {
             switch (deploy.events[deploy.events.length - 1].status) {
                 case "SUCCESS":
@@ -322,11 +320,16 @@ var AppRouter = Backbone.Router.extend({
                             $('.content-section').html(deployListView.render().el);
                             $('.content-section').html(
                                 '<div class="tab-pane fade active in" id="deploys">' +
-                                $('.content-section').html()+pager+
-                               '</div>'
+                                $('.content-section').html() + pager +
+                                '</div>'
                             );
 
-                            $("#deployTable").pageMe({pagerSelector:'#myPager',showPrevNext:true,hidePageNumbers:false,perPage:10});
+                            $("#deployTable").pageMe({
+                                pagerSelector: '#myPager',
+                                showPrevNext: true,
+                                hidePageNumbers: false,
+                                perPage: 10
+                            });
 
 
                             var resultHtml = '<div class="tab-pane fade" id="clients"></div>';

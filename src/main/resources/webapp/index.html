@@ -71,12 +71,12 @@
                 <div class="col-md-4">
                     <div class="list-group-item" style="padding: 7px;margin-bottom:5px">
                         <h6>
-                            <span style="float:right; margin-left: 2px" class="label label-primary">
+                            <span class="label shift-version label-primary">
                                 <%= m.version %>
                             </span>
                         </h6>
                         <h6>
-                            <span style="float:left; margin-right: 5px;" class="label label-success">
+                            <span class="label shift-status label-success">
                                 <span class="glyphicon glyphicon-ok" aria-hidden="true">
                                 </span>
                             </span>
@@ -107,7 +107,11 @@
 <script id="deployTpl" type="text/template">
     <th><span class='glyphicon glyphicon-<%= status %>' aria-hidden="true"></span></th>
     <th><%= timestamp %></th>
-    <th><%= description %></th>
+    <th>
+        <div class="text-ellipsis">
+            <%= description %>
+        </div>
+    </th>
     <th><%= version %></th>
     <th><%= user %></th>
     <th><%= client %></th>
@@ -190,12 +194,12 @@
                     <div class="col-md-4">
                         <div class="list-group-item" style="padding: 7px;margin-bottom:5px">
                             <h6>
-                                <span style="float:right; margin-left: 2px" class="label label-primary">
+                                <span class="label shift-version label-primary">
                                     <%= m.version %>
                                 </span>
                             </h6>
                             <h6>
-                                <span style="float:left;margin-right: 5px;" class="label label-<%= m.color %>">
+                                <span class="label shift-status label-<%= m.color %>">
                                     <span class="glyphicon glyphicon-<%= m.icon %>" aria-hidden="true">
                                     </span>
                                 </span>

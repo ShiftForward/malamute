@@ -22,7 +22,7 @@ if __FILE__ == $0
   end
 
   d1.start()
-  
+
   d1.add_event(DeployStatus::LOG, "Information.")
   n = rand(0..2)
   if n == 0

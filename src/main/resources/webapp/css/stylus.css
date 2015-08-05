@@ -20,3 +20,8 @@
     width: 190px;
     padding-right: 5px;
 }
+
+.list-group-item.unique {
+    padding: 7px;
+    margin-bottom:5px;
+}

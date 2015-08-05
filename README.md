@@ -73,14 +73,14 @@ An example of using is available at `/DeployScript/sample.rb`
 
 ## Authors
 
-Malamute was created by João Pedro Dias and supported by Luís Fonseca e Bruno Maia at [ShiftForward](http://www.shiftforward.eu/).
+_Malamute_ was created by João Pedro Dias and supported by Luís Fonseca e Bruno Maia at [ShiftForward](http://www.shiftforward.eu/).
 
 ## Contributing
 
-We encourage you to contribute to Malamute! Submit bug reports and suggestions for improvements through GitHub's issues and your own improvements through pull requests. 
+We encourage you to contribute to _Malamute_! Submit bug reports and suggestions for improvements through GitHub's issues and your own improvements through pull requests. 
 
 ## Licenses
 
-Copyright (c) 2015 ShiftForward S.A.. See LICENSE for details.
+_malamute_ is licensed under MIT. See LICENSE for details.
 
 [![ShiftForward](http://cdn.shiftforward.eu/wp-content/uploads/2015/01/ShiftForward_logo_new-01.png)](http://www.shiftforward.eu/)

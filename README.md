@@ -73,7 +73,7 @@ An example of using is available at `/DeployScript/sample.rb`
 
 ## Authors
 
-_Malamute_ was created by João Pedro Dias and supported by Luís Fonseca e Bruno Maia at [ShiftForward](http://www.shiftforward.eu/).
+_Malamute_ was created by João Pedro Dias and supported by Bruno Maia and Luís Fonseca at [ShiftForward](http://www.shiftforward.eu/).
 
 ## Contributing
 

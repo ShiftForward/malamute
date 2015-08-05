@@ -10,7 +10,7 @@ if __FILE__ == $0
 
   puts d1.with_module("ABCD!","SNAPSHOT 2.0",ModuleStatus::ADD)
 
-  puts d1.start_deploy()
+  puts d1.start()
 
   puts d1.add_deploy_event(DeployStatus::LOG, "Information.")
   n = rand(0..2)
@@ -28,7 +28,7 @@ if __FILE__ == $0
     ["xptox","SNAPSHOT 2.1",ModuleStatus::ADD],
     ["xyz","SNAPSHOT 2.1a",ModuleStatus::ADD]
   ])
-  d1.start_deploy()
+  d1.start()
 
   
   puts d1.add_deploy_event(DeployStatus::LOG, "Information.")

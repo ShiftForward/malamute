@@ -82,7 +82,7 @@ class Deploy
     @project_name = project_name
   end
   
-  def start_deploy()
+  def start()
     #git configurations for current folder
     user =  `git config --get user.name`.chomp!
     commit_branch = `git rev-parse --abbrev-ref HEAD`.chomp!

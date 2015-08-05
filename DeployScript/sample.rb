@@ -21,7 +21,7 @@ if __FILE__ == $0
     d1.add_event(DeployStatus::SKIPPED, "Skipped.")
   end
 
-  d1.clear_modules().with_client("BlaBlaXPTO").start()
+  d1.start()
 
   
   d1.add_event(DeployStatus::LOG, "Information.")

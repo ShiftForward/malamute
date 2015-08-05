@@ -123,16 +123,6 @@ class Deploy
     @modules.push({:name => "#{name}", :version =>  "#{version}", :status =>  "#{status}"})
     self
   end
-
-  def clear_modules()
-    @modules = Array.new
-    self
-  end
-
-  def with_client(client_name)
-    @client = client_name
-    self
-  end
   
   def add_event(status, description)
     uri = URI.parse(URL + "project/#{@project_name}/deploy/#{@last_deploy_id}/event")

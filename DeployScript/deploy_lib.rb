@@ -123,16 +123,14 @@ class Deploy
     @modules.push({:name => "#{name}", :version =>  "#{version}", :status =>  "#{status}"})
     self
   end
-  
-  def with_modules(modules)
-    modules.each do |mod|
-      @modules.push({:name => "#{mod[0]}", :version =>  "#{mod[1]}", :status =>  "#{mod[2]}"})
-    end
+
+  def clear_modules()
+    @modules = Array.new
+    self
   end
-  
+
   def with_client(client_name)
     @client = client_name
-    @modules = Array.new
     self
   end
   

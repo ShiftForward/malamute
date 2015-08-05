@@ -20,14 +20,8 @@ if __FILE__ == $0
   else
     d1.add_event(DeployStatus::SKIPPED, "Skipped.")
   end
-    
-  d1.with_client("BlaBlaXPTO")
-  d1.with_modules([
-    ["ADxda","SNAPSHOT 2.0",ModuleStatus::ADD],
-    ["xptox","SNAPSHOT 2.1",ModuleStatus::ADD],
-    ["xyz","SNAPSHOT 2.1a",ModuleStatus::ADD]
-  ])
-  d1.start()
+
+  d1.clear_modules().with_client("BlaBlaXPTO").start()
 
   
   d1.add_event(DeployStatus::LOG, "Information.")

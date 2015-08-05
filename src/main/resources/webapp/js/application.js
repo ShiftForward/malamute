@@ -113,7 +113,7 @@ window.ModulesListItemView = Backbone.View.extend({
 
 window.DeployListView = Backbone.View.extend({
     tagName: 'table',
-    className: 'table table-striped table-hover col-md-12',
+    className: 'table table-striped table-hover col-md-12 table-fixed',
     initialize: function (options) {
         this.model.bind("reset", this.render, this);
         this.projname = options.proj
@@ -122,9 +122,9 @@ window.DeployListView = Backbone.View.extend({
     render: function (eventName) {
         var deploysTableHeader = "<thead>" +
             "<tr>" +
-            "<th>Status</th>" +
+            "<th style='width: 70px;'>Status</th>" +
             "<th>Timestamp</th>" +
-            "<th>Description</th>" +
+            "<th class='col-md-3'>Description</th>" +
             "<th>Version</th>" +
             "<th>User</th>" +
             "<th>Client</th>" +

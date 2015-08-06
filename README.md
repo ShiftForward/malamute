@@ -13,11 +13,20 @@ Additionally, there is a Ruby SDK for easy integration in Ruby based systems.
 
 ## Screenshots
 
+### Projects Dashboard
+
 ![Dashboard](http://i.imgur.com/LktCURJ.png)
+
+### Project Deploys
 
 ![Deploys](http://i.imgur.com/Poyi3kr.png)
 
+
+### Project Modules
+
 ![Modules](http://i.imgur.com/b0w8xeC.png)
+
+### Deploy Details
 
 ![Deploy Details](http://i.imgur.com/bxrCpOs.png)
 

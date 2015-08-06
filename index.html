@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>Malamute by ShiftForward</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>Malamute</h1>
+        <h2>Deploy Logger Service - Documenting and recording the release of new product versions</h2>
+        <a href="https://github.com/ShiftForward/malamute" class="button"><small>View project on</small> GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h2>
+<a id="malamute" class="anchor" href="#malamute" aria-hidden="true"><span class="octicon octicon-link"></span></a>Malamute</h2>
+
+<h3>
+<a id="deploy-logger-service" class="anchor" href="#deploy-logger-service" aria-hidden="true"><span class="octicon octicon-link"></span></a>Deploy Logger Service</h3>
+
+<p><img src="http://i.imgur.com/es3RMZy.png" alt="DeployLoggerService"></p>
+
+<p>The Deploy Logger Service is built for documenting and record the release of new versions of projects (deploys) and its modules.</p>
+
+<p>The core of the project was developed using Scala and <a href="http://spray.io/">Spray</a> providing a RESTful API documented through <a href="http://swagger.io/">Swagger</a>. 
+A webapp for viewing information built in <a href="http://backbonejs.org/">Backbone</a> and <a href="https://bootswatch.com/paper/">Bootstrap Paper Template</a>.</p>
+
+<p>Additionally, there is a <a href="SDK-Ruby">Ruby SDK</a> for easy integration in Ruby based systems.</p>
+
+<h2>
+<a id="screenshots" class="anchor" href="#screenshots" aria-hidden="true"><span class="octicon octicon-link"></span></a>Screenshots</h2>
+
+<h3>
+<a id="projects-dashboard" class="anchor" href="#projects-dashboard" aria-hidden="true"><span class="octicon octicon-link"></span></a>Projects Dashboard</h3>
+
+<p><img src="http://i.imgur.com/4iLCgOP.png" alt="Dashboard"></p>
+
+<h3>
+<a id="project-deploys" class="anchor" href="#project-deploys" aria-hidden="true"><span class="octicon octicon-link"></span></a>Project Deploys</h3>
+
+<p><img src="http://i.imgur.com/Poyi3kr.png" alt="Deploys"></p>
+
+<h3>
+<a id="project-modules" class="anchor" href="#project-modules" aria-hidden="true"><span class="octicon octicon-link"></span></a>Project Modules</h3>
+
+<p><img src="http://i.imgur.com/b0w8xeC.png" alt="Modules"></p>
+
+<h3>
+<a id="deploy-details" class="anchor" href="#deploy-details" aria-hidden="true"><span class="octicon octicon-link"></span></a>Deploy Details</h3>
+
+<p><img src="http://i.imgur.com/bxrCpOs.png" alt="Deploy Details"></p>
+
+<h2>
+<a id="configuration" class="anchor" href="#configuration" aria-hidden="true"><span class="octicon octicon-link"></span></a>Configuration</h2>
+
+<p>A configuration file is available in <code>/src/main/resources/reference.conf</code>.</p>
+
+<pre><code>logger-service {
+  apiVerion = "0.1"
+  apiConfig = ${api-config}
+  persistence = ${slick-db.sqlite}
+  interface = "0.0.0.0"
+  port = 8000
+}
+</code></pre>
+
+<h2>
+<a id="api-reference" class="anchor" href="#api-reference" aria-hidden="true"><span class="octicon octicon-link"></span></a>API Reference</h2>
+
+<pre><code>get /api/project/{projName}/deploy/{deployId}
+    Returns a Deploy
+get /apiproject/{projName}/clients
+    Returns a List of Clients
+post /api/project/{projName}/deploy/{deployId}/event
+    Add a event to a deploy
+get /api/project/{projName}/client/{clientName}
+    Returns a Module List
+delete /api/project/{projName}
+    Returns a Project
+get /api/project/{projName}
+    Returns a Project
+get /api/project/{projName}/deploys
+    Returns a List of Deploy
+post /api/project/{projName}/deploy
+    Returns a Deploy
+post /api/project
+    Returns a Project
+get /api/projects
+    Returns an array of Projects
+get /api/ping
+    Returns a pong
+</code></pre>
+
+<p>More information is available at Swagger on <code>http://localhost:8000/swagger</code></p>
+
+<h2>
+<a id="build--run" class="anchor" href="#build--run" aria-hidden="true"><span class="octicon octicon-link"></span></a>Build &amp; Run</h2>
+
+<h3>
+<a id="building" class="anchor" href="#building" aria-hidden="true"><span class="octicon octicon-link"></span></a>Building</h3>
+
+<pre><code>sbt compile
+</code></pre>
+
+<h3>
+<a id="run" class="anchor" href="#run" aria-hidden="true"><span class="octicon octicon-link"></span></a>Run</h3>
+
+<pre><code>sbt run
+</code></pre>
+
+<h3>
+<a id="test" class="anchor" href="#test" aria-hidden="true"><span class="octicon octicon-link"></span></a>Test</h3>
+
+<p>Tests are present in <code>/test/scala/eu.shiftforward.deploylogger/DeployLoggerRouteSpec.scala</code></p>
+
+<p>To run the tests simple do</p>
+
+<pre><code>sbt test
+</code></pre>
+
+<h2>
+<a id="utilities" class="anchor" href="#utilities" aria-hidden="true"><span class="octicon octicon-link"></span></a>Utilities</h2>
+
+<p>In addition to the main project there is a <a href="SDK-Ruby">Ruby SDK</a> that simplifies the process of integration the Deploy Logger Service. 
+An example of using is available at <code>/DeployScript/sample.rb</code></p>
+
+<h2>
+<a id="authors" class="anchor" href="#authors" aria-hidden="true"><span class="octicon octicon-link"></span></a>Authors</h2>
+
+<p><em>Malamute</em> was created by João Pedro Dias and supported by Bruno Maia and Luís Fonseca at <a href="http://www.shiftforward.eu/">ShiftForward</a>.</p>
+
+<h2>
+<a id="contributing" class="anchor" href="#contributing" aria-hidden="true"><span class="octicon octicon-link"></span></a>Contributing</h2>
+
+<p>We encourage you to contribute to <em>Malamute</em>! Submit bug reports and suggestions for improvements through GitHub's issues and your own improvements through pull requests. </p>
+
+<h2>
+<a id="licenses" class="anchor" href="#licenses" aria-hidden="true"><span class="octicon octicon-link"></span></a>Licenses</h2>
+
+<p><em>malamute</em> is licensed under MIT. See LICENSE for details.</p>
+
+<p><a href="http://www.shiftforward.eu/"><img src="http://cdn.shiftforward.eu/wp-content/uploads/2015/01/ShiftForward_logo_new-01.png" alt="ShiftForward"></a></p>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/ShiftForward/malamute/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/ShiftForward/malamute/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/ShiftForward/malamute"></a> is maintained by <a href="https://github.com/ShiftForward">ShiftForward</a>.</p>
+
+          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+  
+  </body>
+</html>

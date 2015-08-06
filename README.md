@@ -9,7 +9,7 @@ The Deploy Logger Service is built for documenting and record the release of new
 The core of the project was developed using Scala and [Spray](http://spray.io/) providing a RESTful API documented through [Swagger](http://swagger.io/). 
 A webapp for viewing information built in [Backbone](http://backbonejs.org/) and [Bootstrap Paper Template](https://bootswatch.com/paper/).
 
-Additionally, there is a Ruby SDK for easy integration in Ruby based systems.
+Additionally, there is a [Ruby SDK](SDK-Ruby/README.md) for easy integration in Ruby based systems.
 
 ## Screenshots
 
@@ -89,7 +89,7 @@ To run the tests simple do
     
 ## Utilities
 
-In addition to the main project there is a Ruby SDK that simplifies the process of integration the Deploy Logger Service. 
+In addition to the main project there is a [Ruby SDK](SDK-Ruby/README.md) that simplifies the process of integration the Deploy Logger Service. 
 An example of using is available at `/DeployScript/sample.rb`
 
 ## Authors

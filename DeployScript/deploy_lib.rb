@@ -30,9 +30,9 @@ class DeployLoggerSDK
     req['Content-Type'] = 'application/json'
 
     req.body = {
-        name : name,
-        description : description,
-        git : git
+        name: name,
+        description: description,
+        git: git
     }.to_json
 
     res = Net::HTTP.start(uri.hostname, uri.port) do |http|
@@ -104,18 +104,18 @@ class Deploy
     req['Content-Type'] = 'application/json'
 
     req.body = {
-        user : user,
-        commit : {
-        branch : commit_branch,
-        hash : commit_hash
+        user: user,
+        commit: {
+        branch: commit_branch,
+        hash: commit_hash
     },
-        description : @description,
-        changelog : @changelog,
-        version : @version,
-        automatic : @automatic,
-        client : @client,
-        modules : @modules,
-        configuration : @configuration
+        description: @description,
+        changelog: @changelog,
+        version: @version,
+        automatic: @automatic,
+        client: @client,
+        modules: @modules,
+        configuration: @configuration
     }.to_json
 
     res = Net::HTTP.start(uri.hostname, uri.port) do |http|
@@ -141,8 +141,8 @@ class Deploy
     req['Content-Type'] = 'application/json'
 
     req.body = {
-        status : status,
-        description : description
+        status: status,
+        description: description
     }.to_json
 
     res = Net::HTTP.start(uri.hostname, uri.port) do |http|

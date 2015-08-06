@@ -4,9 +4,9 @@
 
 ![DeployLoggerService](http://i.imgur.com/es3RMZy.png)
 
-The Deploy Logger Service is built for documenting and record the release of new versions of projects (deploys) and it's modules.
+The Deploy Logger Service is built for documenting and record the release of new versions of projects (deploys) and its modules.
 
-The core of the project was developed using Scala and [Spray](http://spray.io/) providing a RESTful API documented trough [Swagger](http://swagger.io/). 
+The core of the project was developed using Scala and [Spray](http://spray.io/) providing a RESTful API documented through [Swagger](http://swagger.io/). 
 A webapp for viewing information built in [Backbone](http://backbonejs.org/) and [Bootstrap Paper Template](https://bootswatch.com/paper/).
 
 Additionally, there is a Ruby SDK for easy integration in Ruby based systems.

@@ -15,7 +15,7 @@ Additionally, there is a Ruby SDK for easy integration in Ruby based systems.
 
 ### Projects Dashboard
 
-![Dashboard](http://i.imgur.com/LktCURJ.png)
+![Dashboard](http://i.imgur.com/4iLCgOP.png)
 
 ### Project Deploys
 

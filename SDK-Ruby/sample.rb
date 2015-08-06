@@ -8,6 +8,9 @@ if __FILE__ == $0
 
   sdk = DeployLoggerSDK.new(URL)
   p1 = sdk.open_project('malamute')
+  #p1 = sdk.new_project('malamute',
+  #                     'Deploy Logger Service',
+  #                     'https://github.com/ShiftForward/malamute')
   p2 = sdk.open_project('ridgeback')
   #p2 = sdk.new_project('ridgeback',
   #                     'Continuous integration service for performance tests',
@@ -21,9 +24,9 @@ if __FILE__ == $0
                                             port = 8000
                                           })
   )
-    .with_module("LogBack","SNAPSHOT 2.0",ModuleStatus::ADD)
-    .with_module("SBT","SNAPSHOT 2.9.0",ModuleStatus::ADD)
-    .with_module("Spray","SNAPSHOT 2.5",ModuleStatus::ADD)
+    .with_module("LogBack","SNAPSHOT 8.1",ModuleStatus::ADD)
+    .with_module("SBT","SNAPSHOT 8.8",ModuleStatus::ADD)
+    .with_module("Spray","SNAPSHOT 8.9",ModuleStatus::ADD)
     .start().add_event(DeployStatus::LOG, "Script started.")
 
   d2 = p2.new_deploy('Update Angular version.', 'http://pastebin.com/HtdMtgiz',
@@ -35,9 +38,9 @@ if __FILE__ == $0
                                             port = 8000
                                           })
   )
-  .with_module("Backbone","SNAPSHOT 2.1",ModuleStatus::ADD)
-  .with_module("Akka","SNAPSHOT 3.0",ModuleStatus::ADD)
-  .with_module("Angular","v3.0.0",ModuleStatus::ADD)
+  .with_module("Backbone","SNAPSHOT 9.1",ModuleStatus::ADD)
+  .with_module("Akka","SNAPSHOT 9.3",ModuleStatus::ADD)
+  .with_module("Angular","v9.2.3",ModuleStatus::ADD)
   .start().add_event(DeployStatus::LOG, "Script started.")
 
   n = rand(0..2)

@@ -36,8 +36,20 @@ if __FILE__ == $0
                                           })
   )
   .with_module("Backbone","SNAPSHOT 2.1",ModuleStatus::ADD)
-  .with_module("Akka","SNAPSHOT 3.1",ModuleStatus::ADD)
+  .with_module("Akka","SNAPSHOT 3.0",ModuleStatus::ADD)
   .with_module("Angular","v3.0.0",ModuleStatus::ADD)
-  .start()
+  .start().add_event(DeployStatus::LOG, "Script started.")
+
+  n = rand(0..2)
+  if n == 0
+    d2.add_event(DeployStatus::SKIPPED, "Already deployed.")
+    d1.add_event(DeployStatus::FAILED, "Failed due to timeout.")
+  elsif n == 1
+    d2.add_event(DeployStatus::FAILED, "Failed due to timeout.")
+    d1.add_event(DeployStatus::SUCCESS, "Success.")
+  else
+    d2.add_event(DeployStatus::SUCCESS, "All good.")
+    d1.add_event(DeployStatus::SKIPPED, "Scheduled for next week.")
+  end
 
 end

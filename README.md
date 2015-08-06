@@ -94,7 +94,7 @@ An example of using is available at `/DeployScript/sample.rb`
 
 ## Authors
 
-_Malamute_ was created by Jo√£o Pedro Dias and supported by Bruno Maia and Lu√≠s Fonseca at [ShiftForward](http://www.shiftforward.eu/).
+_Malamute_ was created by [Jo„o Pedro Dias](http://jpdias.github.io) and supported by [Bruno Maia](https://brunomaia.eu/) and [LuÌs Fonseca](http://www.pimentelfonseca.pt/) at [ShiftForward](http://www.shiftforward.eu/).
 
 ## Contributing
 

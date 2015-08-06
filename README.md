@@ -11,6 +11,16 @@ A webapp for viewing information built in [Backbone](http://backbonejs.org/) and
 
 Additionally, there is a Ruby SDK for easy integration in Ruby based systems.
 
+## Screenshots
+
+![Dashboard](http://i.imgur.com/LktCURJ.png)
+
+![Deploys](http://i.imgur.com/Poyi3kr.png)
+
+![Modules](http://i.imgur.com/b0w8xeC.png)
+
+![Deploy Details](http://i.imgur.com/bxrCpOs.png)
+
 ## Configuration
 
 A configuration file is available in `/src/main/resources/reference.conf`.
@@ -75,7 +85,7 @@ An example of using is available at `/DeployScript/sample.rb`
 
 ## Authors
 
-_Malamute_ was created by Jo„o Pedro Dias and supported by Bruno Maia and LuÌs Fonseca at [ShiftForward](http://www.shiftforward.eu/).
+_Malamute_ was created by Jo√£o Pedro Dias and supported by Bruno Maia and Lu√≠s Fonseca at [ShiftForward](http://www.shiftforward.eu/).
 
 ## Contributing
 

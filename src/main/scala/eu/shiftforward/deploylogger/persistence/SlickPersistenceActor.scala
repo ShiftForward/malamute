@@ -6,6 +6,7 @@ import akka.pattern.pipe
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.LazyLogging
 import eu.shiftforward.deploylogger.DBTables
+import eu.shiftforward.deploylogger.DBTables._
 import eu.shiftforward.deploylogger.entities._
 import eu.shiftforward.deploylogger.models.{ ModuleModel, EventModel, DeployModel, ProjectModel }
 import SlickPersistenceActor.DBConnected

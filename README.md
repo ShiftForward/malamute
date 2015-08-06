@@ -2,6 +2,8 @@
 
 ### Deploy Logger Service
 
+![DeployLoggerService](http://i.imgur.com/es3RMZy.png)
+
 The Deploy Logger Service is built for documenting and record the release of new versions of projects (deploys) and it's modules.
 
 The core of the project was developed using Scala and [Spray](http://spray.io/) providing a RESTful API documented trough [Swagger](http://swagger.io/). 

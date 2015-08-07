@@ -245,6 +245,7 @@ window.DeployView = Backbone.View.extend({
         downloadDiv('config.txt', 'configText', 'text/plain');
     },
     addEvent: function (e) {
+        $('#eventModal').modal('hide');
         $.ajax({
             url: $(e.currentTarget).data("url"),
             type: "POST",
@@ -255,11 +256,9 @@ window.DeployView = Backbone.View.extend({
             contentType: "application/json",
             dataType: "json",
             success: function () {
-                $('#eventModal').modal('hide');
                 Backbone.history.loadUrl(Backbone.history.fragment);
             },
             failure: function () {
-                $('#eventModal').modal('hide');
                 Backbone.history.loadUrl(Backbone.history.fragment);
                 simpleError("Error on processing request.");
             }

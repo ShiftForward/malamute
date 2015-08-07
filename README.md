@@ -69,6 +69,20 @@ A configuration file is available in `/src/main/resources/reference.conf`.
 
 More information is available at Swagger on `http://localhost:8000/swagger`
 
+### Using the API
+
+With this API you can easily integrate the _Deploy Logger Service_ with your existent deploy scripts or services like [jenkins-ci](https://jenkins-ci.org/).
+
+Example of a cURL for creating a project:
+
+```
+curl -X POST --header "Content-Type: application/json; charset=UTF-8" --header "Accept: */*" -d "{
+  \"name\": \"malamute\",
+  \"description\": \"Deploy Logger Service\",
+  \"git\": \"https://github.com/ShiftForward/malamute\"
+}" "http://localhost:8000/api/project"
+```
+
 ## Build & Run
 
 ### Building
